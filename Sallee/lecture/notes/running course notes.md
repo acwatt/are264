@@ -1,4 +1,73 @@
-# 2022-01-
+# 2022-01-25 Instrument Choice
+
+## Prep for lecture 4
+- bCourses prompt for Jacobsen & van Benthem
+- background reading: Borenstein
+
+### Policies used to deal with environmental Externalities
+- Pigouvian tax
+- Tradable emissions permits
+- subsidies for emissions reductions
+- performance standards
+- technology mandates
+- technology R&D subsidies
+- buy back programs
+- voluntary conservations / pollution reduction program
+- regulators determine efficiency standard, then set a revenue cap, which incentivies
+- usage cap / restrictions
+
+G&P:
+Goulder, Lawrence H., and Ian W. H. Parry. “Instrument Choice in Environmental Policy.” Review of Environmental Economics & Policy 2, no. 2 (July 2008): 152–74. https://doi.org/10.1093/reep/ren005.
+
+### Criteria to choose between alternatives (from G&P):
+
+1. Efficiency
+1. Cost effectiveness
+1. Equity/distribution/fairness
+1. Robustness to uncertainty
+1. Political feasibility
+    - input from affected stakeholders / communities (EJ)
+1. Political flexibility or robustness
+1. **Administrative costs**
+1. Enforcement
+1. Spillover effects
+
+--> Economists are cononically excited about instruments that provide cost effectiveness (even without fully achieving efficiency -- the *right* amount of pollution).
+
+--> Difference between regulations and market based instruments: the amount of information required to ensure cost-effectiveness.
+- Direct regulatory mechanisms “less inefficient” when
+heterogeneity limited
+- Performance standards can approach cost effectiveness as
+output-reduction small
+
+
+### Narrow cost effectiveness
+- Cost effectiveness before accounting for administrative costs
+- Administrative costs are often important and can justify an
+alternative policy
+
+
+## Weitzman result, via Pizer and Prest
+
+Weitzman: 
+- relative welfare gains between price and quantity instruments depend on relative slopes between supply and demand
+- 1 period model
+
+Pizer & Prest:
+- quantity instruments can incorporate expectations about the future through banking /borrowing permits
+- quanitity instruments (permits) can lead to first-best outcomes in the simple model because the gov't takes a while to update the policy
+- Calculated the SCC at the end as a realistic measure of how large the difference would be between a price or quantity instrument. How quickly can people change their minds, how often do beliefs get updated? ==> how big is the difference in order of magnitude?
+
+
+## Publishing
+- If you're a junior faculty member trying to get tenure: always try to publish in general interest (top 5). These are the ones that get you your first job/tenure/outside offers
+- actually impacting your field: sometimes publishing in the top field-specific journal can have more impact and lead to more citiations.
+- hard to publish this type of applied theory in a top journal without an empirical application
+we
+**Look at Hindrick Kleven early applied theory papers in field journals.**
+
+Paper: empirical application of Pizer and Prest
+
 
 
 
