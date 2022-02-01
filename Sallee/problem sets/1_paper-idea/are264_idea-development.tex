@@ -1,9 +1,9 @@
 \documentclass[12pt]{article}
-\usepackage{preamble}
-\graphicspath{{pics/PS1/}}
+\usepackage{../preamble}
+\graphicspath{{pics/leaks_paper/}}
 \begin{document}
 % \maketitle
-\chead{Problem Set 1}
+\chead{Leaks Paper Idea}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                  Definitions                %
@@ -25,156 +25,183 @@
 %%%%%%%%%%%%%%%%%
 %     Part a    %
 %%%%%%%%%%%%%%%%%
+% Suppose that you knew that there were thousands of underground storage tanks in the  United States. Mostly they contain petroleum products (because they are largely tanks  under gas stations). A substantial fraction of them leak at some point after a decade or  two. The leaks might be harmful to health, but they would have impacts at a very local  level, like within a quarter of a mile of the site (possibly through groundwater  contamination, but that may not be the only thing).
+
+% Suppose now that you were able to obtain a record of all the leaks that happened in a  particular state. The data on leaks includes the start and end of any leak, as reported to the  local environmental regulator.  
+
+% Think through, in some detail, how you might try to construct a paper around this topic.  What other data might you try to obtain? What regression would you try to run? How  would you frame the paper?
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 1                    %
+%                Abstract                     %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 1}
-\problem{Problem name}{
-    Problem description
-}
+% (less than 100 words). Assume some results for purposes of writing a mock abstract. (Strongly recommend that you write the abstract AFTER doing the other parts.)
+\section{Abstract}
 
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+The US EPA has spent more than three decades regulating and helping clean up leaks from underground storage tanks (USTs) but the EPA has a complicated regulatory relationship with federally recognized American Indian tribes. While progress has been made in leak prevention, health effects of UST leaks on residents of tribal territories remain not well studied. In this paper, I modify a model of UST leak effects on housing prices to estimate health outcome differences between residents in and out of federally recognized lands. I find an increase of 15\% in annual hospital visits and 11\% sick days taken.
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 2                    %
+%                Data                         %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% a discussion of what data you would try to gather
+\section{Data}
+
+
+
+Underground Storage Tanks (USTs) can contain many different products, including nuclear waste.[1] However, since only petroleum and hazardous materials are federally regulated in USTs, and most USTs on tribal lands in the US contain petroleum products, I will narrow the scope of this proposal to leaks from petroleum USTs. The challenging data to collect for this analysis would be household level health indicators.
+
+Cursory analysis can begin with the leaks data, geographic boundaries of tribal lands, and health data. Namely:
+\begin{itemize}
+    \item Leak location
+    \item Leak start date
+    \item Leak end date (date the tank is stopped from leaking)
+    \item Leak clean-up end date (date the leaked petroleum has been cleaned up to federal standards)
+    \item US Tribal land geographic boundaries (shapefile) -- for purposes of examining differences of enforcement, these would be federally-recognized geographic boundaries that determine how the state government views jurisdiction of regulatory authority. Much land in the US is disputed (if not legally, then on social platforms), but these would be the boundaries that the federal government recognized at the time of the leak. From what I know, these boundaries have remained relative unchanged since 1871.
+    \item Household annual number of visits to the hospital (the year before and after the leak)
+    \item Household annual number of visits to the doctor (the year before and after the leak)
+    \item Household annual expenditure on medications and other health aids (the year before and after the leak)
+    \item Household ages
+\end{itemize}
+
+There are likely many more health data that would need to be collected an I would refer to recent health economics research for that.
+
+
+
+
+
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                Analysis                     %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% a plan of what econometric methods you would deploy
+\section{Analysis}
+The main research question is: are effects from underground storage tank leaks larger for residents of tribal lands than for other US residents? To test this, I can add a fourth layer of differencing onto Muehlenbachs et al.'s tripple difference approach [5] -- a difference between residents of tribal and non-tribal lands. Muehlenbachs et al. estimated the effects of shale gas development on housing prices, however, the housing market is significantly different on tribal lands and the sale of houses is likely much more sparse. An important outcome however is health effects, so I adapt the model to estimate differential health outcomes instead of housing values. This would be differences in: time (before and after the leak), space (within and outside of 1/4 mile of the leak), drinking water supply (ground water vs. piped-supply water), and landtype (tribal land vs. not). 
+
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%                Framing                      %
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% this will be embodied in the abstract, but describe briefly here how you might think of framing/positioning the paper
+\section{Framing}
+After a very cursory literature search, there seems to be little previous research on environmental impacts in tribal communities in the US. In particular, there seems to be little economics research on federal regulation of environmental problems caused by private entities on tribal lands. I think this paper could be positioned as joining a sparse literature of economics on how the outcomes of federal and state governments' environmental regulations differs between tribal and non-tribal jurisdictions, especially in the regulation of private firms for public health concerns.
+
+I wanted to narrow the scope of this paper to focus on differential outcomes between state-recognized tribal territories and other US lands. There are many components to UST leaks (prevention, notification, cleanup, enforcement, licensing, effects of the leak) and a larger analysis might be able to combine some of these. At my current stage, it seems like focusing a string of papers on each part of this process would be most feasible. This paper that focuses on health impacts fits into a larger framework of understanding the parts of federal and state regulation that interact with tribal governance and sovereignty, and how this relationship and different resources spent can change environmental and public health outcomes.
+
 \newpage
-\section*{Problem 2}
-\problem{Problem name}{
-    Problem description
-}
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+\section{References}
+
+% \begin{thebibliography}{9}
+% \bibitem{texbook}
+% Donald E. Knuth (1986) \emph{The \TeX{} Book}, Addison-Wesley Professional.
+
+% \bibitem{lamport94}
+% Leslie Lamport (1994) \emph{\LaTeX: a document preparation system}, Addison
+% Wesley, Massachusetts, 2nd ed.
+% \end{thebibliography}
+
+% \textbf{Use the zotero better bibtex to turn these to bibtex items}
+
+[1](US EPA, OLEM. “Leaking Underground Storage Tanks Corrective Action Resources.” Overviews and Factsheets, December 8, 2014. https://www.epa.gov/ust/leaking-underground-storage-tanks-corrective-action-resources.)
+
+[2](US EPA, OLEM. “Underground Storage Tanks (USTs).” Collections and Lists, December 19, 2013. https://www.epa.gov/ust.)
+
+[3](US EPA, OLEM. “Underground Storage Tanks (USTs) Program in Indian Country.” Overviews and Factsheets, December 9, 2014. https://www.epa.gov/ust/underground-storage-tanks-usts-program-indian-country.)
+
+[4](“Stanford Study Reveals the Changing Scope of Native American Groundwater Rights – and Opportunities for Better Freshwater Management,” August 3, 2018. https://news.stanford.edu/press/view/22397.)
+
+[5](Muehlenbachs, Lucija, Elisheba Spiller, and Christopher Timmins. “The Housing Market Impacts of Shale Gas Development.” American Economic Review 105, no. 12 (December 1, 2015): 3633–59. https://doi.org/10.1257/aer.20140079.)
+
+[6](US EPA, OLEM. “Report to Congress on the Underground Storage Tank Program in Indian Country - 2005 Energy Policy Act.” Overviews and Factsheets, January 22, 2014. https://www.epa.gov/ust/report-congress-underground-storage-tank-program-indian-country-2005-energy-policy-act.)
+
+[7](EPA, Office Of Underground Storage Tanks. “Report To Congress On Implementing And Enforcing The Underground Storage Tank Program In Indian Country.” EPA, August 2007. https://www.epa.gov/sites/default/files/2014-01/documents/rtc\_finalblnkpgs.pdf.)
+
+% \newpage
+% \section{(for later Aaron) Other ideas to explore:}
+% \begin{itemize}
+%     \item strategic behavior of the regulated entity (the owner/operator of the UST). Are they optimizing between (costs of preventing leaks when installing the UST) vs (costs of cleanup)*(probability of getting caught if there is a leak)*(time discount for the leak happening in the future)? What are the incentives to comply -- do they get fined? Seems like fines and documenting/reporting requirements differ by state, so would need to create a data set of how compliance costs vary by state. Do compliance rates vary by compliance costs?
+%     \item Could look at information shocks to housing prices (hedonic) after a leak is made public. Do people incorporate risk of health costs into housing prices? Need to understand how the information is communicated to the public and how long the leaks take to fix and cleanup.
+%     \item Could I look into how the LUST Trust Fund money is spent?\\
+%         "In 1984, Congress enacted and President
+%         Reagan signed into law Subtitle I of the
+%         Solid Waste Disposal Act (SWDA), as
+%         amended by the Resource Conservation and
+%         Recovery Act (RCRA), directing EPA to
+%         develop a comprehensive regulatory
+%         program for USTs. This new regulatory
+%         program required owners and operators of
+%         USTs to prevent, detect, and cleanup
+%         releases. In 1986, Congress further
+%         expanded the law by creating the Leaking
+%         Underground Storage Tank (LUST) Trust
+%         Fund to pay for the cleanup of releases from
+%         USTs as well as oversight and enforcement
+%         activities by EPA and states."[7]
+% \end{itemize}
+
+% \textbf{Possible econometric analyses:}
+% \begin{itemize}
+%     \item Diff in Diff of health outcomes: between inside and outside quarter-mile radius, before and after leak
+%     \item Triple Differences:  between inside and outside quarter-mile radius, before and after leak, drinking water source from ground water vs from municipal piped source. (footnote: After writing this up, I stumbled upon this paper [5], so I want to acknowledge that someone has done a similar analysis, but that none of what I have written was taken from this paper. I am specifically waiting until after submitting this assignment to read the paper.)
+% \end{itemize}
 
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 3                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section*{Problem 3}
-\problem{Problem name}{
-    Problem description
-}
+% \newpage
+% \begin{verbatim}
+% # My Notes
 
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+% ## Required Corrective Actions
 
+% "Immediate responses may include removing flammable or explosive materials
+% from the release area and preventing discharges to stormwater utilities,
+% wetlands, and surface waters. It may also be necessary to provide bottled
+% water for individuals, families, or businesses that rely on groundwater for
+% drinking, bathing, and food preparation. The intrusion of petroleum vapors
+% into indoor building spaces has become an important concern and may require
+% the active ventilation of indoor building spaces." [1]
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 4                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section*{Problem 4}
-\problem{Problem name}{
-    Problem description
-}
+% ## Health outcomes
 
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+% "can contaminate surrounding soil, groundwater, or surface waters, or affect
+% indoor air spaces" [1]
 
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 5                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
-\section*{Problem 5}
-\problem{Problem name}{
-    Problem description
-}
-
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+% ## Possible areas to explore
+% - avoid notification of authorities
+% - avoiding preventing leaks
+% - avoiding cleaning up leaks
+%     - what are the incentives? Look into the fines associated with leaks
+%     - "Documentation and reporting requirements are also unique to each 
+%       state and tribe" [1]
+% - causal health impacts
+% - information shocks to housing prices: after a leak is made public
+% - LUST trust fund -- how are the funds used? Who pays into the funds
+% - [Underground Storage Tanks (USTs) Program in Indian Country](https://www.epa.gov/ust/underground-storage-tanks-usts-program-indian-country) 
+%     - how are USTs regulated in Tribal lands? Are they less regulated, if so,
+%     why? Is it because the gov't does not want to interfere with the political
+%     process inside the tribal land, or is it because there is less of a
+%     policical incentive? Is there any way to tell these two apart?
+%     - How do the clean up times vary with inside or outside tribal lands?
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 6                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 6}
-\problem{Problem name}{
-    Problem description
-}
-
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+% I have only conducted a cursory literature search, but there seems to a lack
+% of research on environmental impacts on tribal lands. The EPA regulates many
+% regulated USTs on tribal land [3]. I
 
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 7                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 7}
-\problem{Problem name}{
-    Problem description
-}
-
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+% \end{verbatim}
 
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 8                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 8}
-\problem{Problem name}{
-    Problem description
-}
+% For the triple diff: I would like to get the following data for all households within a 2-mile radius of, and for 1 month before and after, each leak:
 
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
-
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 9                    %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 9}
-\problem{Problem name}{
-    Problem description
-}
-
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%                Problem 10                   %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section*{Problem 10}
-\problem{Problem name}{
-    Problem description
-}
-
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
-
-
-
+% \begin{itemize}
+%     \item drinking water quality, ideally for each households from before, during, and after the leak. I doubt this data exists at the household level.
+%     \item drinking water source (separated into ground water sourced at the house vs pumped in using pipes from a municipal source). I would want to drop any
+%     \item Compile the dates and details of state and federal regulatory changes regarding USTs
+% \end{itemize}
 
 \end{document}
 
