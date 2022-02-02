@@ -1,0 +1,42 @@
+# 2022-02-01 264 Lecutre notes
+
+## Writing a paper
+Hierarchy of exposure:
+- many people read your title (from your CV or TOC
+- less abstract
+- less intro
+- epsilon read the paper
+
+## Abstract
+- motivate topic
+- explicate tresearch questions
+- explain the results
+- anticipate objections/concerns *
+- state contribution relative to literature
+- outline paper
+
+## Strategic Citations
+- directing citaitons: helping the editor find the appropriate referees
+- Flattering citations: citing the referees or editor of the journal
+	- this can be hard to balance -- if you really don't want someone to be a referee, do you cite them just in case they referee it, or do you avoid citing them to decrease the chance the editor will use them as a referee, but risk them being a referee anyway and being upset that you didn't cite them at all...
+- Seminal citations: what makes a paper seem important -- connecting it to the roots of the topic
+- Current citations: is this a current topic of interest? Should be some recent research on it, right?
+- Tier of citaitons: are your citiatons published in the same tier of journal that you are submitting to? The editor may take the tier of your citiations as a signal for what type of journal is 
+
+Need to know a paper well enough that your comments on the paper are accurate.
+
+
+## Titles (Tarduno)
+Also can use the title strategically -- "I'm an environmental economists and this paper is highly related to air pollution
+
+
+## Leaks paper
+- leverage the random things you know a lot about
+- prompt based on Michelle Marcus "going beneath the surface" AEJ policy 2021
+
+Health impacts data:
+- hospitalizations
+- expenditures
+- infant motality
+- infant health outocmes (birth and death certicates, geocode to address)
+- can use as an RD or donut (concentric donuts with indicators)
