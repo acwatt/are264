@@ -46,7 +46,7 @@ Suppose that the only instrument the planner has available is a subsidy, denoted
 }
 
 
-\def\sumj{\sum\limits_j}
+\def\sumj{\sum\limits_j} \def\sumi{\sum\limits_i} \def\sumk{\sum\limits_k}
 \def\cj{c_j(x_j)} \def\cjprime{c_j'(x_j)}
 \def\gj{g_j(a_j)} \def\gjprime{g_j'(a_j)}
 \def\ej{e_j(x_j)} \def\ejprime{e_j'(x_j)}
@@ -74,7 +74,7 @@ Suppose that the only instrument the planner has available is a subsidy, denoted
 \begin{align*}
 \intertext{Let $\{\xsp\}_j$ be the optimal allocation resulting from the solution to the social planner's problem, and let $\{\xs\}_j$ be the allocation resulting from the subsidy level $s$. Suppose that, for some subsidy level $s$, the abatement subsidy achieved the optimal allocation. That is, assume that $\xs = \xsp \ \forall j$. Then the corresponding aggregate goods would be equal: $X^s = X^{SP}$}
 \intertext{Then, by the FOCs above,}
-    c_j'(x_j^s) = U'(X^s) \\
+    c_j'(x_j^s) &= U'(X^s) \\
         &= U'(X^{SP}) \\
         &= c_j'(x_j^{SP}) + \phi\cdot e_j'(x_j^{SP}) \\
         &= c_j'(x_j^s) + \phi\cdot e_j'(x_j^s)
@@ -116,10 +116,75 @@ You might consider using some version of the abatement cost model from class and
 
 Do consider drawing trying to write down a model that will allow you to graph your result.
 }
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+
+\def\ajstar{a_j^*}
+\def\SWF{\text{SWF}}
+\def\gjstar{g_j(a_j^*)}
+\def\abar{\bar{a}}
+To start, let's make some simplifying assumptions:
+\begin{align*} 
+\intertext{Assume that there are $J$ firms, all producing 1 unit of output ($x_j$), all with identical emissions ($e_j$) and costs of production ($c_j$) equal to 1 when producing 1 unit, and that the market price of the good being produced is normalized to 1. Let $\gj$ be $j$'s cost of abating $a_j$ units of emissions and that the cost of abating zero units is zero:}
+    x_j &= 1,\ e_j(1) = 1,\ c_j(1) = 1,\ g_j(0) = 0 \ \forall j 
+    \text{   and } P=1
+\intertext{Then the $J$ firms produce $J$ units in total. Assuming that marginal damages caused by emissions are constant and equal to $\phi$, the social planner's problem of maximizing the social welfare function becomes}
+\max_{\{a_j\}} \SWF
+    &= U(X) - \sumj(\cj +\gj) - \phi\sumj(\ej - a_j) \\
+    &= U(J) - \sumj(1 + \gj) - \phi\sumj(1 - a_j)
+\intertext{The First Order Conditions describing the optimal firm-level abatement are then}
+    \dda \SWF\Big|_{\ajstar} &= \phi - g_j'(a_j^*)= 0 
+    \implies \ajstar = g_j'^{-1}(\phi)\\
+\intertext{With no policy, firm $j$'s problem is}
+\max_{a_j} \pi_j &=  P\cdot x_j - \cj - \gj\\
+    &= 1 - 1 -\gj\\
+    &= \gj
+\intertext{Assume abatement must be positive. Since the firms can only choose their level of abatement and face no penalties of emissions, it is obvious that their profit-maximizing choice is to abate zero emissions. Thus the social welfare evaluated under \textit{no policy} is}
+\SWF^{np} &= U(J) - \sumj(1 +\ 0) - \phi\sumj(1 - 0) \quad \text{since } g_j(0) = 0\\
+    &= U(J) - J(1+\phi)
+\intertext{To incentivize the socially optimal level of abatement from each firm ($\ajstar$), we impose a Pigouvian tax equal to the marginal damages $\phi$:}
+    \tau^* &= \phi
+\intertext{Because the tax revenue is a wealth transfer, it does not change overall welfare and we can leave out the tax revenue from the SWF. The social welfare evaluated under a \textit{Pigouvian tax} is then}
+\SWF^{pt} &= U(X) - \sumj(\cj +\gjstar) - \phi\sumj(\ej-a_j^*) \\
+    &= U(J) - \sumj\left(1 + \gjstar\right) - \phi\sumj\left(1-\ajstar\right) \\
+    &= U(J) - J(1+\phi) + \sumj\left(\phi\ajstar - \gjstar\right) \\
+    % &= U(J) - 2J - \sumj\left(\frac{1}{\gamma_j} - \gamma_j \ajstar^2\right) \\
+    % &= U(J) - 2J - \sumj\left(\gamma_j \frac{1}{4\gamma_j^2} - \frac{1}{\gamma_j}\right) \\
+    % &= U(J) - 2J - \sumj\left(\frac{1}{4\gamma_j} - \frac{1}{\gamma_j}\right) \\
+    % &= U(J) - 2J - \sumj\left(- \frac{3}{4\gamma_j}\right) \\
+    % &= U(J) - 2J + \sumj\left(\frac{3}{4\gamma_j}\right)
+\intertext{For a command and control type policy, let's assume the regulator imposes a uniform abatement level that all firms must follow. Let's further assume the regulator is aware of the optimal level of abatement and imposes a uniform level of abatement equal to the average abatement under the socially optimal outcome ($\abar=\frac{1}{J}\sumj\ajstar$). Then the social welfare function for this command and control is}
+\SWF^{cc} &= U(X) - \sumj(\cj +g_j(\abar)) - \phi\sumj(\ej-\abar) \\
+    &= U(J) - \sumj(1 +g_j(\abar)) - \phi\sumj(1-\abar) \\
+    &= U(J) - J(1+\phi) + \sumj(\phi\abar - g_j(\abar))
+\intertext{So the welfare gain from the efficiency of the Pigouvian tax over the command and control policy is}
+\SWF^{pt} - \SWF^{cc}
+&= \left[U(J) - J(1+\phi) + \sumj\left(\phi\ajstar - \gjstar\right) \right]
+    - \left[U(J) - J(1+\phi) + \sumj(\phi\abar - g_j(\abar))\right]\\
+&= \sumj\left(\phi\ajstar - \phi\abar + g_j(\abar) - \gjstar\right)\\
+\intertext{recognizing that we can cancel out the first two terms...}
+&= \phi\sumj\ajstar - \phi\sumj\abar +\sumj\left( g_j(\abar) - \gjstar\right)\\
+&= \phi\sumj\ajstar - \phi J\abar +\sumj\left( g_j(\abar) - \gjstar\right)\\
+&= \phi J\abar - \phi J\abar +\sumj\left( g_j(\abar) - \gjstar\right)\\
+&= \sumj\left( g_j(\abar) - \gjstar\right)\\
+\end{align*}
+
+
+\begin{align*}
+\intertext{It would be enough to assume that $g_j', g_j''>0$, but for a concrete example, let's assume that firms have heterogeneous but quadratic costs of abatement $g_j$:}
+    g_j(a_j) &= \gamma_j a_j^2
+\intertext{where $\gamma_j>0$ is a constant for each firm. Then the degree of heterogeneity of marginal abatement costs can be described by the spread of $\gamma_j$ among the firms.}
+\end{align*}
+
+
+
+
+% &= \sumj\left(\ajstar - \abar + \gamma_j\abar^2 - \gamma_j \ajstar^2\right)\\
+% \intertext{Note that $\ajstar=\frac{1}{2\gamma_j}$ and $\abar=\frac{1}{J}\sumj\frac{1}{2\gamma_j}$, so}
+% &= \sumj\left(\frac{1}{2\gamma_j} - \frac{1}{J}\sumk\frac{1}{2\gamma_k} 
+%     + g_j\left(\frac{1}{J}\sumk\frac{1}{2\gamma_k}\right) 
+%     - g_j\left(\frac{1}{2\gamma_j}\right)\right)\\
+
+
+
 
 
 
