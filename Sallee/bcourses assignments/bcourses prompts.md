@@ -1,3 +1,14 @@
+# 2022-02-17
+## Prompt
+see problem sets/2_writing-workshop/WorkshopPrompt.pdf
+
+## Response
+
+
+
+
+
+
 # 2022-02-09
 ## Prompt
 Below is a table from Muller and Mendelsohn (AER 2009) that describes the distribution of marginal damages from a ton of each pollutant. The distribution is across points sources in the United States. The differences derive from an air transport model that maps how emissions at each point interact with the ambient environment and determine exposure to people.
