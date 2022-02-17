@@ -174,6 +174,19 @@ To start, let's make some simplifying assumptions:
 \intertext{where $\gamma_j>0$ is a constant for each firm. Then the degree of heterogeneity of marginal abatement costs can be described by the spread of $\gamma_j$ among the firms.}
 \end{align*}
 
+Figure 1 shows an illustration of this situation for two firms with the following abatement cost curves: $g_1(a_1) = 5 a_1^2$ and $g_2(a_2) = a_2^2$. In the diagram, the small arrows on the top plot represent the quantities $g_j(\abar) - \gjstar$. We can see that the arrow for firm 1 is larger than the arrow on the right for firm 2, meaning $g_1(\abar) - g_1(a_1^*) > - (g_2(\abar) - g_2(a_2^*))$ and the welfare gain from the efficiency of the Pigouvian tax compared to the command and control policy will be positive.
+
+Further, we can imagine if the abatement costs were closer together. This would result in $a_j^*$'s that are closer together. This implies that the $g_j(\abar) - \gjstar$ quantities would be closer in magnitude (and opposite in direction), so the overall sum $\sumj\left( g_j(\abar) - \gjstar\right)$ would be smaller.
+
+This is true for this example, but could also be shown in general for more firms and abatement cost curves such that $g_j(0)=0, g_j'>0,$ and $g_j''>0$. Heuristically, this tells us that the final sum for the welfare gain is in fact a function of the spread in abatement costs.
+
+\FloatBarrier
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.8\textwidth]{2}
+\caption{Two firms, both with quadratic abatement costs, face a Pigouvian tax $\tau$. They have resulting abatement responses $a_1^*$ and $a_2^*$. The average abatement $\abar$ is shown with the middle vertical line. The vertical difference for firm 1 between the abatement cost evaluated at $a_1^*$ and $\abar$ is greater than the vertical difference in firm 2's abatement cost evaluated at $a_2^*$ and $\abar$. Thus the welfare gain will be positive. However, because the second derivative of abatement costs are positive, the difference will be small for firms that have closer abatement cost curves (and thus a smaller spread of $\ajstar$'s).}
+\label{fig1}
+\end{figure}
 
 
 
@@ -186,24 +199,72 @@ To start, let's make some simplifying assumptions:
 
 
 
-
-
+\FloatBarrier
+\vspace{5em}
+\newpage
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                Problem 3                    %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\newpage
+\vspace{5em}
 \section*{Problem 3}
+
 \problem{Two related dirty goods}{
     You wish to comment on the optimal tax for a good that creates a negative externality, but which is a relatively clean version of a product. That is, close substitutes for the good create an even larger externality. (I.e., you are thinking about taxing natural gas relative to coal; or hybrid cars relative to conventional vehicles; or energy-efficient appliances relative to less efficient ones.) Others debating this policy believe that the relatively clean product should be subsidized (not taxed) because the dirtier products are undertaxed relative to their marginal damages. You are not sure if the product should be subsidized, so you wish to describe the optimal tax on the relatively clean good, under the assumption that the dirtier substitute is undertaxed.\\
     
     \textbf{Write down a mathematical model that allows you to describe the optimal tax on the relatively clean good, assuming that the tax on the dirtier good is fixed and you cannot change it. Solve the model and describe how the results answer the broader question of how mispriced substitutes can affect optimal policy design for a dirty good.}
 }
 
-\begin{align} 
-    \intertext{stuff}
-    y&=x
-\end{align}
+
+\textit{Note: I did not finish this problem. I realized that prices need to be endogenously determined and that I was working on an incomplete maximization problem. I then realized that Jacobsen et al. (2020) has the perfect model setup. I would need to add the budget constraint to the problem below, where the representative consumer has income and gets the tax revenue as additional funds.}
+
+
+\def\qis{q_i^*} \def\qiss{q_i^{**}}
+
+Adapting Holland, Hughes and Knittel (2009), let's define the following model:
+\begin{itemize}
+    \item Two fuel sources: $H$ and $L$ with high and low marginal damages, respectively.
+    \item Assume perfectly competitive producers of both fuels.
+    \item Associated productions costs $C_H(q), C_L(q)$ such that $C_H', C_H'', C_L', C_L''>0$ and $C_H(q)<C_L(q)\ \forall q>0$ (since dirtier fuels are often cheaper to produce per unit energy).
+    \item Assume quantities $q_i$ of $C_H(q_H), C_L(q_L)$ are both measured in the same units of energy.
+    \item Associated constant marginal damages $\phi_H, \phi_L$ such that $\phi_H>\phi_L\geq0$ so the environmental damage from fuel $i$ is $\phi_i q_i$.
+    \item Let the social benefit from consumption of both types of energy be $U(q_H, q_L)$ such that $U$ is increasing, concave, and differentiable.
+    \item There exists a fixed tax $t_H$ on the dirty fuel source such that $t_H < \phi_H$.
+\end{itemize}
+\begin{align*} 
+\intertext{Then the social planner's problem becomes}
+\max_{\{q_i\}} \SWF &= (\text{Benefit of consumption}) - (\text{Cost of production}) - (\text{Damages to the environment})\\
+    &= U(q_H, q_L) - C_H(q_H) - C_L(q_L) - (\phi_H q_H + \phi_L q_L)
+\intertext{and the FOCs for this are}
+\part{U}{q_i}\Big|_{\qis} &= C_i'(\qis) + \phi_i \quad \text{for } i\in\{H,L\}
+\intertext{Consider imposing two taxes $t_H, t_L$, where $t_H$ is fixed and $t_H < \phi_H$. Since we have perfect competition, the firms are price-takers and consider prices $p_i$ as exogenous. Then, assuming firms can choose to produce either or both fuels, a firm's profit maximization problem is}
+\max_{\{q_i\}} \pi &= (\text{Revenue from selling the fuel}) - (\text{Cost of production}) - (\text{Tax payments})\\
+    &= (p_H q_H + p_L q_L) - C_H(q_H) - C_L(q_L) - (t_H q_H + t_L q_L)
+\intertext{and the firm's FOCs are:}
+p_i &= C_i'(\qiss) + t_i
+\intertext{Since consumers purchase until marginal benefit equals the price they pay, $p_i= \dpart{U}{q_i}\Big|_{\qiss}$ in equilibrium. Thus}
+\part{U}{q_i}\Big|_{\qiss} &= C_i'(\qiss) + t_i
+\intertext{Rearranging, we have}
+\part{U}{q_i}\Big|_{\qiss} &- C_i'(\qiss)  = t_i
+\intertext{We know $t_H < \phi_H$. Is $q_H^{**}$ larger or smaller than $q_H^*$? Since $U$ is increasing and concave (therefore decreasing slope) and $C_i$ is increasing in slope, the quantity on the left hand side increases as we decrease $\qiss$. i.e.,}
+\frac{\partial}{\partial \qiss}&\left[\part{U}{q_i}\Big|_{\qiss} - C_i'(\qiss)\right]
+    = \frac{\partial^2 U}{\partial q_i^2} - C_i'' <0
+\intertext{Since $t_H < \phi_H$, then }
+\part{U}{q_H}\Big|_{q_H^{**}} &- C_H'(q_H^{**}) < \part{U}{q_H}\Big|_{q_H^*} - C_H'(q_H^*)
+\intertext{Since the function $\part{U}{q_i}\Big|_{q} &- C_i'(q)$ is unambiguously decreasing in $q$, it must be that $q_H^{**} > q_H^*$. Thus the quantity of the dirty good produced under the non-optimal tax will be greater than the first-best quantity. We knew this from the beginning -- the fuel that is undertaxed will be overproduced. But what is the optimal tax on the cleaner fuel?}
+\intertext{We can pose the regulator's problem as setting the tax given the firms' best response function (their profit maximizing decision). The firm's best response for fuel $i$ is the quantity of $i$ produced given the price and tax:}
+q_i(p_i, t_i) &= BR_i(p_i, t_i) = C_i'^{-1}(p_i - t_i)
+\intertext{We treat $t_H$ as fixed, but the prices are determined endogenously between producers and consumers. So I write $p_i(t_L)$ as the equilibrium price of fuel $i$ resulting from tax $t_L$. Then using chain rule, we have}
+\part{}{t_L}q_H(p_H, t_H) &= \part{q_H}{p_H}\part{p_H}{t_L} \\
+\part{}{t_L}q_L(p_L, t_L) &= \part{q_L}{p_L}\part{p_L}{t_L} 
+    + \part{q_L}{t_L}
+\intertext{Since $q_i(p_i, t_i) = C_i'^{-1}(p_i - t_i)$, then}
+\part{q_L}{t_L} &= -\part{q_L}{p_L} \quad \text{and} \quad
+\part{}{t_L}q_L(p_L, t_L) = - \part{q_L}{t_L}\part{p_L}{t_L} 
+    + \part{q_L}{t_L} = \part{q_L}{t_L}\left(1-\part{p_L}{t_L} \right)
+\end{align*}
+
 
  
+
 \end{document}
 
