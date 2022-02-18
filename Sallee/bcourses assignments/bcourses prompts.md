@@ -3,7 +3,7 @@
 see problem sets/2_writing-workshop/WorkshopPrompt.pdf
 
 ## Response
-
+See pre-notes pdf
 
 
 
