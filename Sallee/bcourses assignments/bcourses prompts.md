@@ -1,3 +1,16 @@
+# 2022-02-24
+## Prompt
+Goulder, Hafstead and Williams 2016 
+What does this article find that is surprising?
+What do you think about the nature of the evidence presented in this paper?
+
+## Response
+Goulder, Hafstead, and Williams find that there are plausible circumstances where an efficiency standard can actually out-perform a carbon tax or cap and trade policy on cost-effectiveness grounds. Using a model that incorporates the complexity of the US tax system and the energy market, and calibrates on real input-output tables of international trade, they find that efficiency standards can outperform carbon taxes due to the tax-interaction effect.
+
+The results, both analytical and numerical, seem like existence proofs -- that there are some cases in which CES can do better than a tax. These results are not necessarily robust to most situations, but the fact that there are reasonable conditions in which CES could be more cost-effective was important to show so that economists don't walk around badmouthing standards when they actually could be more useful than a carbon tax given the complicated existing market distortions already in place in the US.
+
+
+
 # 2022-02-17
 ## Prompt
 see problem sets/2_writing-workshop/WorkshopPrompt.pdf
