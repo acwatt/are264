@@ -1,3 +1,26 @@
+# 2022-03-03
+## Prompt
+Take the example of OPower information treatments. If you wanted to establish the welfare effects of this treatment, how might you do it? (Here I'm getting at the idea that the nudge might induce guilt versus provide valuable information versus some other channel. The experiment reveals the behavioral response, but how should we interpret that in terms of the welfare of the people in the experiment?)
+
+## Response
+I imagine four changes in utility for the energy consumer that result from the informational nudge. Because the consumer assumes their changes in consumption probably won't affect the total amount of CO2 or other pollutants coming from energy use in their area, I assume that they have no change in utility from decreased externalities from energy use. The four effects on utility I imagine that result from a decrease in energy use or a shift to a "better" time to consume energy are: (1) decreases in utility from shifting or decreasing consumption (because they were probably at a weak optimum in terms of the timing and amount of energy consumed before the nudge), (2) decrease in utility from the guilt of not being a good environmentalist, (3) increase in utility from income savings from energy bill savings (if decreasing consumption or shifting to a time that has a lower rate), and (4) increase in utility from the pride associated with being a better environmentalist and shifting/decreasing consumption. 
+
+If the household changes their consumption in reaction to the nudge, which we would see in the data, then I assume that the absolute value of increases in utility (3 and 4) is larger than decreases in utility (1 and 2) so that the new choice is utility-maximizing. From this, it's hard to get a very clear measure of welfare changes. But I think we could at least sign the changes: if people change their behavior after the nudge, their utility has increased (positive welfare change); if they do not change their behavior, then their utility has weakly decreased from guilt but has not changed w.r.t. points 1, 3, or 4.
+
+
+
+# 2022-03-01
+## Prompt
+Upload a quick file or enter text explaining the main contribution of Myers, Puller and West. Assume that the reader you are addressing is an applied economist with no particular expertise in energy or behavioral economics.
+
+## Response
+Of interest to both policy makers and economists, this paper provides some of the first evidence on efficacy of mandatory disclosure programs. Specifically, in a program where it is mandatory to disclose the energy efficiency of a house before sale, this paper shows evidence that the program increases investments in energy efficiency and thus increases the quality of the good being sold.
+
+Additionally, of more general interest to economists, this paper provides evidence from a structural behavior model that the market failure being corrected by the policy is that of symmetrically incomplete information where both the seller and buyer are missing information about the energy efficiency of the house relative to other houses (as opposed to asymmetric where the seller has more information than the buyer). This is useful because it helps further decompose the class of incomplete information market failures and provide evidence for a policy instrument that could alleviate this particular form of incomplete information.
+
+
+
+
 # 2022-02-24
 ## Prompt
 Goulder, Hafstead and Williams 2016 
