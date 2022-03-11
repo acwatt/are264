@@ -1,0 +1,82 @@
+Helpful tips from Reed about doing research
+
+Research starts with:
+- start with a question that is interesting to you
+- you will probably work on it for 6+ years
+- research is easy, you just need to know more than anyone else in the field about that specific thing
+
+Sources of ideas:
+- classes, seminars, not th literature, newspaper, non-econ nonfiction (biography, history), talking to people (economists and noneconomists)
+- first find an idea that's interesting, then learn all you can about it
+- write down all your ideas within minutes
+- make a headers of a topic or idea, then start filling it in with papes, experiences, related stuff so you can start to catelog things together for later review
+
+If you think you have a good idea:
+- do due diligence: examine the data and code thoroughly and get the core of the project really tight
+- then go straight to the hardest question you can imagine from a referee and try to test your results agains that
+
+Idea evaluation:
+- what is the question, why is it interesting?
+- why is the existing literature crappy, nonexisitant, unresolved?
+- how are you going to sovle it?
+
+
+Main challenges to social cost of pollution research:
+1. Causal inference
+2. Pollutants and emissions are correlated
+3. Short-run vs long-run exposure
+4. Adaptation and heterogeneity in dose-response function
+5. Monetization (hospitalization costs /= welfare, that my welfare loss might be a lot more than just the hopitalization cost of the injury to me)
+
+
+READ for NAAQS nonattainment status effects (Reed's slides):
+- henderson, list et al
+- greenstone 2002
+- greenstone, list, syverson
+- walker 2012
+- Hanna 2010
+
+
+NAAQS research:
+- could think more about how to idenify firms, areas that are non-attainment, but have heterogeous impacts from being non-attainment
+- look at papers exaimining impacts of NAFTA on economy and how it relates to env police
+
+
+
+
+===================================================
+Data
+===================================================
+spatialmodel.com Di et al and van Donkelaar from Fowlie et al
+
+
+
+
+===================================================
+Tools
+===================================================
+Unconditional Quantile regression (Fipo et al 2009, but should find a better user manual for UQR that's easier to understand)
+
+
+
+===================================================
+CAA Research:
+===================================================
+1. understanding the costs of CAA:
+	we worry that we might eventually reach a point where deminishing returns of abatement put marginal costs of abatement above marginal benefits. In a static model, we probably wouldn't trade off $20 more dollars of abatement for a $10 improvement. But in a dynamic model, that $20 might also incentivize innovation that could decrease the cost of abatement in the future or increase profitablity of firms with low product emissions
+
+2. Sh=chlenker and Walker 2015 CA airports using EPA and CARB monitors -- could update using PA data to point out issues with sparse nature of EPA monitors
+
+
+
+
+
+
+
+
+
+
+
+
+
+
