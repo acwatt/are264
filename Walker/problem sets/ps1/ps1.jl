@@ -89,6 +89,28 @@ function fraction_above_threshold(Tmax, Tmin, Threshold)
 end
 
 
+"""Degree day calculation from Snyder 1985, using integral of sine."""
+function degree_day_calc(MAX, MIN, THR)
+    M = (MAX + MIN) / 2  # average temp
+    W = (MAX - MIN) / 2  # half temp range
+    θ = asin( (THR - M) / W )  # radian between -π/2 and π/2 where sine crosses THR
+    DD = ( (M - THR)(π/2 - θ) + W*cos(θ) ) / π
+    return DD
+end
+
+
+"""Return degree days above threshold temperature for single day based on max and min temperatures."""
+function degree_day_single_day(Tmax, Tmin, Threshold)
+    if Threshold ≥ Tmax
+        return 0
+    elseif Threshold ≤ Tmin
+        return (Tmax + Tmin)/2 - Threshold
+    else
+        return degree_day_calc(Tmax, Tmin, Threshold)
+    end
+
+end
+
 
 
 
