@@ -112,6 +112,9 @@ function degree_day_single_day(Tmax, Tmin, Threshold)
 end
 
 
+#! need to apply degree_day_single_day() to all day-gridpoints in df1.
+
+
 
 
 
