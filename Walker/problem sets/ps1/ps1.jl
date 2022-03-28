@@ -12,10 +12,11 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
-Pkg.add(["ZipFile", "StatFiles"])
+# Pkg.add(["ZipFile", "StatFiles"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames
+using CSV
 
 
 #==============================================================================
@@ -30,14 +31,13 @@ root = dirname(@__FILE__)
 zip_fn = "Walker-ProblemSet1-Data.zip"
 county_fn = "fips1001.dta"
 example_fn = "CountyAnnualTemperature1950to2012.dta"
+example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
 
 # Extract and read county fips file from zip
 extract_file_from_zip(root, zip_fn, county_fn)
 df1 = DataFrame(load(joinpath(root, county_fn)))
-# Extract and read example county file to compare variables
-extract_file_from_zip(root, zip_fn, example_fn)
-df2 = DataFrame(load(joinpath(root, example_fn)))
-
+# Download and load example county file to compare variables
+df2 = df_from_url(example_url, joinpath(root, example_fn))
 
 
 
@@ -58,6 +58,16 @@ function extract_file_from_zip(root_dir, zip_name, file_name)
     write(save_path, read(zarchive.files[idx]))
 end
 
+
+"""Read file at save_path to dataframe, if not present, download from url."""
+function df_from_url(url, save_path)
+    if isfile(save_path)
+        return DataFrame(load(joinpath(root, example_fn)))
+    else
+        download(example_url, joinpath(root, example_fn))
+        return DataFrame(load(joinpath(root, example_fn)))
+    end
+end
 
 
 
@@ -114,6 +124,16 @@ end
 
 #! need to apply degree_day_single_day() to all day-gridpoints in df1.
 
+#=
+Using data on exposure to each 1-degree Celsius temperature interval, we approximate
+the above integral... pg 7, appendix
+
+First, we approximate g(h) using dummy variables for each three-degree 
+temperature interval. This step function effectively regresses yield on 
+season-total time within each temperature interval
+
+The second speciﬁcation assumes g(h) is an m-th order Chebychev polynomial
+=#
 
 
 
