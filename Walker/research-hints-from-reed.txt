@@ -85,6 +85,43 @@ Climate Damages Research:
 
 
 
+===================================================
+Measurement error
+===================================================
+John Bound measurement error
+
+
+
+
+===================================================
+Treatment effec heterogeneity
+===================================================
+Burgeoning Interest in Understanding Treatment Eect Heterogeneity
+Separating out sampling variability from fundamental heterogeneity
+
+See recent work by:
+Heckman, Tobias, & Vytlacil 2001, Angrist 2004, Angrist & Fernandez-Val 2010,
+Bertanha & Imbens 2014, Allcott 2015, Dehejia, Pop-Eleches and Samii 2015,
+Gechter 2015, Athey & Imbens 2016
+
+For the most part, these econometric problems have not received a lot of
+attention in the energy/environment space
+
+
+
+===================================================
+IO Policy evaluation
+===================================================
+Idea from IO handbook chapeter on costs of regulation:
+- compare firms/markets before/after and in/out of attainment areas to estimate cost of non-attainment status / regulation on firms and markets. Compare to estimated benefits of attainment there (health with population, etc)
+
+
+
+===================================================
+Contingent Evaluation
+===================================================
+NOAA NAS panel on CV: came up with guidelines for what would be "best practices" in CV
+
 
 
 
