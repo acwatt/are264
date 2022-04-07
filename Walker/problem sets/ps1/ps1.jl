@@ -17,6 +17,8 @@ using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames
 using CSV
+using Statistics
+using Dates
 
 
 #==============================================================================
@@ -30,16 +32,32 @@ df = dataframe
 root = dirname(@__FILE__)
 zip_fn = "Walker-ProblemSet1-Data.zip"
 county_fn = "fips1001.dta"
+employment_fn = "reis_combine.dta"
 example_fn = "CountyAnnualTemperature1950to2012.dta"
 example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
 
+
 # Extract and read county fips file from zip
+println("Reading $county_fn from zip folder.")
 extract_file_from_zip(root, zip_fn, county_fn)
-df1 = DataFrame(load(joinpath(root, county_fn)))
+df_temp_ = DataFrame(load(joinpath(root, county_fn)))
+# Extract and read emplyment file from zip
+println("Reading $employment_fn from zip folder.")
+extract_file_from_zip(root, zip_fn, employment_fn)
+df_employ = DataFrame(load(joinpath(root, employment_fn)))
 # Download and load example county file to compare variables
-df2 = df_from_url(example_url, joinpath(root, example_fn))
+println("Downloading $example_fn from dropbox folder.")
+df_ex = df_from_url(example_url, joinpath(root, example_fn))
+df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
+CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
 
 
+# sum over year, then average over all grid points
+df_temp = aggregate_df(df_temp_)
+
+
+# Open linear piecewise stata results
+df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
 
 
 #==============================================================================
@@ -122,6 +140,23 @@ function degree_day_single_day(Tmax, Tmin, Threshold)
 end
 
 
+m(a) = maximum([0, a])
+
+
+"""Return jth restricted cubic spline variable using the list of knots t."""
+function r_cubic_spline_var(x, j, t)
+    k = length(t)
+    if j < 1 | j > k-1
+        println("Out of Bounds: j is < 1 or > k-1. Not a valid variable.")
+    elseif j == 1
+        return x
+    else
+        xj = m(x-t[j-1])³ -
+             m(x-t[k-1])³ * (t[k]-t[j-1])/(t[k]-t[k-1]) +
+             m(x-t[k])³ * (t[k-1]-t[j-1])/(t[k]-t[k-1])
+end
+
+
 #! need to apply degree_day_single_day() to all day-gridpoints in df1.
 
 #=
@@ -135,6 +170,46 @@ season-total time within each temperature interval
 The second speciﬁcation assumes g(h) is an m-th order Chebychev polynomial
 =#
 
+
+"""Return grid-day data aggregated to county-year level"""
+function aggregate_df(df)
+    # Sum over all days in each year, for each grid point
+    df[!,"date"] = Date(1960,1,1) + Day.(df.dateNum)
+    df[!,"year"] = Year.(df.date)
+    gd_gy = groupby(df, [:gridNumber, :year])
+    df_gy = combine(gd, :tMax => sum => :tMax)
+    gd_y = groupby(df_gy, :year)
+    df_y = combine(gd_y, :tMax => mean => :tMax)
+
+    combine(groupby(combine(gd, :tMax => mean => :tMax), :year), :tMax => mean)
+    # Weighted average using Decennial Census Block population counts as weights
+    gridnum_fips_fn = "linkGridnumberFIPS.dta"
+    lookup = DataFrame(load(joinpath(root, gridnum_fips_fn)))
+
+end
+
+
+
+
+
+#=
+Merge gridNumber with latlon then with Decennial Census Block population counts.
+Or are they weighted using crop weights like in degreeDays.do? 
+
+# lat-lon from degreeDays.do
+use ../metaData/cropArea, clear;
+gen longitude = -125 + mod(gridNumber-1,1405)/24;
+label var longitude "longitude of grid centroid (decimal degrees)";
+gen latitude  = 49.9375+1/48 - ceil(gridNumber/1405)/24;
+label var latitude  "latitude of grid centroid (decimal degrees)";
+merge 1:1 gridNumber using ../metaData/linkGridnumberFIPS;
+
+
+# Decennial census block population counts
+
+
+
+=#
 
 
 
