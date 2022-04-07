@@ -111,26 +111,58 @@ end
 m(a) = maximum([0, a])
 
 
-"""Return jth restricted cubic spline variable using the list of knots t."""
-function cubic_spline_var(x, j, t)
+"""Return jth restricted cubic spline variable using the list of knots t.
+From Frank Harrell's Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
+"""
+function cubic_spline_var_harrell(x, j, t)
     k = length(t)
-    if j < 1 | j > k-1
-        println("Out of Bounds: j is < 1 or > k-1. Not a valid variable.")
+    if (j < 1) | (j > k-1)
+        println("Out of Bounds (j=$j): j is < 1 or > k-1. Not a valid variable.")
     elseif j == 1
         return x
     else
-        xj = m(x .- t[j-1])^3 .-
-             m(x .- t[k-1])^3 .* (t[k]-t[j-1])/(t[k]-t[k-1]) +
-             m(x .- t[k])^3 * (t[k-1]-t[j-1])/(t[k]-t[k-1])
+        xⱼ = m.(x .- t[j-1]).^3 .-
+             m.(x .- t[k-1]).^3 * (t[k]-t[j-1])/(t[k]-t[k-1]) +
+             m.(x .- t[k]).^3 * (t[k-1]-t[j-1])/(t[k]-t[k-1])
+        # Divide by the scale factor from the stata formula (range of the knots)
+        return xⱼ / (t[k] - t[1])^2
     end
 end
 
+
+"""Return jth restricted cubic spline variable using the list of knots t.
+From stata's mkspline documentation
+"""
+function cubic_spline_var_stata(V, i, k)
+    n = length(k)
+    if (i < 1) | (i > n-1)
+        println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
+    elseif i == 1
+        return V
+    else
+        Vᵢ = (m.(V .- k[i-1]).^3 .- (k[n]-k[n-1])^(-1) * 
+                ( m.(V .- k[n-1]).^3 * (k[n]-k[i-1]) .- (V .- k[n]).^3 * (k[n-1]-k[i-1]) ) ) ./ 
+             (k[n]-k[1])^2
+        return Vᵢ
+    end
+end
+
+
 """Add restricted cubic spline basis variables to dataframe df.
-Using continuous variable varname from dataframe and list of knots t."""
-function cubic_spline_vars(df, varname, t)
-    for j in 1:(length(t)-1)
-        newname = "$varname$j"
-        df[!, newname] = cubic_spline_var(df[!, varname], j, t)
+Using continuous variable varname from dataframe and list of knots.
+
+After trying both the stata and Harrell formulas, neither matched the example file given.
+After comparing the formulas, I recognized the only difference was a scaling factor of 
+    1/(knots[last] - knots[first])^2
+so I added that scaling factor to the Harrell formula and it produces results that match
+the example file. So I probably just messed up the stata formula somehow. I assume the
+example file was created in stata with mksplines.
+"""
+function cubic_spline_vars(df, varname, knots, newbasename = "splineC")
+    for i in 1:(length(knots)-1)
+        newname = "$newbasename$i"
+        println("Making $newname")
+        df[!, newname] = cubic_spline_var_harrell(df[!, varname], i, knots)
     end
     return df
 end
@@ -152,19 +184,25 @@ The second speciﬁcation assumes g(h) is an m-th order Chebychev polynomial
 
 """Return grid-day data aggregated to county-year level"""
 function aggregate_df(df)
+    # List of variables to average or sum over
+    avg_list = [:tMin, :tMax, :tAvg, :prec]
+    sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]
     # Sum over all days in each year, for each grid point
     df[!,"date"] = Date(1960,1,1) + Day.(df.dateNum)
     df[!,"year"] = Year.(df.date)
     gd_gy = groupby(df, [:gridNumber, :year])
-    df_gy = combine(gd_gy, :tMax => mean => :tMax)
+    df_gy = combine(gd_gy,
+                    avg_list .=> mean .=> avg_list,
+                    sum_list .=> sum .=> sum_list)
     gd_y = groupby(df_gy, :year)
-    df_y = combine(gd_y, :tMax => mean => :tMax)
+    df_y = combine(gd_y, valuecols(gd_y) .=> mean .=> valuecols(gd_y))
 
-    combine(groupby(combine(gd, :tMax => mean => :tMax), :year), :tMax => mean)
+    # combine(groupby(combine(gd, :tMax => mean => :tMax), :year), :tMax => mean)
     # Weighted average using Decennial Census Block population counts as weights
     gridnum_fips_fn = "linkGridnumberFIPS.dta"
     lookup = DataFrame(load(joinpath(root, gridnum_fips_fn)))
 
+    return df_y
 end
 
 
@@ -230,12 +268,13 @@ CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
 
 # Add cubic spline basis variables
 knots = [0 8 16 24 32]
+df_temp1 = DataFrame(load(joinpath(root, county_fn)))
 df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
 df_temp1 = cubic_spline_vars(df_temp1, :tAvg, knots)
 
 # sum over year, then average over all grid points
 df_temp = aggregate_df(df_temp1)
-
+df_temp[20, [:year, :splineC1, :splineC2, :splineC3, :splineC4]]
 
 # Open linear piecewise stata results
 df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
