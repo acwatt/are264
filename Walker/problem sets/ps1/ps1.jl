@@ -19,45 +19,9 @@ using DataFrames
 using CSV
 using Statistics
 using Dates
+using Plots
 
 
-#==============================================================================
-                                    SETUP
-key:
-fn = filename
-dir = directory
-df = dataframe
-==============================================================================#
-# Set local directory paths and filenames
-root = dirname(@__FILE__)
-zip_fn = "Walker-ProblemSet1-Data.zip"
-county_fn = "fips1001.dta"
-employment_fn = "reis_combine.dta"
-example_fn = "CountyAnnualTemperature1950to2012.dta"
-example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
-
-
-# Extract and read county fips file from zip
-println("Reading $county_fn from zip folder.")
-extract_file_from_zip(root, zip_fn, county_fn)
-df_temp_ = DataFrame(load(joinpath(root, county_fn)))
-# Extract and read emplyment file from zip
-println("Reading $employment_fn from zip folder.")
-extract_file_from_zip(root, zip_fn, employment_fn)
-df_employ = DataFrame(load(joinpath(root, employment_fn)))
-# Download and load example county file to compare variables
-println("Downloading $example_fn from dropbox folder.")
-df_ex = df_from_url(example_url, joinpath(root, example_fn))
-df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
-CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
-
-
-# sum over year, then average over all grid points
-df_temp = aggregate_df(df_temp_)
-
-
-# Open linear piecewise stata results
-df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
 
 
 #==============================================================================
@@ -67,6 +31,10 @@ df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month
 function extract_file_from_zip(root_dir, zip_name, file_name)
     zip_path = joinpath(root_dir, zip_name)
     save_path = joinpath(root_dir, file_name)
+    # If the file is already extracted, done.
+    if isfile(save_path)
+        return
+    end
     # Open zip file
     zarchive = ZipFile.Reader(zip_path)
     # Find file_name in zip archive
@@ -144,16 +112,27 @@ m(a) = maximum([0, a])
 
 
 """Return jth restricted cubic spline variable using the list of knots t."""
-function r_cubic_spline_var(x, j, t)
+function cubic_spline_var(x, j, t)
     k = length(t)
     if j < 1 | j > k-1
         println("Out of Bounds: j is < 1 or > k-1. Not a valid variable.")
     elseif j == 1
         return x
     else
-        xj = m(x-t[j-1])³ -
-             m(x-t[k-1])³ * (t[k]-t[j-1])/(t[k]-t[k-1]) +
-             m(x-t[k])³ * (t[k-1]-t[j-1])/(t[k]-t[k-1])
+        xj = m(x .- t[j-1])^3 .-
+             m(x .- t[k-1])^3 .* (t[k]-t[j-1])/(t[k]-t[k-1]) +
+             m(x .- t[k])^3 * (t[k-1]-t[j-1])/(t[k]-t[k-1])
+    end
+end
+
+"""Add restricted cubic spline basis variables to dataframe df.
+Using continuous variable varname from dataframe and list of knots t."""
+function cubic_spline_vars(df, varname, t)
+    for j in 1:(length(t)-1)
+        newname = "$varname$j"
+        df[!, newname] = cubic_spline_var(df[!, varname], j, t)
+    end
+    return df
 end
 
 
@@ -177,7 +156,7 @@ function aggregate_df(df)
     df[!,"date"] = Date(1960,1,1) + Day.(df.dateNum)
     df[!,"year"] = Year.(df.date)
     gd_gy = groupby(df, [:gridNumber, :year])
-    df_gy = combine(gd, :tMax => sum => :tMax)
+    df_gy = combine(gd_gy, :tMax => mean => :tMax)
     gd_y = groupby(df_gy, :year)
     df_y = combine(gd_y, :tMax => mean => :tMax)
 
@@ -210,6 +189,61 @@ merge 1:1 gridNumber using ../metaData/linkGridnumberFIPS;
 
 
 =#
+
+
+
+
+
+
+
+
+#==============================================================================
+                                    SETUP
+key:
+fn = filename
+dir = directory
+df = dataframe
+==============================================================================#
+# Set local directory paths and filenames
+root = dirname(@__FILE__)
+zip_fn = "Walker-ProblemSet1-Data.zip"
+county_fn = "fips1001.dta"
+employment_fn = "reis_combine.dta"
+example_fn = "CountyAnnualTemperature1950to2012.dta"
+example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
+
+
+# Extract and read county fips file from zip
+println("Reading $county_fn from zip folder.")
+extract_file_from_zip(root, zip_fn, county_fn)
+df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+# Extract and read emplyment file from zip
+println("Reading $employment_fn from zip folder.")
+extract_file_from_zip(root, zip_fn, employment_fn)
+df_employ = DataFrame(load(joinpath(root, employment_fn)))
+# Download and load example county file to compare variables
+println("Downloading $example_fn from dropbox folder.")
+df_ex = df_from_url(example_url, joinpath(root, example_fn))
+df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
+CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
+
+
+# Add cubic spline basis variables
+knots = [0 8 16 24 32]
+df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
+df_temp1 = cubic_spline_vars(df_temp1, :tAvg, knots)
+
+# sum over year, then average over all grid points
+df_temp = aggregate_df(df_temp1)
+
+
+# Open linear piecewise stata results
+df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
+
+
+
+
+
 
 
 
