@@ -12,13 +12,20 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
+<<<<<<< HEAD
+# Pkg.add(["ZipFile", "StatFiles"])
+=======
 Pkg.add(["ZipFile", "StatFiles", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels"])
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames
 using CSV
 using Statistics
+<<<<<<< HEAD
+=======
 using StatsModels
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 using Dates
 using Plots
 using GLM
@@ -355,21 +362,33 @@ df_employ = DataFrame(load(joinpath(root, employment_fn)))
 # Download and load example county file to compare variables
 println("Downloading $example_fn from dropbox folder.")
 df_ex = df_from_url(example_url, joinpath(root, example_fn))
+<<<<<<< HEAD
+df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
+CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
+=======
 # Save single county (01001) to compare to built results
 df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
 CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 # Add cubic spline basis variables
 knots = [0 8 16 24 32]
+<<<<<<< HEAD
+df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+=======
 # df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
 df_temp1 = cubic_spline_vars(df_temp1, :tAvg, knots)
 
 # sum over year, then average over all grid points
 df_temp = aggregate_df(df_temp1)
 df_temp[20, [:year, :splineC1, :splineC2, :splineC3, :splineC4]]
+<<<<<<< HEAD
+=======
 CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 # Open linear piecewise stata results
 df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
@@ -434,9 +453,12 @@ Provide an interpretation of the coefficient of the 32+ bin.
 
 
 
+<<<<<<< HEAD
+=======
 #! % change in employees for the average county for each day above 32.
 
 
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
@@ -452,9 +474,13 @@ confidence intervals, and compare to the binned
 temperature response function above.
 =================================================#
 
+<<<<<<< HEAD
+
+=======
 #! estimate the coef, then use and array 0:0.25:40 of temps and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
 #! is there a lincom function in python or julia to use that will calculate SEs of combination of 
 #! coefs? Could use delta method.
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
@@ -628,7 +654,10 @@ measures. Interpret your findings.
 
 
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 #=================================================
 2.2.3 First stage, reduced form
 
@@ -651,7 +680,11 @@ results.
 
 
 
+<<<<<<< HEAD
+
+=======
 #! python 2sls function? IV2SLS from StatsModels
+>>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
