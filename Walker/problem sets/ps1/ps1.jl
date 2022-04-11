@@ -12,20 +12,14 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
-<<<<<<< HEAD
-# Pkg.add(["ZipFile", "StatFiles"])
-=======
-Pkg.add(["ZipFile", "StatFiles", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels"])
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
+Pkg.add(["ZipFile", "StatFiles", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels", "Econometrics"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames
 using CSV
+using Econometrics
 using Statistics
-<<<<<<< HEAD
-=======
 using StatsModels
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 using Dates
 using Plots
 using GLM
@@ -80,36 +74,12 @@ end
 #==============================================================================
                             TEMPERATURE FUNCTIONS
 ==============================================================================#
-"""Return temperature threshold after converting to -1,1 interval (for sine function)"""
-function convert_temp_threshold(Tmax, Tmin, Thresh)
-    proportion = (Thresh - Tmin) / (Tmax - Tmin)
-    return (2 * proportion - 1)
-end
-
-
-"""
-Return portion (0 to 1) of day's temperature above temperature Threshold,
-given max and min temperature, 
-based on sinusoidal curve to model diurnal temperature cycle.
-"""
-function fraction_above_threshold(Tmax, Tmin, Threshold)
-    α = convert_temp_threshold(Tmax, Tmin, Threshold)
-    if α ≥ 1
-        return 0
-    elseif α ≤ -1
-        return 1
-    else
-        return (π - 2 * asin(α)) / (2π)
-    end
-end
-
-
 """Degree day calculation from Snyder 1985, using integral of sine."""
 function degree_day_calc(MAX, MIN, THR)
     M = (MAX + MIN) / 2  # average temp
     W = (MAX - MIN) / 2  # half temp range
     θ = asin((THR - M) / W)  # radian between -π/2 and π/2 where sine crosses THR
-    DD = ((M - THR)(π / 2 - θ) + W * cos(θ)) / π
+    DD = ((M - THR)*(π / 2 - θ) + W * cos(θ)) / π
     return DD
 end
 
@@ -127,11 +97,78 @@ function degree_day_single_day(Tmax, Tmin, Threshold)
 end
 
 
+"""Return dataframe with degree day columns, degree days over each threshold in t."""
+function add_degree_days(df::DataFrame, t::Vector)
+    println("Adding degree days above thresholds in t.")
+    for k ∈ 1:length(t)
+        df[!, "dday$(t[k])C"] = degree_day_single_day.(df[!, :tMax], df[!, :tMin], t[k])
+    end
+    return df
+end
+
+
+"""Return temperature threshold after converting to -1,1 interval (for sine function)"""
+function convert_temp_threshold(Tmax, Tmin, Thresh)
+    proportion = (Thresh - Tmin) / (Tmax - Tmin)
+    return (2 * proportion - 1)
+end
+
+
+"""Return portion (0 to 1) of day's temperature above temperature Threshold,
+    given max and min temperature, 
+    based on sinusoidal curve to model diurnal temperature cycle.
+"""
+function fraction_above_threshold(Tmax, Tmin, Threshold)
+    α = convert_temp_threshold(Tmax, Tmin, Threshold)
+    if α ≥ 1
+        return 0
+    elseif α ≤ -1
+        return 1
+    else
+        return (π - 2 * asin(α)) / (2π)
+    end
+end
+
+
+"""Return portion (0 to 1) of day's temperature between temperature Thresholds,
+    given max and min temperature, 
+    based on sinusoidal curve to model diurnal temperature cycle.
+"""
+function fraction_between_thresholds(Tmax, Tmin, Threshold_lower, Threshold_upper)
+    # Fraction between = (fraction above lower) - (fraction above upper)
+    lower = fraction_above_threshold(Tmax, Tmin, Threshold_lower)
+    upper = fraction_above_threshold(Tmax, Tmin, Threshold_upper)
+    return lower - upper
+end
+
+
+"""Return dataframe with binned temperature variables columns (portion of day in bin)."""
+function add_binned_days(df::DataFrame, bins::Vector)
+    println("Adding portion of days between bin edges in bins.")
+    for k ∈ 1:length(bins)
+        if k == 1
+            # Portion of day below lowest threshold
+            df[!, "tempB$(bins[k])"] = 1 .- fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+        else
+            # Portion of day between this threshold and previous threshold
+            df[!, "temp$(bins[k-1])to$(bins[k])"] = fraction_between_thresholds.(df[!, :tMax], df[!, :tMin], bins[k-1], bins[k])
+
+            if k == length(bins)
+                # Portion of day above threshold
+                df[!, "tempA$(bins[k])"] = fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+            end
+        end
+    end
+    return df
+end
+
+
+"""(⋅)₊ function from Harrell 2001"""
 m(a) = maximum([0, a])
 
 
 """Return jth restricted cubic spline variable using the list of knots t.
-From Frank Harrell's Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
+    From Frank Harrell's Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
 """
 function cubic_spline_var_harrell(x, j, t)
     k = length(t)
@@ -149,8 +186,8 @@ function cubic_spline_var_harrell(x, j, t)
 end
 
 
-"""Return jth restricted cubic spline variable using the list of knots t.
-From stata's mkspline documentation
+"""Return ith restricted cubic spline variable using the list of knots k.
+    From stata's mkspline documentation
 """
 function cubic_spline_var_stata(V, i, k)
     n = length(k)
@@ -168,16 +205,13 @@ end
 
 
 """Add restricted cubic spline basis variables to dataframe df.
-Using continuous variable varname from dataframe and list of knots.
+    Using continuous variable varname from dataframe and list of knots.
 
-After trying both the stata and Harrell formulas, neither matched the example file given.
-After comparing the formulas, I recognized the only difference was a scaling factor of 
-    1/(knots[last] - knots[first])^2
-so I added that scaling factor to the Harrell formula and it produces results that match
-the example file. So I probably just messed up the stata formula somehow. I assume the
-example file was created in stata with mksplines.
+    After trying both the stata and Harrell formulas, neither matched the example file given. After comparing the formulas, I recognized the only difference was a scaling factor of 
+        `julia 1/(knots[last] - knots[first])^2`
+    so I added that scaling factor to the Harrell formula and it produces results that match the example file. So I probably just messed up the stata formula somehow. I assume the example file was created in stata with mksplines.
 """
-function cubic_spline_vars(df, varname, knots, newbasename="splineC")
+function add_cubic_spline_vars(df, varname, knots, newbasename="splineC")
     for i in 1:(length(knots)-1)
         newname = "$newbasename$i"
         println("Making $newname")
@@ -187,39 +221,63 @@ function cubic_spline_vars(df, varname, knots, newbasename="splineC")
 end
 
 
-#! need to apply degree_day_single_day() to all day-gridpoints in df1.
+"""Return vector of element-wise minimum between a vector and constant."""
+min_vecs(vec, c) = minimum.(zip(vec, repeat([c], length(vec))))
+"""Return vector of element-wise maximum between a vector and constant."""
+max_vecs(vec, c) = maximum.(zip(vec, repeat([c], length(vec))))
 
-#=
-Using data on exposure to each 1-degree Celsius temperature interval, we approximate
-the above integral... pg 7, appendix
 
-First, we approximate g(h) using dummy variables for each three-degree 
-temperature interval. This step function effectively regresses yield on 
-season-total time within each temperature interval
+"""Return ith linear piecewise variable using the list of knots k.
+    From stata's mkspline documentation
+"""
+function piecewise_linear_var_stata(V, i, k)
+    n = length(k) + 1
+    if i == 1
+        return min_vecs(V, k[i])
+    elseif i > 1 && i < n
+        return max_vecs(min_vecs(V, k[i]), k[i-1]) .- k[i-1]
+    elseif i == n
+        return max_vecs(V, k[n-1]) .- k[n-1]
+    else
+        println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
+    end
+end
 
-The second speciﬁcation assumes g(h) is an m-th order Chebychev polynomial
-=#
+
+"""Return dataframe with piecewise linear basis variable columns using given knots."""
+function add_piecewise_linear_vars(df, varname, knots; newbasename="piece")
+    println("Adding piecewise linear basis variable columns with breakpoints.")
+    n = length(knots)+1
+    for i in 1:n
+        e = i == 1 ? "B$(knots[i])" :
+            i == n ? "A$(knots[n-1])" :
+            #= o.w =# "$(knots[i-1])to$(knots[i])"
+        newname = "$newbasename$e"
+        println("Making $newname")
+        df[!, newname] = piecewise_linear_var_stata(df[!, varname], i, knots)
+    end
+    return df
+end
 
 
 """Return grid-day data aggregated to county-year level"""
-function aggregate_df(df)
-    # List of variables to average or sum over
+function aggregate_df(df, tags)
+    # List of columns to average over
     avg_list = [:tMin, :tMax, :tAvg, :prec]
-    sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]
+    # List of columns to sum over the year (all cols with a substring from tags)
+    sum_list = [n for n in names(df) if any(occursin.(tags, n))]
+    # sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]
+
     # Sum over all days in each year, for each grid point
     df[!, "date"] = Date(1960, 1, 1) + Day.(df.dateNum)
     df[!, "year"] = Year.(df.date)
     gd_gy = groupby(df, [:gridNumber, :year])
     df_gy = combine(gd_gy,
-        avg_list .=> mean .=> avg_list,
-        sum_list .=> sum .=> sum_list)
+                    avg_list .=> mean .=> avg_list,
+                    sum_list .=> sum .=> sum_list)
+    # Take the average over all grid points in the county
     gd_y = groupby(df_gy, :year)
     df_y = combine(gd_y, valuecols(gd_y) .=> mean .=> valuecols(gd_y))
-
-    # combine(groupby(combine(gd, :tMax => mean => :tMax), :year), :tMax => mean)
-    # Weighted average using Decennial Census Block population counts as weights
-    gridnum_fips_fn = "linkGridnumberFIPS.dta"
-    lookup = DataFrame(load(joinpath(root, gridnum_fips_fn)))
 
     return df_y
 end
@@ -228,24 +286,7 @@ end
 
 
 
-#=
-Merge gridNumber with latlon then with Decennial Census Block population counts.
-Or are they weighted using crop weights like in degreeDays.do? 
 
-# lat-lon from degreeDays.do
-use ../metaData/cropArea, clear;
-gen longitude = -125 + mod(gridNumber-1,1405)/24;
-label var longitude "longitude of grid centroid (decimal degrees)";
-gen latitude  = 49.9375+1/48 - ceil(gridNumber/1405)/24;
-label var latitude  "latitude of grid centroid (decimal degrees)";
-merge 1:1 gridNumber using ../metaData/linkGridnumberFIPS;
-
-
-# Decennial census block population counts
-
-
-
-=#
 
 
 
@@ -262,19 +303,20 @@ end
 
 
 """Return OLS or WLS regression using dataframe df and formula.
-Weights specified by wts can be string (column name in df) or vector of weights
-of same length as df. If wts is unspecified, OLS is assumed.
 
-# Arguments:
-- `df::DataFrame`: dataframe of data
-- `formula::FormulaTerm`: @formula with names of columns in df
-- `weights::Union{String, Vector, Nothing}=nothing`: string columnname of df, or vector, used as weights in WLS
-- `vcov::Union{String, Nothing}=nothing`: a string indicating which Heteroskedasticity-robust covariance matrix to report and use in standard errors.
-- `cluster::Union{String, Nothing}=nothing`: string columnname of df to cluster on
-Long & Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) 
-in the linear regression model, recommending to use HC3 which is thus the default
+    Weights specified by wts can be string (column name in df) or vector of weights
+    of same length as df. If wts is unspecified, OLS is assumed.
 
-Currently only works if there are no missing values in df.
+    # Arguments:
+    - `df::DataFrame`: dataframe of data
+    - `formula::FormulaTerm`: @formula with names of columns in df
+    - `weights::Union{String, Vector, Nothing}=nothing`: string columnname of df, or vector, used as weights in WLS
+    - `vcov::Union{String, Nothing}=nothing`: a string indicating which Heteroskedasticity-robust covariance matrix to report and use in standard errors.
+    - `cluster::Union{String, Nothing}=nothing`: string columnname of df to cluster on
+    Long & Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) 
+    in the linear regression model, recommending to use HC3 which is thus the default
+
+    Currently only works if there are no missing values in df.
 """
 function regression(df::DataFrame,
                     formula::FormulaTerm; 
@@ -362,33 +404,32 @@ df_employ = DataFrame(load(joinpath(root, employment_fn)))
 # Download and load example county file to compare variables
 println("Downloading $example_fn from dropbox folder.")
 df_ex = df_from_url(example_url, joinpath(root, example_fn))
-<<<<<<< HEAD
-df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
-CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df2_ex)
-=======
 # Save single county (01001) to compare to built results
-df_ex = subset(df2, :fips => ByRow(==(01001)), skipmissing=true)
+df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
 CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
-
-# Add cubic spline basis variables
-knots = [0 8 16 24 32]
-<<<<<<< HEAD
+# Add degree days for each day-gridpoint
 df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-=======
-# df_temp1 = DataFrame(load(joinpath(root, county_fn)))
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
-df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
-df_temp1 = cubic_spline_vars(df_temp1, :tAvg, knots)
+thresholds = [30, 32, 34]
+df_temp1 = add_degree_days(df_temp1, thresholds)
 
-# sum over year, then average over all grid points
-df_temp = aggregate_df(df_temp1)
-df_temp[20, [:year, :splineC1, :splineC2, :splineC3, :splineC4]]
-<<<<<<< HEAD
-=======
+# Add binned temperature variables
+bins = [0, 4, 8, 12, 16, 20, 24, 28, 32]
+df_temp1 = add_binned_days(df_temp1, bins)
+
+# Add cubic spline basis variables for each day-gridpoint
+knots = [0 8 16 24 32]
+df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
+df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
+
+# Add piecewise linear basis variables for each day-gridpoint
+knots = [28, 32]
+df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
+
+# sum over year, then average over all grid points in county
+column_tags = ["dday", "temp", "splineC", "piece"]
+df_temp = aggregate_df(df_temp1, column_tags)
 CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 # Open linear piecewise stata results
 df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
@@ -453,12 +494,9 @@ Provide an interpretation of the coefficient of the 32+ bin.
 
 
 
-<<<<<<< HEAD
-=======
 #! % change in employees for the average county for each day above 32.
 
 
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
@@ -474,13 +512,9 @@ confidence intervals, and compare to the binned
 temperature response function above.
 =================================================#
 
-<<<<<<< HEAD
-
-=======
 #! estimate the coef, then use and array 0:0.25:40 of temps and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
 #! is there a lincom function in python or julia to use that will calculate SEs of combination of 
 #! coefs? Could use delta method.
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
@@ -654,10 +688,6 @@ measures. Interpret your findings.
 
 
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 #=================================================
 2.2.3 First stage, reduced form
 
@@ -680,11 +710,7 @@ results.
 
 
 
-<<<<<<< HEAD
-
-=======
 #! python 2sls function? IV2SLS from StatsModels
->>>>>>> 3045055866bec3727117301f9f1b7631c3f1c84b
 
 
 
@@ -876,3 +902,32 @@ research designs underlying the results.
 
 
 
+#==============================================================================
+                        Extra Notes / leftovers
+==============================================================================#
+
+
+#=
+Merge gridNumber with latlon then with Decennial Census Block population counts.
+Or are they weighted using crop weights like in degreeDays.do? 
+
+# lat-lon from degreeDays.do
+use ../metaData/cropArea, clear;
+gen longitude = -125 + mod(gridNumber-1,1405)/24;
+label var longitude "longitude of grid centroid (decimal degrees)";
+gen latitude  = 49.9375+1/48 - ceil(gridNumber/1405)/24;
+label var latitude  "latitude of grid centroid (decimal degrees)";
+merge 1:1 gridNumber using ../metaData/linkGridnumberFIPS;
+
+
+# Decennial census block population counts
+=#
+
+
+
+
+
+    # combine(groupby(combine(gd, :tMax => mean => :tMax), :year), :tMax => mean)
+    # Weighted average using Decennial Census Block population counts as weights
+    # gridnum_fips_fn = "linkGridnumberFIPS.dta"
+    # lookup = DataFrame(load(joinpath(root, gridnum_fips_fn)))
