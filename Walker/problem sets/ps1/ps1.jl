@@ -12,7 +12,7 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
-Pkg.add(["ZipFile", "StatFiles", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels", "Econometrics"])
+Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels", "Econometrics", "Latexify"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames
@@ -142,20 +142,41 @@ function fraction_between_thresholds(Tmax, Tmin, Threshold_lower, Threshold_uppe
 end
 
 
+"""Return dataframe with binned temperature variables columns (indicator for tAvg in bin)."""
+function add_bin_indicator_days(df::DataFrame, edges::Vector)
+    println("Adding inidicator for average daily temperature in each bin")
+    for k ∈ 1:length(edges)
+        if k == 1
+            # tAvg below lowest threshold
+            df[!, "tempB$(edges[k])"] = (df[!, :tAvg] .< edges[k])
+        else
+            #  tAvg between this threshold and previous threshold
+            df[!, "temp$(edges[k-1])to$(edges[k])"] = (edges[k-1] .≤ df[!, :tAvg] .< edges[k])
+
+            if k == length(edges)
+                # tAvg above threshold
+                df[!, "tempA$(edges[k])"] = (df[!, :tAvg] .≥ edges[k])
+            end
+        end
+    end
+    return df
+end
+
+
 """Return dataframe with binned temperature variables columns (portion of day in bin)."""
-function add_binned_days(df::DataFrame, bins::Vector)
+function add_bin_portion_days(df::DataFrame, bins::Vector)
     println("Adding portion of days between bin edges in bins.")
     for k ∈ 1:length(bins)
         if k == 1
             # Portion of day below lowest threshold
-            df[!, "tempB$(bins[k])"] = 1 .- fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+            df[!, "tempPropB$(bins[k])"] = 1 .- fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
         else
             # Portion of day between this threshold and previous threshold
-            df[!, "temp$(bins[k-1])to$(bins[k])"] = fraction_between_thresholds.(df[!, :tMax], df[!, :tMin], bins[k-1], bins[k])
+            df[!, "tempProp$(bins[k-1])to$(bins[k])"] = fraction_between_thresholds.(df[!, :tMax], df[!, :tMin], bins[k-1], bins[k])
 
             if k == length(bins)
                 # Portion of day above threshold
-                df[!, "tempA$(bins[k])"] = fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+                df[!, "tempPropA$(bins[k])"] = fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
             end
         end
     end
@@ -410,16 +431,17 @@ CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
 
 # Add degree days for each day-gridpoint
 df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
 thresholds = [30, 32, 34]
 df_temp1 = add_degree_days(df_temp1, thresholds)
 
 # Add binned temperature variables
-bins = [0, 4, 8, 12, 16, 20, 24, 28, 32]
-df_temp1 = add_binned_days(df_temp1, bins)
+bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
+df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
+df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
 
 # Add cubic spline basis variables for each day-gridpoint
 knots = [0 8 16 24 32]
-df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
 df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
 
 # Add piecewise linear basis variables for each day-gridpoint
