@@ -18,6 +18,7 @@ using StatFiles  # read Stata files
 using DataFrames
 using CSV
 using Econometrics
+using CategoricalArrays
 using Statistics
 using StatsModels
 using Dates
@@ -28,6 +29,25 @@ using Latexify
 Latexify.set_default(fmt = "%.3f")
 
 
+#==============================================================================
+                                    GLOBALS
+==============================================================================#
+# Set local directory paths and filenames
+root = dirname(@__FILE__)
+zip_fn = "Walker-ProblemSet1-Data.zip"
+county_fn = "fips1001.dta"
+employment_fn = "reis_combine.dta"
+example_fn = "CountyAnnualTemperature1950to2012.dta"
+pollution_fn = "poll7080.dta"
+example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
+
+
+
+#==============================================================================
+                        Keyboard Shortcuts
+Fold current function: ctrl + shift + [
+Fold all: ctrl+k ctrl+0
+==============================================================================#
 
 
 #==============================================================================
@@ -304,6 +324,37 @@ function aggregate_df(df, tags)
 end
 
 
+"""Save temperature variables"""
+function create_temperature_vars()
+    # Load data and create average daily temp
+    df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+    df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
+
+    # Add degree days for each day-gridpoint
+    thresholds = [30, 32, 34]
+    df_temp1 = add_degree_days(df_temp1, thresholds)
+
+    # Add binned temperature variables
+    bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
+    df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
+    df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
+
+    # Add cubic spline basis variables for each day-gridpoint
+    knots = [0 8 16 24 32]
+    df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
+
+    # Add piecewise linear basis variables for each day-gridpoint
+    knots = [28, 32]
+    df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
+
+    # sum over year, then average over all grid points in county
+    column_tags = ["dday", "temp", "splineC", "piece"]
+    df_temp = aggregate_df(df_temp1, column_tags)
+
+    # Save the new file
+    CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
+end
+
 
 
 
@@ -320,8 +371,6 @@ function apply_vcov(reg::StatsModels.TableRegressionModel, SE::AbstractVector)
     df[!, "Std. Error"] = SE
     return df
 end
-
-
 
 """Return OLS or WLS regression using dataframe df and formula.
 
@@ -346,6 +395,7 @@ function regression(df::DataFrame,
                     cluster::Union{String, Nothing}=nothing,
                     filestub::Union{String, Nothing}=nothing,
                     append_time::Bool=true)
+    println("Beginning regression of $formula")
     # If weights is a string, convert to column vector
     if typeof(weights) <: String
         try
@@ -404,54 +454,20 @@ fn = filename
 dir = directory
 df = dataframe
 ==============================================================================#
-# Set local directory paths and filenames
-root = dirname(@__FILE__)
-zip_fn = "Walker-ProblemSet1-Data.zip"
-county_fn = "fips1001.dta"
-employment_fn = "reis_combine.dta"
-example_fn = "CountyAnnualTemperature1950to2012.dta"
-pollution_fn = "poll7080.dta"
-example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
+
+
 
 
 # Extract and read county fips file from zip
 println("Reading $county_fn from zip folder.")
 extract_file_from_zip(root, zip_fn, county_fn)
 df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-# Extract and read emplyment file from zip
-println("Reading $employment_fn from zip folder.")
-extract_file_from_zip(root, zip_fn, employment_fn)
-df_employ = DataFrame(load(joinpath(root, employment_fn)))
-# Download and load example county file to compare variables
-println("Downloading $example_fn from dropbox folder.")
-df_ex = df_from_url(example_url, joinpath(root, example_fn))
+
 # Save single county (01001) to compare to built results
 df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
 CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
 
-# Add degree days for each day-gridpoint
-df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
-thresholds = [30, 32, 34]
-df_temp1 = add_degree_days(df_temp1, thresholds)
 
-# Add binned temperature variables
-bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
-df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
-df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
-
-# Add cubic spline basis variables for each day-gridpoint
-knots = [0 8 16 24 32]
-df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
-
-# Add piecewise linear basis variables for each day-gridpoint
-knots = [28, 32]
-df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
-
-# sum over year, then average over all grid points in county
-column_tags = ["dday", "temp", "splineC", "piece"]
-df_temp = aggregate_df(df_temp1, column_tags)
-CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
 
 # Open linear piecewise stata results
 df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
@@ -468,29 +484,17 @@ df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month
 1.1.1 Construct 4 temperature response variables
 =================================================#
 
-
-
-
-
 #=================================================
 1.1.2 Aggregate to year-county
 - sum each new temperaature variable in each grid point over each year
 - average tMin, tMax, tAvg, perc in each gridpoint over each year
 - take a simple average over all grid points in the county to get county-year level
 =================================================#
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Create a new file with temperature variables for example county
+# This will be compared to the file given.
+create_temperature_vars()
+# This file will not be used for the rest of the problem set
+# This was just an exercise to create the variables. 
 
 
 #==============================================================================
@@ -500,9 +504,23 @@ df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month
 1.2.0 Merge Income and Employment onto climate data
 =================================================#
 
+# Extract and read employment file from zip
+println("Reading $employment_fn from zip folder.")
+extract_file_from_zip(root, zip_fn, employment_fn)
+df_employ = DataFrame(load(joinpath(root, employment_fn)))
+df_employ[!, :fips] = parse.(Int32, df_employ[!, :fips])
+# Download and load example county file to compare variables
+println("Downloading $example_fn from dropbox folder.")
+df_temp = df_from_url(example_url, joinpath(root, example_fn))
+# drop first row because it's missing
+df_temp = last(df_temp, nrow(df_temp)-1)
 
+# Join onto climate data
+df = innerjoin(df_temp, df_employ, on=[:fips, :year])
 
-
+# Make year and fips categegorical
+df[!,:year] = categorical(df[!,:year])
+df[!,:fips] = categorical(df[!,:fips])
 
 
 
@@ -513,7 +531,6 @@ and the vector of binned temperature controls.
 Include additional controls for county FE, year FE.
 Provide an interpretation of the coefficient of the 32+ bin.
 =================================================#
-
 
 
 #! % change in employees for the average county for each day above 32.
@@ -534,9 +551,28 @@ confidence intervals, and compare to the binned
 temperature response function above.
 =================================================#
 
-#! estimate the coef, then use and array 0:0.25:40 of temps and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
-#! is there a lincom function in python or julia to use that will calculate SEs of combination of 
-#! coefs? Could use delta method.
+#! estimate the coef, then use and array 0:0.25:40 of temps 
+#! and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
+#! is there a lincom function in python or julia to use that 
+# will calculate SEs of combination of coefs? Could use delta method.
+
+# Create log tranformed inc_farm_prop_income/population 
+logfn(x) = x===missing ? missing : (x<0 ? missing : log(x))
+df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
+# 40,385 missing
+
+
+
+cols122 = [:inc_farm_prop_inc_lpc, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+df212 = convert_float32(pollution, [[:dlhouse, :pop7080]; cols212])
+formula212 = (term(:dlhouse) ~ sum(term.(Symbol.(cols212))))
+
+formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 +
+                      splineC3 + splineC4 + absorb(year + fips))
+reg212 = regression(df, formula122; filestub="reg122")
+
+fit(EconometricModel, formula122, df)
+reg212[:reg]
 
 
 
