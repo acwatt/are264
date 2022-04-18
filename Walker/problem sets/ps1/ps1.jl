@@ -12,21 +12,29 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
-Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "CovarianceMatrices", "DataFrames", "CSV", "StatsModels", "Econometrics", "Latexify"])
+# Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
-using DataFrames
+using DataFrames, Chain
 using CSV
-using Econometrics
+# using Econometrics
+using CovarianceMatrices
 using CategoricalArrays
 using Statistics
 using StatsModels
+using StatsBase:sample
+using CUDA  # must be run before FixedEffectModels
+using FixedEffectModels
+using RegressionTables
 using Dates
 using Plots
 using GLM
-using CovarianceMatrices
 using Latexify
+using RDatasets
+using StatsPlots
+using LinearAlgebra
 Latexify.set_default(fmt = "%.3f")
+
 
 
 #==============================================================================
@@ -44,14 +52,14 @@ example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature
 
 
 #==============================================================================
-                        Keyboard Shortcuts
+KEYBOARD SHORTCUTS
 Fold current function: ctrl + shift + [
 Fold all: ctrl+k ctrl+0
 ==============================================================================#
 
 
 #==============================================================================
-                                    ADMIN FUNCTIONS
+ADMIN FUNCTIONS
 ==============================================================================#
 """Extracts file_name from zip folder zip_name in directory root_dir."""
 function extract_file_from_zip(root_dir, zip_name, file_name)
@@ -61,6 +69,8 @@ function extract_file_from_zip(root_dir, zip_name, file_name)
     if isfile(save_path)
         return
     end
+
+    println("Extracting $file_name from $root_dir")
     # Open zip file
     zarchive = ZipFile.Reader(zip_path)
     # Find file_name in zip archive
@@ -76,7 +86,7 @@ function df_from_url(url, save_path)
     if isfile(save_path)
         return DataFrame(load(joinpath(root, example_fn)))
     else
-        download(example_url, joinpath(root, example_fn))
+        download(url, joinpath(root, example_fn))
         return DataFrame(load(joinpath(root, example_fn)))
     end
 end
@@ -92,7 +102,7 @@ end
 
 
 #==============================================================================
-                            TEMPERATURE FUNCTIONS
+TEMPERATURE FUNCTIONS
 ==============================================================================#
 """Degree day calculation from Snyder 1985, using integral of sine."""
 function degree_day_calc(MAX, MIN, THR)
@@ -252,7 +262,7 @@ end
         `julia 1/(knots[last] - knots[first])^2`
     so I added that scaling factor to the Harrell formula and it produces results that match the example file. So I probably just messed up the stata formula somehow. I assume the example file was created in stata with mksplines.
 """
-function add_cubic_spline_vars(df, varname, knots, newbasename="splineC")
+function add_cubic_spline_vars(df, varname, knots; newbasename="splineC")
     for i in 1:(length(knots)-1)
         newname = "$newbasename$i"
         println("Making $newname")
@@ -324,8 +334,17 @@ function aggregate_df(df, tags)
 end
 
 
-"""Save temperature variables"""
+"""Save temperature variables
+    1.1.1 Construct 4 temperature response variables
+    1.1.2 Aggregate to year-county
+    - sum each new temperaature variable in each grid point over each year
+    - average tMin, tMax, tAvg, perc in each gridpoint over each year
+    - take a simple average over all grid points in the county to get county-year level
+"""
 function create_temperature_vars()
+    # Extract county fips file from zip if not present, and read
+    extract_file_from_zip(root, zip_fn, county_fn)
+
     # Load data and create average daily temp
     df_temp1 = DataFrame(load(joinpath(root, county_fn)))
     df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
@@ -363,7 +382,7 @@ end
 
 
 #==============================================================================
-                                ANALYSIS FUNCTIONS
+ANALYSIS FUNCTIONS
 ==============================================================================#
 function apply_vcov(reg::StatsModels.TableRegressionModel, SE::AbstractVector)
     df = DataFrame(coeftable(reg))[!, ["Name", "Coef.", "Std. Error"]]
@@ -419,8 +438,8 @@ function regression(df::DataFrame,
     # If not clustering, use Heteroskedastic-consistent
     if cluster === nothing
         hc = eval(Symbol(varcov))
-        V = vcov(hc(), reg)
-        SE = stderror(hc(), reg)
+        V = vcov(reg, hc())
+        SE = stderror(reg, hc)
 
     else  # clustering, use cluster-robust heteroskedasticity-consistent
         V = vcov(CRHC1(cluster, df), reg)
@@ -443,34 +462,48 @@ function regression(df::DataFrame,
 end
 
 
+function reg2(df::DataFrame,
+    formula::FormulaTerm; 
+    weights::Union{String, Vector, Nothing}=nothing,
+    varcov::String="HC3",
+    cluster::Union{String, Nothing}=nothing,
+    filestub::Union{String, Nothing}=nothing,
+    append_time::Bool=true)
+    #! can I implement Econometrics.jl fit? 
+    # issues:
+    #   - HC3 doesn't seem to work (OutOfMemory() error)
+    #   - latexify(model) does not work on the econometrics.jl model. Can I convert to statsmodel?
+end
+
 
 
 
 
 #==============================================================================
-                                    SETUP
-key:
-fn = filename
-dir = directory
-df = dataframe
+SETUP
+    key:
+    fn = filename
+    dir = directory
+    df = dataframe
 ==============================================================================#
-
-
-
-
-# Extract and read county fips file from zip
-println("Reading $county_fn from zip folder.")
-extract_file_from_zip(root, zip_fn, county_fn)
-df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-
 # Save single county (01001) to compare to built results
-df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
-CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
-
+f = joinpath(root, "CountyAnnualTemperature1950to2012.csv")
+if !isfile(f)
+    df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
+    CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
+end
 
 
 # Open linear piecewise stata results
-df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
+# df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
+
+
+
+
+
+
+
+
 
 
 
@@ -478,47 +511,48 @@ df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month
 
 
 #==============================================================================
-                        1.1 TEMPERATURE AGGREGATION
+1.1 TEMPERATURE AGGREGATION
 ==============================================================================#
 #=================================================
 1.1.1 Construct 4 temperature response variables
-=================================================#
-
-#=================================================
 1.1.2 Aggregate to year-county
-- sum each new temperaature variable in each grid point over each year
-- average tMin, tMax, tAvg, perc in each gridpoint over each year
-- take a simple average over all grid points in the county to get county-year level
 =================================================#
-# Create a new file with temperature variables for example county
-# This will be compared to the file given.
-create_temperature_vars()
-# This file will not be used for the rest of the problem set
-# This was just an exercise to create the variables. 
+# Create a new file with temperature variables for example county (01001)
+# This will be compared to the file given by Reed (example_fn)
+if !isfile(joinpath(root, "CountyAnnualTemperature_aaron.csv"))
+    create_temperature_vars()
+end
+# This file will NOT be used for the rest of the problem set
+# This was just an exercise to create the variables.
+
+
+
 
 
 #==============================================================================
-                        1.2 US Climate Impacts
+1.2 US Climate Impacts
 ==============================================================================#
 #=================================================
 1.2.0 Merge Income and Employment onto climate data
 =================================================#
 
 # Extract and read employment file from zip
-println("Reading $employment_fn from zip folder.")
+println("Loading $employment_fn.")
 extract_file_from_zip(root, zip_fn, employment_fn)
 df_employ = DataFrame(load(joinpath(root, employment_fn)))
 df_employ[!, :fips] = parse.(Int32, df_employ[!, :fips])
+
 # Download and load example county file to compare variables
 println("Downloading $example_fn from dropbox folder.")
 df_temp = df_from_url(example_url, joinpath(root, example_fn))
+
 # drop first row because it's missing
 df_temp = last(df_temp, nrow(df_temp)-1)
 
 # Join onto climate data
 df = innerjoin(df_temp, df_employ, on=[:fips, :year])
 
-# Make year and fips categegorical
+# Make year and fips categegorical for regressions
 df[!,:year] = categorical(df[!,:year])
 df[!,:fips] = categorical(df[!,:fips])
 
@@ -526,11 +560,21 @@ df[!,:fips] = categorical(df[!,:fips])
 
 #=================================================
 1.2.1 emp_farm vs binned temperature
-Explore the relationship between log tranformed emp_farm 
-and the vector of binned temperature controls.
-Include additional controls for county FE, year FE.
-Provide an interpretation of the coefficient of the 32+ bin.
+    Explore the relationship between log tranformed emp_farm 
+    and the vector of binned temperature controls.
+    Include additional controls for county FE, year FE.
+    Provide an interpretation of the coefficient of the 32+ bin.
 =================================================#
+# Create log(farm employees in county) and replace log(0) with missing for regressions
+df[!, :emp_farm_ln] = replace(log.(df[!, :emp_farm]), -Inf => missing)
+
+formula121 = @formula(emp_farm_ln ~ tempB0 + temp0to4 + temp4to8 + temp8to12 + temp12to16 + temp16to20 + temp24to28 + temp28to32 + tempA32 +
+                                    fe(year) + fe(fips))
+# Reference category = temp20to24 (days in county-year where tAvg ∈ (20, 24]C)
+
+reg121 = @time reg(df, formula121, Vcov.cluster(:fips))
+regtable(reg121, 
+         renderSettings = latexOutput("reg121_$(Dates.now()).tex"))
 
 
 #! % change in employees for the average county for each day above 32.
@@ -542,52 +586,166 @@ Provide an interpretation of the coefficient of the 32+ bin.
 
 #=================================================
 1.2.2 per capita farm prop income vs cubic spline temperature
-Explore the relationship between log tranformed 
-inc_farm_prop_income/population (i.e. log(per capita 
-farm prop income) using the restricted cubic spline. 
-Include additional controls for county FE and year FE.
-Plot the predicted marginal effects with associated 
-confidence intervals, and compare to the binned 
-temperature response function above.
+    Explore the relationship between log tranformed 
+    inc_farm_prop_income/population (i.e. log(per capita 
+    farm prop income) using the restricted cubic spline. 
+    Include additional controls for county FE and year FE.
+    Plot the predicted marginal effects with associated 
+    confidence intervals, and compare to the binned 
+    temperature response function above.
 =================================================#
+# Create log tranformed inc_farm_prop_income/population 
+logfn(x) = x===missing ? missing : (x ≤ 0 ? missing : log(x))
+df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
+# 40,385 missing
+df122 = df[!, [:year, :fips, :tAvg, :inc_farm_prop_inc_lpc, :splineC1, :splineC2, :splineC3, :splineC4]]
 
-#! estimate the coef, then use and array 0:0.25:40 of temps 
+# Regress inc_farm_prop_inc_lpc on spline variables and fixed effects
+formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 + splineC3 + splineC4 +
+                                    fe(year) + fe(fips))
+reg122 = @time reg(df, formula122, Vcov.cluster(:fips))
+regtable(reg122, 
+         renderSettings = latexOutput("reg122_$(Dates.now()).tex"))
+
+# Initialize x-axis for plotting: 161 points in 0.25 temperature steps between 0 and 40
+df_plot = DataFrame(tAvg=0:0.25:40)
+# Create cubic spline basis variables from x-axis
+knots = [0 8 16 24 32]
+df_plot = add_cubic_spline_vars(df_plot, :tAvg, knots)
+
+# We want to construct the estimated effect of average temperature of a day on inc_farm_prop_inc_lpc
+# Calculate point estimates and Conf Intervals for linear combination of parameters
+
+# Point estimates are just directly plugging in the coefficients (Σxₖ⋅βₖ)
+df_plot[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg122.coef
+@df df_plot plot(:tAvg, :yhat)
+
+# Let's standardize the effect to compare to the effect at 20°C
+# This means calculating the spline variables at 20°C
+# I do this so I can also calculate SEs later
+df_plot[!, "20C"] = repeat([20], nrow(df_plot))
+df_plot = add_cubic_spline_vars(df_plot, "20C", knots, newbasename="20C")
+# Then subtracting the difference for each spline variable
+for k in 1:4
+    df_plot[!, "splinenewC$k"] = df_plot[!, "splineC$k"] - df_plot[!, "20C$k"]
+end
+# Finally constructing the spline again
+df_plot[!, :yhat_new] = Matrix(df_plot[!,r"splinenewC"]) * reg122.coef
+
+
+
+
+
+
+
+
+# Standard Errors can be calculated using either the delta method or
+# analytically using additivity of variance and covariance (b/c linear)
+
+
+function get_diagonal(M::Matrix)
+    n,_ = size(M)
+    return [M[i,i] for i∈1:n]
+end
+
+# Delta method: SE =  √(∂f(β)/∂β ⋅ VCOV ⋅ ∂f(β)/∂β)
+# Calculate the β-derivative of the function of parameters
+# f(β) = Σxₖ⋅βₖ ⟹ ∂f∂βₖ = xₖ
+∂fβ_∂β = Matrix(df_plot[!,r"splineC"])
+# Get the variance-covariance matrix of parameter estimates
+VCOV = reg122.vcov
+df_plot[!, :SE] = get_diagonal(.√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+
+# Delta method on recentered data (relative to 20°C)
+∂fβ_∂β2 = Matrix(df_plot[!,r"splinenewC"])
+df_plot[!, :SE_new] = .√(get_diagonal(∂fβ_∂β2 * VCOV * ∂fβ_∂β2'))
+df_plot[!, :y_lb] = df_plot[!, :yhat_new] - 1.96*df_plot[!, :SE_new]
+df_plot[!, :y_ub] = df_plot[!, :yhat_new] + 1.96*df_plot[!, :SE_new]
+
+#! estimate the coef, then use an array 0:0.25:40 of temps 
 #! and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
 #! is there a lincom function in python or julia to use that 
 # will calculate SEs of combination of coefs? Could use delta method.
 
-# Create log tranformed inc_farm_prop_income/population 
-logfn(x) = x===missing ? missing : (x<0 ? missing : log(x))
-df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
-# 40,385 missing
+
+
+# Let's try bootstrapping!
+"""Given a dataframe sample and dataframe with tAvg values to predict on,
+    estimate the prediction vector"""
+function prediction_sample(df, df_plot)
+    reg_ = reg(df, formula122, Vcov.cluster(:fips))
+    df2 = DataFrame(tAvg=0:0.25:40)
+    df2[!, :yhat] = Matrix(df_plot[!,r"splinenewC"]) * reg_.coef
+    return df2[!, [:tAvg, :yhat]]
+end
+
+preds = []
+simulations = 10000
+for k ∈ 1:simulations
+    k%100 == 0 ? print("⋅") : nothing
+    sample_rows = sample(1:nrow(df), nrow(df), replace=true)
+    df_sample = df122[sample_rows, :]
+    append!(preds, [prediction_sample(df_sample, df_plot)])
+end
+
+# Combine all the bootstrapped predictions
+preds_comb = reduce(vcat, preds)
+
+# Get mean and 95% CI for each value of tAvg
+α = 0.05
+df_ = @chain preds_comb begin
+    groupby(:tAvg)
+    combine(:yhat => mean => :y_mean,
+            :yhat => (x -> quantile!(x, α/2)) => :y_lb,
+            :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
+            :yhat => minimum => :y_min, :yhat => maximum => :y_max)
+end
+df_plot2 = DataFrame(tAvg = df_[!, :tAvg],
+                     y = df_[!, :y_mean],
+                     y_lb_dm = df_plot[!, :y_lb],
+                     y_ub_dm = df_plot[!, :y_ub],
+                     y_lb_bs = df_[!, :y_lb],
+                     y_ub_bs = df_[!, :y_ub])
+
+
+# Plot it!
+# pboth = @df df_plot plot(:tAvg, [:yhat, :yhat_new])
+# p2 = @df df_plot plot(:tAvg, [:yhat, :yhat_new], ribbon=:SE_new)
+# p3 = @df df_plot plot(:tAvg, :yhat_new, ribbon=:SE_new)
+# p4 = @df df_ plot(:tAvg, [:y_mean, :y_lb, :y_ub])
+# p5 = plot(df_plot[!,:tAvg],
+#         [df_plot[!, :yhat_new],df_plot[!, :y_lb],df_plot[!, :y_ub],
+#          df_[!, :y_mean], df_[!, :y_lb], df_[!, :y_ub]])
+# savefig(p3, "plot122-dm.png")
+# savefig(p4, "plot122-bs.png")
+
+s = 0
+@df df_plot2 plot(:tAvg, :y_lb_dm, w=0, msw = 0, ms = s, c=1,
+    fillrange=:y_ub_dm, fillalpha=0.35,
+    label="95% CI Delta Method", dpi=300)
+@df df_plot2 plot!(:tAvg, :y_lb_bs, w=0, msw = 0, ms = s, c=2,
+    fillrange=:y_ub_bs, fillalpha=0.35,
+    label="95% CI BootStrap (10,000)", dpi=300)
+p6 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=300)
+savefig(p6, "plot122-both.png")
 
 
 
-cols122 = [:inc_farm_prop_inc_lpc, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-df212 = convert_float32(pollution, [[:dlhouse, :pop7080]; cols212])
-formula212 = (term(:dlhouse) ~ sum(term.(Symbol.(cols212))))
-
-formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 +
-                      splineC3 + splineC4 + absorb(year + fips))
-reg212 = regression(df, formula122; filestub="reg122")
-
-fit(EconometricModel, formula122, df)
-reg212[:reg]
-
+ 
 
 
 
 
 #=================================================
 1.2.3 Treatment heterogeneity
-Use the binned temperature estimator to design a 
-test for whether we observe treatment effect
-heterogeneity. One possibility for this test is 
-to interact the temperature bins with the average
-# of days in a county for which the temperature 
-falls into each respective bin (i.e. are counties
-that experience more 32+ days more/less responsive 
-to temperature).
+    Use the binned temperature estimator to design a 
+    test for whether we observe treatment effect
+    heterogeneity. One possibility for this test is 
+    to interact the temperature bins with the average
+    # of days in a county for which the temperature 
+    falls into each respective bin (i.e. are counties
+    that experience more 32+ days more/less responsive 
+    to temperature).
 =================================================#
 #! the temperature bin variables are degree-days in the bin
 #! which are averaged over all grid points in the county
@@ -621,21 +779,20 @@ to temperature).
 
 
 #==============================================================================
-                        2.2 Hedonic Air Quality Analysis
-
-Does Air Quality Get Capitalized into Housing Prices? The outcome of interest
-is  the change in county housing prices during the 1970s. We want to estimate
-the  “causal” effect of air pollution changes on housing price changes.
-According  to hedonic price theory, the housing market may be used to estimate
-the  implicit prices of clean air and the economic value of pollution
-reductions to individuals. A statistically significant negative relationship
-between changes in property values and pollution levels across counties is
-interpreted as  evidence that clean air has economic benefits. (For a summary
-of the theory,  you could read: Rosen, Sherwin, “The Theory of Equalizing
-Differences,” Chapter 12 in Handbook of Labor Economics, Volume 1, 1986, pp.
-641-92.) A basic model for the change in housing prices at the county level
-could be:  Change in housing price = g(economic shocks, changes in county
-characteristics,  change in air pollution)
+2.2 Hedonic Air Quality Analysis
+    Does Air Quality Get Capitalized into Housing Prices? The outcome of interest
+    is  the change in county housing prices during the 1970s. We want to estimate
+    the  “causal” effect of air pollution changes on housing price changes.
+    According  to hedonic price theory, the housing market may be used to estimate
+    the  implicit prices of clean air and the economic value of pollution
+    reductions to individuals. A statistically significant negative relationship
+    between changes in property values and pollution levels across counties is
+    interpreted as  evidence that clean air has economic benefits. (For a summary
+    of the theory,  you could read: Rosen, Sherwin, “The Theory of Equalizing
+    Differences,” Chapter 12 in Handbook of Labor Economics, Volume 1, 1986, pp.
+    641-92.) A basic model for the change in housing prices at the county level
+    could be:  Change in housing price = g(economic shocks, changes in county
+    characteristics,  change in air pollution)
 ==============================================================================#
 #=================================================
 2.2.0 Load Data
