@@ -727,12 +727,12 @@ print("$(t.time) seconds")
 # of their data
 println("\nStarting clustered bootstrap")
 preds2 = []
-fips_list = convert(Vector{Int32}, unique(df[!, :fips]))
-ncounties = length(fips_list)
+df_grouped = groupby(df, :fips)
+ngroups = length(df_grouped)
 t = @timed for k ∈ 1:nsimulations
     k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
-    sample_counties = sample(fips_list, ncounties, replace=true, ordered=true)
-    df_sample = @subset df (in.(:fips, [sample_counties]))
+    sample_idx = sample(1:ngroups, ngroups; replace = true, ordered = false)
+    df_sample = reduce(vcat, [df_grouped[i] for i in sample_idx])
     append!(preds2, [prediction_sample(df_sample, df_plot)])
 end
 print("$(t.time) seconds")
