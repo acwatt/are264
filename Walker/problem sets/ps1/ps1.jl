@@ -15,7 +15,7 @@ using Pkg
 # Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
-using DataFrames, Chain
+using DataFrames, Chain, DataFramesMeta
 using CSV
 # using Econometrics
 using CovarianceMatrices
@@ -81,12 +81,23 @@ function extract_file_from_zip(root_dir, zip_name, file_name)
 end
 
 
+"""Return dataframe, after unzipping and saving the file."""
+function df_from_zip(root_dir, zip_name, filename)
+    extract_file_from_zip(root_dir, zip_name, filename)
+    println("Loading $filename from file.")
+    return DataFrame(load(joinpath(root_dir, filename)))
+end
+
+
 """Read file at save_path to dataframe, if not present, download from url."""
 function df_from_url(url, save_path)
     if isfile(save_path)
+        println("Loading $save_path from file.")
         return DataFrame(load(joinpath(root, example_fn)))
     else
+        println("Downloading $save_path from url.")
         download(url, joinpath(root, example_fn))
+        println("Loading $save_path from file.")
         return DataFrame(load(joinpath(root, example_fn)))
     end
 end
@@ -538,12 +549,10 @@ end
 
 # Extract and read employment file from zip
 println("Loading $employment_fn.")
-extract_file_from_zip(root, zip_fn, employment_fn)
-df_employ = DataFrame(load(joinpath(root, employment_fn)))
+df_employ = df_from_zip(root, zip_fn, employment_fn)
 df_employ[!, :fips] = parse.(Int32, df_employ[!, :fips])
 
 # Download and load example county file to compare variables
-println("Downloading $example_fn from dropbox folder.")
 df_temp = df_from_url(example_url, joinpath(root, example_fn))
 
 # drop first row because it's missing
@@ -641,8 +650,31 @@ df_plot[!, :yhat_new] = Matrix(df_plot[!,r"splinenewC"]) * reg122.coef
 
 # Standard Errors can be calculated using either the delta method or
 # analytically using additivity of variance and covariance (b/c linear)
+# or using bootstrap resampling
 
 
+
+# Let's try the analytical method!
+#=
+Define x = a single day's average temperature
+Define f(x) = the effect of moving a single day's average temperature from 20°C to x
+We want to estimate the 95% confidence interval of f(x) for each x ∈ [0°C, 40°C]
+Each of our spline basis variables is a function of the average temperature x
+Let Zₖ = gₖ(X) to be the spline basis variables for k ∈ {1,2,3,4}
+We run a regression on the spline basis variables to fit the spline to farm employment:
+    y = ΣₖZₖβₖ + year + county (year and county fixed effects)
+After running our regression on the spline basis variables and fixed effects,
+    our predicted response of percapita farm employment from moving a day 
+    with average temp 0°C to average temp x is:
+    f(x) = ΣₖZₖβₖ
+Then we would want to calculate the variance of the prediction f(x) at each value of x
+So Var(f(x)) = Var(ΣₖZₖβₖ) = ΣₖZₖ² Var(βₖ) + 2 Σ{k}Σ{j>k} ZₖZⱼ Cov(βₖ,βⱼ)
+... turns out this is identical to the delta method formula, even after making f(x)
+    relative to a specific temperature (20°C)
+=#
+
+
+# Let's try the Delta Method!
 function get_diagonal(M::Matrix)
     n,_ = size(M)
     return [M[i,i] for i∈1:n]
@@ -656,16 +688,13 @@ end
 VCOV = reg122.vcov
 df_plot[!, :SE] = get_diagonal(.√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
 
-# Delta method on recentered data (relative to 20°C)
+# Delta method on recentered data (outcome centered on predicted outcome at 20°C)
 ∂fβ_∂β2 = Matrix(df_plot[!,r"splinenewC"])
 df_plot[!, :SE_new] = .√(get_diagonal(∂fβ_∂β2 * VCOV * ∂fβ_∂β2'))
 df_plot[!, :y_lb] = df_plot[!, :yhat_new] - 1.96*df_plot[!, :SE_new]
 df_plot[!, :y_ub] = df_plot[!, :yhat_new] + 1.96*df_plot[!, :SE_new]
 
-#! estimate the coef, then use an array 0:0.25:40 of temps 
-#! and 2.26 and 2.27 in Harrell 2001 to construct the function to plot
-#! is there a lincom function in python or julia to use that 
-# will calculate SEs of combination of coefs? Could use delta method.
+
 
 
 
@@ -679,33 +708,64 @@ function prediction_sample(df, df_plot)
     return df2[!, [:tAvg, :yhat]]
 end
 
+# Simple Bootstrap (over all individuals)
+println("\nStarting simple bootstrap")
+screenwidth = 50
 preds = []
-simulations = 10000
-for k ∈ 1:simulations
-    k%100 == 0 ? print("⋅") : nothing
+nsimulations = 10000
+t = @timed for k ∈ 1:nsimulations
+    k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
     sample_rows = sample(1:nrow(df), nrow(df), replace=true)
     df_sample = df122[sample_rows, :]
     append!(preds, [prediction_sample(df_sample, df_plot)])
 end
+print("$(t.time) seconds")
+
+# Clustered Bootstrap (over each fips county code)
+# Need to sample 3055 counties of 3055 counties (with replacement)
+# Requires repeating some counties in the data and keeping all years
+# of their data
+println("\nStarting clustered bootstrap")
+preds2 = []
+fips_list = convert(Vector{Int32}, unique(df[!, :fips]))
+ncounties = length(fips_list)
+t = @timed for k ∈ 1:nsimulations
+    k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
+    sample_counties = sample(fips_list, ncounties, replace=true, ordered=true)
+    df_sample = @subset df (in.(:fips, [sample_counties]))
+    append!(preds2, [prediction_sample(df_sample, df_plot)])
+end
+print("$(t.time) seconds")
 
 # Combine all the bootstrapped predictions
 preds_comb = reduce(vcat, preds)
+preds_comb_cluster = reduce(vcat, preds2)
 
 # Get mean and 95% CI for each value of tAvg
 α = 0.05
-df_ = @chain preds_comb begin
+df_bs = @chain preds_comb begin
     groupby(:tAvg)
     combine(:yhat => mean => :y_mean,
             :yhat => (x -> quantile!(x, α/2)) => :y_lb,
             :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
             :yhat => minimum => :y_min, :yhat => maximum => :y_max)
 end
-df_plot2 = DataFrame(tAvg = df_[!, :tAvg],
-                     y = df_[!, :y_mean],
-                     y_lb_dm = df_plot[!, :y_lb],
+df_bs_cluster = @chain preds_comb_cluster begin
+    groupby(:tAvg)
+    combine(:yhat => mean => :y_mean,
+            :yhat => (x -> quantile!(x, α/2)) => :y_lb,
+            :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
+            :yhat => minimum => :y_min, :yhat => maximum => :y_max)
+end
+df_plot2 = DataFrame(tAvg = df_bs[!, :tAvg],
+                     y = df_bs[!, :y_mean],        # predicted outcome
+                     y_lb_dm = df_plot[!, :y_lb],  # delta method CI
                      y_ub_dm = df_plot[!, :y_ub],
-                     y_lb_bs = df_[!, :y_lb],
-                     y_ub_bs = df_[!, :y_ub])
+                     y_lb_bs = df_bs[!, :y_lb],    # simple bootstrap CI
+                     y_ub_bs = df_bs[!, :y_ub],
+                     y_lb_bsc = df_bs_cluster[!, :y_lb],  # clustered bootstrap CI
+                     y_ub_bsc = df_bs_cluster[!, :y_ub],
+                     )
 
 
 # Plot it!
@@ -719,15 +779,30 @@ df_plot2 = DataFrame(tAvg = df_[!, :tAvg],
 # savefig(p3, "plot122-dm.png")
 # savefig(p4, "plot122-bs.png")
 
-s = 0
+using Plots:plot,plot!
+
+s = 0; dpi=400;
 @df df_plot2 plot(:tAvg, :y_lb_dm, w=0, msw = 0, ms = s, c=1,
     fillrange=:y_ub_dm, fillalpha=0.35,
-    label="95% CI Delta Method", dpi=300)
+    label="95% CI Delta Method", dpi=dpi)
 @df df_plot2 plot!(:tAvg, :y_lb_bs, w=0, msw = 0, ms = s, c=2,
     fillrange=:y_ub_bs, fillalpha=0.35,
-    label="95% CI BootStrap (10,000)", dpi=300)
-p6 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=300)
-savefig(p6, "plot122-both.png")
+    label="95% CI BootStrap ($nsimulations)", dpi=dpi)
+p6 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=dpi, legend=:bottomleft)
+savefig(p6, "plot122-both.svg")
+
+
+@df df_plot2 plot(:tAvg, :y_lb_dm, w=0, msw = 0, ms = s, c=1,
+    fillrange=:y_ub_dm, fillalpha=0.35,
+    label="95% CI Delta Method", dpi=dpi)
+@df df_plot2 plot!(:tAvg, :y_lb_bs, w=0, msw = 0, ms = s, c=2,
+    fillrange=:y_ub_bs, fillalpha=0.35,
+    label="95% CI BootStrap ($nsimulations)", dpi=dpi)
+@df df_plot2 plot!(:tAvg, :y_lb_bsc, w=0, msw = 0, ms = s, c=3,
+    fillrange=:y_ub_bsc, fillalpha=0.35,
+    label="95% CI BootStrap-clustered ($nsimulations, FIPS)", dpi=dpi)
+p7 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=dpi, legend=:bottomleft)
+savefig(p7, "plot122-delta-boot-bootcluster.svg")
 
 
 
