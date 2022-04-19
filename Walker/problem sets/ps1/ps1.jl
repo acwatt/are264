@@ -33,6 +33,7 @@ using Latexify
 using RDatasets
 using StatsPlots
 using LinearAlgebra
+using Distributions
 Latexify.set_default(fmt = "%.3f")
 
 
@@ -548,7 +549,6 @@ end
 =================================================#
 
 # Extract and read employment file from zip
-println("Loading $employment_fn.")
 df_employ = df_from_zip(root, zip_fn, employment_fn)
 df_employ[!, :fips] = parse.(Int32, df_employ[!, :fips])
 
@@ -614,32 +614,66 @@ formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 + splineC3 + s
                                     fe(year) + fe(fips))
 reg122 = @time reg(df, formula122, Vcov.cluster(:fips))
 regtable(reg122, 
-         renderSettings = latexOutput("reg122_$(Dates.now()).tex"))
+         renderSettings = latexOutput("reg122_$(Dates.now()).tex")
+)
 
-# Initialize x-axis for plotting: 161 points in 0.25 temperature steps between 0 and 40
-df_plot = DataFrame(tAvg=0:0.25:40)
-# Create cubic spline basis variables from x-axis
-knots = [0 8 16 24 32]
-df_plot = add_cubic_spline_vars(df_plot, :tAvg, knots)
-
-# We want to construct the estimated effect of average temperature of a day on inc_farm_prop_inc_lpc
-# Calculate point estimates and Conf Intervals for linear combination of parameters
-
-# Point estimates are just directly plugging in the coefficients (Σxₖ⋅βₖ)
-df_plot[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg122.coef
-@df df_plot plot(:tAvg, :yhat)
-
-# Let's standardize the effect to compare to the effect at 20°C
-# This means calculating the spline variables at 20°C
-# I do this so I can also calculate SEs later
-df_plot[!, "20C"] = repeat([20], nrow(df_plot))
-df_plot = add_cubic_spline_vars(df_plot, "20C", knots, newbasename="20C")
-# Then subtracting the difference for each spline variable
-for k in 1:4
-    df_plot[!, "splinenewC$k"] = df_plot[!, "splineC$k"] - df_plot[!, "20C$k"]
+"""Return DF of avg temp, cubic spline, and predicted outcome variables needed for regressions and plotting.
+    
+    @param: reg_output: output from a regression on 4 cubic spline variables
+    
+    - create an x-axis for plotting: define an array of avg temps from 0 to 40°C, 0.25 steps
+    - define the spline knots/breakpoints
+    - Create spline basis variables. After regressing, the absolute level of the outcome (y-axis)
+        is not identified because the county & year fixed effects shift the intercept around.
+        So these basis will be compared to the spline basis variables created for X°C.
+    - Create spline basis variables for X°C
+    - Create relative basis variables (base - X°C variables) which is equivalent to shifting
+        the base prediction by the X°C prediction, but allows for adjusted standard errors
+        in the delta method calculation.
+"""
+function plotdf_init(reg_output; X=20)
+    df = DataFrame(tAvg=0:0.25:40)      # Initialize x-axis
+    knots = [0 8 16 24 32]              # breakpoints in spline
+    # Create base basis spline variables
+    df = add_cubic_spline_vars(df, :tAvg, knots, newbasename="splinebaseC")
+    # Create X°C basis spline variables
+    df[!, "XC"] = repeat([X], nrow(df))
+    df = add_cubic_spline_vars(df, "XC", knots, newbasename="XC")
+    # Create relative basis spline variables (relative to X°C)
+    for k in 1:4
+        df[!, "splinerelativeC$k"] = df[!, "splinebaseC$k"] - df[!, "XC$k"]
+    end
+    # Construct the predicted spline outcome
+    df[!, :yhat] = Matrix(df[!,r"splinerelativeC"]) * reg_output.coef
+    # Return the x-axis, predicted outcome, splinerelCnd relative spline variables (for delta method SE estimation)
+    return df[!, [["tAvg", "yhat"]; ["splineC$k" for k ∈ 1:4]]]
 end
-# Finally constructing the spline again
-df_plot[!, :yhat_new] = Matrix(df_plot[!,r"splinenewC"]) * reg122.coef
+
+
+# # Initialize x-axis for plotting: 161 points in 0.25 temperature steps between 0 and 40
+# df_plot = DataFrame(tAvg=0:0.25:40)
+# # Create cubic spline basis variables from x-axis
+# knots = [0 8 16 24 32]
+# df_plot = add_cubic_spline_vars(df_plot, :tAvg, knots)
+
+# # We want to construct the estimated effect of average temperature of a day on inc_farm_prop_inc_lpc
+# # Calculate point estimates and Conf Intervals for linear combination of parameters
+
+# # Point estimates are just directly plugging in the coefficients (Σxₖ⋅βₖ)
+# df_plot[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg122.coef
+# @df df_plot plot(:tAvg, :yhat)
+
+# # Let's standardize the effect to compare to the effect at 20°C
+# # This means calculating the spline variables at 20°C
+# # I do this so I can also calculate SEs later
+# df_plot[!, "20C"] = repeat([20], nrow(df_plot))
+# df_plot = add_cubic_spline_vars(df_plot, "20C", knots, newbasename="20C")
+# # Then subtracting the difference for each spline variable
+# for k in 1:4
+#     df_plot[!, "splinenewC$k"] = df_plot[!, "splineC$k"] - df_plot[!, "20C$k"]
+# end
+# # Finally constructing the spline again
+# df_plot[!, :yhat_new] = Matrix(df_plot[!,r"splinenewC"]) * reg122.coef
 
 
 
@@ -680,19 +714,31 @@ function get_diagonal(M::Matrix)
     return [M[i,i] for i∈1:n]
 end
 
+df_plot = plotdf_init(reg122)
+
 # Delta method: SE =  √(∂f(β)/∂β ⋅ VCOV ⋅ ∂f(β)/∂β)
 # Calculate the β-derivative of the function of parameters
 # f(β) = Σxₖ⋅βₖ ⟹ ∂f∂βₖ = xₖ
-∂fβ_∂β = Matrix(df_plot[!,r"splineC"])
+# ∂fβ_∂β = Matrix(df_plot[!,r"splineC"])
 # Get the variance-covariance matrix of parameter estimates
 VCOV = reg122.vcov
-df_plot[!, :SE] = get_diagonal(.√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+# df_plot[!, :SE] = get_diagonal(.√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+
+"""Return DF with upper and lower bounds created from delta method."""
+function deltamethod_CIbounds!(df, reg_output; column_stem="splineC", α=0.95)
+    VCOV = reg_output.vcov
+    ∂fβ_∂β = Matrix(df[!, Regex(column_stem)])
+    n = reg_output.nobs
+    df[!, :SE] = .√(get_diagonal(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+    df[!, :y_lb] = df[!, :yhat] - 1.96*df[!, :SE]
+    df[!, :y_ub] = df[!, :yhat] + 1.96*df[!, :SE]
+end
 
 # Delta method on recentered data (outcome centered on predicted outcome at 20°C)
-∂fβ_∂β2 = Matrix(df_plot[!,r"splinenewC"])
-df_plot[!, :SE_new] = .√(get_diagonal(∂fβ_∂β2 * VCOV * ∂fβ_∂β2'))
-df_plot[!, :y_lb] = df_plot[!, :yhat_new] - 1.96*df_plot[!, :SE_new]
-df_plot[!, :y_ub] = df_plot[!, :yhat_new] + 1.96*df_plot[!, :SE_new]
+∂fβ_∂β = Matrix(df_plot[!,r"$column_stem"])
+df_plot[!, :SE] = .√(get_diagonal(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+df_plot[!, :y_lb] = df_plot[!, :yhat] - 1.96*df_plot[!, :SE]
+df_plot[!, :y_ub] = df_plot[!, :yhat] + 1.96*df_plot[!, :SE]
 
 
 
@@ -704,22 +750,30 @@ df_plot[!, :y_ub] = df_plot[!, :yhat_new] + 1.96*df_plot[!, :SE_new]
 function prediction_sample(df, df_plot)
     reg_ = reg(df, formula122, Vcov.cluster(:fips))
     df2 = DataFrame(tAvg=0:0.25:40)
-    df2[!, :yhat] = Matrix(df_plot[!,r"splinenewC"]) * reg_.coef
+    df2[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg_.coef
     return df2[!, [:tAvg, :yhat]]
 end
 
-# Simple Bootstrap (over all individuals)
-println("\nStarting simple bootstrap")
-screenwidth = 50
-preds = []
-nsimulations = 10000
-t = @timed for k ∈ 1:nsimulations
-    k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
-    sample_rows = sample(1:nrow(df), nrow(df), replace=true)
-    df_sample = df122[sample_rows, :]
-    append!(preds, [prediction_sample(df_sample, df_plot)])
+
+"""Return dataframe of bootstrapped """
+function bootstrap_predicted_outcome(df::DataFrame,
+                                     prediction_function::Function;
+                                     screenwidth=50
+                                     nsimulations=10000
+                                     )
+    println("\nStarting simple bootstrap")
+    cols = [:year, :fips, :tAvg, :inc_farm_prop_inc_lpc, :splineC1, :splineC2, :splineC3, :splineC4]
+    preds = []
+    t = @timed for k ∈ 1:nsimulations
+        k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
+        sample_rows = sample(1:nrow(df), nrow(df), replace=true)
+        df_sample = df[sample_rows, cols]
+        append!(preds, [prediction_sample(df_sample, df_plot)])
+    end
+    print("$(t.time) seconds")
 end
-print("$(t.time) seconds")
+# Simple Bootstrap (over all individuals)
+
 
 # Clustered Bootstrap (over each fips county code)
 # Need to sample 3055 counties of 3055 counties (with replacement)
