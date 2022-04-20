@@ -12,7 +12,7 @@ notes:
                                     PACKAGES
 ==============================================================================#
 using Pkg
-# Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra"])
+# Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra", "TimeSeries"])
 using ZipFile  # unzip compressed .zip folders
 using StatFiles  # read Stata files
 using DataFrames, Chain, DataFramesMeta
@@ -35,6 +35,7 @@ using RDatasets
 using StatsPlots
 using LinearAlgebra
 using Distributions
+using TimeSeries
 Latexify.set_default(fmt = "%.3f")
 
 
@@ -574,6 +575,9 @@ logfn(x) = x===missing ? missing : (x ≤ 0 ? missing : log(x))
 df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
 # 40,385 missing
 
+# Convert the year into a Date
+df[!, :Date] = Date.(convert(Vector{Int}, df[!,:year]))
+
 
 #=================================================
 1.2.1 emp_farm vs binned temperature
@@ -583,7 +587,8 @@ df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_
     Provide an interpretation of the coefficient of the 32+ bin.
 =================================================#
 formula121 = @formula(emp_farm_ln ~ tempB0 + temp0to4 + temp4to8 + temp8to12 + temp12to16 + temp16to20 + temp24to28 + temp28to32 + tempA32 +
-fe(fips) + fe(year))
+    fe(fips) + fe(year)
+)
 # Reference category = temp20to24 (days in county-year where tAvg ∈ (20, 24]C)
 
 reg121 = @time reg(df, formula121, Vcov.cluster(:fips))
@@ -602,16 +607,16 @@ df121 = reduce(vcat, [[df121]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)
 df121 = sort!(df121, :tAvg)
 
 plot(df121[!,:tAvg], repeat([0], nrow(df121)), c="gray", s=:dash, label="")
-@df df121 plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+@df df121 plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
     fillrange=:y_ub, fillalpha=0.35,
     label="95% CI")
 xlabel!("Average Temperature")
 ylabel!("log(Farm Employment)")
 title!("Binned Temperature Response: Farm Employment      ")
-p = @df df121 plot!(:tAvg, :yhat, 
+p121 = @df df121 plot!(:tAvg, :yhat, 
     label="Predicted Response", 
-    legend=:bottomright, c=2)
-savefig(p, "plot121-bins.svg")
+    legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+savefig(p121, "plot121-bins.svg")
 
 #! % change in employees for the average county for each day above 32.
 
@@ -693,22 +698,22 @@ Standard Errors can be calculated using:
 
 
 
-# Let's try the analytical method!
-#=
-Define x = a single day's average temperature
-Define f(x) = the effect of moving a single day's average temperature from 20°C to x
-We want to estimate the 95% confidence interval of f(x) for each x ∈ [0°C, 40°C]
-Each of our spline basis variables is a function of the average temperature x
-Let Zₖ = gₖ(X) to be the spline basis variables for k ∈ {1,2,3,4}
-We run a regression on the spline basis variables to fit the spline to farm employment:
-    y = ΣₖZₖβₖ + year + county (year and county fixed effects)
-After running our regression on the spline basis variables and fixed effects,
-    our predicted response of percapita farm employment from moving a day 
-    with average temp 0°C to average temp x is:
-    f(x) = ΣₖZₖβₖ
-Then we would want to calculate the variance of the prediction f(x) at each value of x
-So Var(f(x)) = Var(ΣₖZₖβₖ) = ΣₖZₖ² Var(βₖ) + 2 Σ{k}Σ{j>k} ZₖZⱼ Cov(βₖ,βⱼ)
-... turns out this is identical to the delta method formula, even after making f(x)
+
+#= Let's try the analytical method!
+    Define x = a single day's average temperature
+    Define f(x) = the effect of moving a single day's average temperature from 20°C to x
+    We want to estimate the 95% confidence interval of f(x) for each x ∈ [0°C, 40°C]
+    Each of our spline basis variables is a function of the average temperature x
+    Let Zₖ = gₖ(X) to be the spline basis variables for k ∈ {1,2,3,4}
+    We run a regression on the spline basis variables to fit the spline to farm employment:
+        y = ΣₖZₖβₖ + year + county (year and county fixed effects)
+    After running our regression on the spline basis variables and fixed effects,
+        our predicted response of percapita farm employment from moving a day 
+        with average temp 0°C to average temp x is:
+        f(x) = ΣₖZₖβₖ
+    Then we would want to calculate the variance of the prediction f(x) at each value of x
+    So Var(f(x)) = Var(ΣₖZₖβₖ) = ΣₖZₖ² Var(βₖ) + 2 Σ{k}Σ{j>k} ZₖZⱼ Cov(βₖ,βⱼ)
+    ... turns out this is identical to the delta method formula, even after making f(x)
     relative to a specific temperature (20°C)
 =#
 
@@ -744,14 +749,6 @@ function deltamethod_CIbounds!(df, reg_output; column_stem="splinerelativeC", α
     #! If the sample size is small, consider using the second-order delta method
     return df
 end
-
-
-# Initialize dataframe used for plotting (x-axis with temperatures, spline variables)
-df_plot = plotdf_init(reg122)
-# Delta method on recentered data (outcome centered on predicted outcome at 20°C)
-df_plot = deltamethod_CIbounds!(df_plot, reg122)
-
-
 
 
 # Let's try bootstrapping!
@@ -837,36 +834,44 @@ function bootstrap_predicted_outcome(df::DataFrame,
 end
 
 
+# Initialize dataframe used for plotting (x-axis with temperatures, spline variables)
+df_plot = plotdf_init(reg122)
+# Delta method on recentered data (outcome centered on predicted outcome at 20°C)
+df_plot = deltamethod_CIbounds!(df_plot, reg122)
+
 
 # Get mean and 95% CI for each value of tAvg using bootstraps
-nsimulations = 100
-# Simple bootstrap (over all individuals)
-df_bs = bootstrap_predicted_outcome(df, prediction_sample, nsimulations=nsimulations)
-# Clustered bootstrap
-df_bs_cluster = bootstrap_predicted_outcome(df, prediction_sample, :fips; nsimulations=nsimulations)   
+if 1==0
+    nsimulations = 100
+    # Simple bootstrap (over all individuals)
+    df_bs = bootstrap_predicted_outcome(df, prediction_sample, nsimulations=nsimulations)
+    # Clustered bootstrap
+    df_bs_cluster = bootstrap_predicted_outcome(df, prediction_sample, :fips; nsimulations=nsimulations)   
 
-# Plot it!
+
+    # Plot Delta method and bootstraps confidence intervals and predicted outcome
+    s = 0; dpi=400;
+    @df df_plot plot(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+        fillrange=:y_ub, fillalpha=0.35,
+        label="95% CI Delta Method")
+    @df df_bs plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=2,
+        fillrange=:y_ub, fillalpha=0.35,
+        label="95% CI BootStrap ($nsimulations)")
+    @df df_bs_cluster plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=3,
+        fillrange=:y_ub, fillalpha=0.35,
+        label="95% CI BootStrap-clustered ($nsimulations, FIPS)")
+    p8 = @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft)
+    savefig(p8, "plot122-delta-boot-bootcluster.svg")
+end
+
 
 # Plot Delta method confidence intervals and predicted outcome
-s = 0; dpi=400;
-@df df_plot plot(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
-    fillrange=:y_ub, fillalpha=0.35,
-    label="95% CI Delta Method")
-@df df_bs plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=2,
-    fillrange=:y_ub, fillalpha=0.35,
-    label="95% CI BootStrap ($nsimulations)")
-@df df_bs_cluster plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=3,
-    fillrange=:y_ub, fillalpha=0.35,
-    label="95% CI BootStrap-clustered ($nsimulations, FIPS)")
-p8 = @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft)
-savefig(p8, "plot122-delta-boot-bootcluster.svg")
-
 plot(df_plot[!,:tAvg], repeat([0], nrow(df_plot)), c="gray", s=:dash, label="")
-@df df_plot plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+@df df_plot plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
     fillrange=:y_ub, fillalpha=0.35,
     label="95% CI")
 xlabel!("Average Temperature")
-ylabel!("log(Farm Employment per capita)")
+ylabel!("log(Farm Income per capita)")
 title!("Spline Temperature Response: Farm Employment      ")
 p9 = @df df_plot plot!(:tAvg, :yhat, 
     label="Predicted Response", legend=:bottomleft, c=2)
@@ -905,7 +910,125 @@ savefig(p9, "plot122-spline.svg")
 #! which are averaged over all grid points in the county
 #! so aren't they already "the average # of days in a county
 #! for which the temperature falls inot each bin"?
+#! Simon ==> use 10-year rolling averages
 
+
+function add_moving_avgs!(df; windowsize=10)
+    # group each county
+    cols = [["fips", "Date"]; names(df, r"temp[^P]")]
+    gdf = groupby(df[!, cols], :fips)
+    dfs = []
+    # for each county, calculate a 10-year backward-looking moving average
+    for group in gdf
+        # Create TimeArray
+        temp = TimeArray(group, timestamp = :Date)
+        # create moving average of last 10 years
+        temp = moving(mean, temp, windowsize)
+        # convert back to dataframe
+        temp = DataFrame(temp)
+        append!(dfs, [temp])
+    end
+    # concatenate county dataframes and leftjoin onto df using fips and Date
+    df_avg = reduce(vcat, dfs)
+    renamingdict = [names(df, r"temp[^P]") .=> names(df, r"temp[^P]") .* "_avg"; ["timestamp" => "Date"]]
+    df_avg = DataFrames.rename(df_avg, renamingdict)
+    df = leftjoin(df, df_avg, on=[:fips, :Date])
+    return df
+end
+
+# For each bin, add the 10-year moving average
+df = add_moving_avgs!(df)
+
+
+# Calculate the deviance from the running mean
+for col in names(df, r"temp[^P].*(?<!_avg)$")
+    df[!, "$(col)_dev"] = df[!, col] - df[!, "$(col)_avg"]
+end
+
+
+# Regress the outcomes on the deviance from the running average bins
+function reg123(df, y; cluster=:fips, regex=r"temp(?!20to24).*_dev")
+    formula_ = term(y) ~ sum([term.(names(df, regex)); [term(fe(:fips)), term(fe(:year))]])
+    reg_ = @time reg(df, formula_, Vcov.cluster(cluster))
+    se = .√[reg_.vcov[i,i] for i in 1:length(reg_.coef)]
+    ub = reg_.coef + 1.96*se
+    lb = reg_.coef - 1.96*se
+    df2 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
+                    yhat=reg_.coef,
+                    yerror=1.96*se,
+                    y_ub=ub,
+                    y_lb=lb)
+    df2 = reduce(vcat, [[df2]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
+    df2 = sort!(df2, :tAvg)
+    return df2
+end
+
+
+labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income per capita")
+Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
+for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
+    temp = reg123(df, y)
+    plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
+    @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI")
+    xlabel!("Average Temperature")
+    ylabel!("log($(labels[y]))")
+    title!("Binned DDay Deviance from Avg: $(labels[y])          ")
+    p121 = @df temp plot!(:tAvg, :yhat, 
+        label="Predicted Response", 
+        legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+    savefig(p121, "plot123 $(labels[y]) deviance.svg")
+end
+
+
+
+for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
+    temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
+    plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
+    @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI")
+    xlabel!("Average Temperature")
+    ylabel!("log($(labels[y]))")
+    title!("Binned Temperature Response: $(labels[y])         ")
+    p121 = @df temp plot!(:tAvg, :yhat, 
+        label="Predicted Response", 
+        legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+    savefig(p121, "plot123 $(labels[y]) bins.svg")
+end
+
+
+
+
+
+
+
+# formula123a = @formula(emp_farm_ln ~ tempB0_dev + temp0to4_dev + temp4to8_dev + 
+#     temp8to12_dev + temp12to16_dev + temp16to20_dev + temp24to28_dev + temp28to32_dev + tempA32_dev +
+#     fe(fips) + fe(year)
+# )
+# formula123b = @formula(inc_farm_prop_inc_lpc ~ tempB0_dev + temp0to4_dev + temp4to8_dev + 
+#     temp8to12_dev + temp12to16_dev + temp16to20_dev + temp24to28_dev + temp28to32_dev + tempA32_dev +
+#     fe(fips) + fe(year)
+# )
+# # Reference category = temp20to24 (days in county-year where tAvg ∈ (20, 24]C)
+
+# reg123a = @time reg(df, formula123a, Vcov.cluster(:fips))
+# reg123b = @time reg(df, formula123b, Vcov.cluster(:fips))
+# regtable(reg121, 
+#          renderSettings = latexOutput("reg121_$(Dates.now()).tex")
+# )
+# se121 = .√[reg121.vcov[i,i] for i in 1:length(reg121.coef)]
+# ub121 = reg121.coef + 1.96*se121
+# lb121 = reg121.coef - 1.96*se121
+# df121 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
+#                   yhat=reg121.coef,
+#                   yerror=1.96*se121,
+#                   y_ub=ub121,
+#                   y_lb=lb121)
+# df121 = reduce(vcat, [[df121]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
+# df121 = sort!(df121, :tAvg)
 
 
 
