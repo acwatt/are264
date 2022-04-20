@@ -28,6 +28,7 @@ using FixedEffectModels
 using RegressionTables
 using Dates
 using Plots
+using Plots:plot,plot!  # just to get rid of wavey syntax lines (VCcode bug)
 using GLM
 using Latexify
 using RDatasets
@@ -565,6 +566,13 @@ df = innerjoin(df_temp, df_employ, on=[:fips, :year])
 df[!,:year] = categorical(df[!,:year])
 df[!,:fips] = categorical(df[!,:fips])
 
+# Create log(farm employees in county) and replace log(0) with missing
+df[!, :emp_farm_ln] = replace(log.(df[!, :emp_farm]), -Inf => missing)
+
+# Create log tranformed inc_farm_prop_income/population 
+logfn(x) = x===missing ? missing : (x ≤ 0 ? missing : log(x))
+df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
+# 40,385 missing
 
 
 #=================================================
@@ -574,19 +582,46 @@ df[!,:fips] = categorical(df[!,:fips])
     Include additional controls for county FE, year FE.
     Provide an interpretation of the coefficient of the 32+ bin.
 =================================================#
-# Create log(farm employees in county) and replace log(0) with missing for regressions
-df[!, :emp_farm_ln] = replace(log.(df[!, :emp_farm]), -Inf => missing)
-
 formula121 = @formula(emp_farm_ln ~ tempB0 + temp0to4 + temp4to8 + temp8to12 + temp12to16 + temp16to20 + temp24to28 + temp28to32 + tempA32 +
-                                    fe(year) + fe(fips))
+fe(fips) + fe(year))
 # Reference category = temp20to24 (days in county-year where tAvg ∈ (20, 24]C)
 
 reg121 = @time reg(df, formula121, Vcov.cluster(:fips))
 regtable(reg121, 
-         renderSettings = latexOutput("reg121_$(Dates.now()).tex"))
+         renderSettings = latexOutput("reg121_$(Dates.now()).tex")
+)
+se121 = .√[reg121.vcov[i,i] for i in 1:length(reg121.coef)]
+ub121 = reg121.coef + 1.96*se121
+lb121 = reg121.coef - 1.96*se121
+df121 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
+                  yhat=reg121.coef,
+                  yerror=1.96*se121,
+                  y_ub=ub121,
+                  y_lb=lb121)
+df121 = reduce(vcat, [[df121]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
+df121 = sort!(df121, :tAvg)
 
+plot(df121[!,:tAvg], repeat([0], nrow(df121)), c="gray", s=:dash, label="")
+@df df121 plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI")
+xlabel!("Average Temperature")
+ylabel!("log(Farm Employment)")
+title!("Binned Temperature Response: Farm Employment      ")
+p = @df df121 plot!(:tAvg, :yhat, 
+    label="Predicted Response", 
+    legend=:bottomright, c=2)
+savefig(p, "plot121-bins.svg")
 
 #! % change in employees for the average county for each day above 32.
+
+
+
+
+
+
+
+
 
 
 
@@ -602,20 +637,18 @@ regtable(reg121,
     Plot the predicted marginal effects with associated 
     confidence intervals, and compare to the binned 
     temperature response function above.
-=================================================#
-# Create log tranformed inc_farm_prop_income/population 
-logfn(x) = x===missing ? missing : (x ≤ 0 ? missing : log(x))
-df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
-# 40,385 missing
-df122 = df[!, [:year, :fips, :tAvg, :inc_farm_prop_inc_lpc, :splineC1, :splineC2, :splineC3, :splineC4]]
 
+    We want to construct the estimated effect of average 
+    temperature of a day on inc_farm_prop_inc_lpc
+    Calculate point estimates and Conf Intervals 
+    for linear combination of parameters
+=================================================#
 # Regress inc_farm_prop_inc_lpc on spline variables and fixed effects
 formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 + splineC3 + splineC4 +
                                     fe(year) + fe(fips))
 reg122 = @time reg(df, formula122, Vcov.cluster(:fips))
-regtable(reg122, 
-         renderSettings = latexOutput("reg122_$(Dates.now()).tex")
-)
+regtable(reg122,renderSettings = latexOutput("reg122_$(Dates.now()).tex"))
+
 
 """Return DF of avg temp, cubic spline, and predicted outcome variables needed for regressions and plotting.
     
@@ -646,45 +679,17 @@ function plotdf_init(reg_output; X=20)
     # Construct the predicted spline outcome
     df[!, :yhat] = Matrix(df[!,r"splinerelativeC"]) * reg_output.coef
     # Return the x-axis, predicted outcome, splinerelCnd relative spline variables (for delta method SE estimation)
-    return df[!, [["tAvg", "yhat"]; ["splineC$k" for k ∈ 1:4]]]
+    return df[!, [["tAvg", "yhat"]; ["splinerelativeC$k" for k ∈ 1:4]]]
 end
 
 
-# # Initialize x-axis for plotting: 161 points in 0.25 temperature steps between 0 and 40
-# df_plot = DataFrame(tAvg=0:0.25:40)
-# # Create cubic spline basis variables from x-axis
-# knots = [0 8 16 24 32]
-# df_plot = add_cubic_spline_vars(df_plot, :tAvg, knots)
 
-# # We want to construct the estimated effect of average temperature of a day on inc_farm_prop_inc_lpc
-# # Calculate point estimates and Conf Intervals for linear combination of parameters
-
-# # Point estimates are just directly plugging in the coefficients (Σxₖ⋅βₖ)
-# df_plot[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg122.coef
-# @df df_plot plot(:tAvg, :yhat)
-
-# # Let's standardize the effect to compare to the effect at 20°C
-# # This means calculating the spline variables at 20°C
-# # I do this so I can also calculate SEs later
-# df_plot[!, "20C"] = repeat([20], nrow(df_plot))
-# df_plot = add_cubic_spline_vars(df_plot, "20C", knots, newbasename="20C")
-# # Then subtracting the difference for each spline variable
-# for k in 1:4
-#     df_plot[!, "splinenewC$k"] = df_plot[!, "splineC$k"] - df_plot[!, "20C$k"]
-# end
-# # Finally constructing the spline again
-# df_plot[!, :yhat_new] = Matrix(df_plot[!,r"splinenewC"]) * reg122.coef
-
-
-
-
-
-
-
-
-# Standard Errors can be calculated using either the delta method or
-# analytically using additivity of variance and covariance (b/c linear)
-# or using bootstrap resampling
+#=
+Standard Errors can be calculated using:
+- the delta method
+- analytically using additivity of variance and covariance (b/c linear)
+- bootstrap resampling
+=#
 
 
 
@@ -714,32 +719,37 @@ function get_diagonal(M::Matrix)
     return [M[i,i] for i∈1:n]
 end
 
-df_plot = plotdf_init(reg122)
 
-# Delta method: SE =  √(∂f(β)/∂β ⋅ VCOV ⋅ ∂f(β)/∂β)
-# Calculate the β-derivative of the function of parameters
-# f(β) = Σxₖ⋅βₖ ⟹ ∂f∂βₖ = xₖ
-# ∂fβ_∂β = Matrix(df_plot[!,r"splineC"])
-# Get the variance-covariance matrix of parameter estimates
-VCOV = reg122.vcov
-# df_plot[!, :SE] = get_diagonal(.√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+"""Return DF with upper and lower bounds created from delta method.
 
-"""Return DF with upper and lower bounds created from delta method."""
-function deltamethod_CIbounds!(df, reg_output; column_stem="splineC", α=0.95)
+    Delta method: SE =  √(∂f(β)/∂β ⋅ VCOV ⋅ ∂f(β)/∂β)
+    Calculate the β-derivative of the function of parameters
+    f(β) = Σxₖ⋅βₖ ⟹ ∂f∂βₖ = xₖ
+    ∂fβ_∂β = Matrix(df_plot[!,r"splineC"])
+    SEs are the diagonal of .√(∂fβ_∂β * VCOV * ∂fβ_∂β'))
+    where VCOV is the variance-covariance matrix of parameter estimates
+    from the regression results
+"""
+function deltamethod_CIbounds!(df, reg_output; column_stem="splinerelativeC", α=0.05)
     VCOV = reg_output.vcov
     ∂fβ_∂β = Matrix(df[!, Regex(column_stem)])
     n = reg_output.nobs
     df[!, :SE] = .√(get_diagonal(∂fβ_∂β * VCOV * ∂fβ_∂β'))
-    df[!, :y_lb] = df[!, :yhat] - 1.96*df[!, :SE]
-    df[!, :y_ub] = df[!, :yhat] + 1.96*df[!, :SE]
+    # Use a t-distribution just in case the sample is small
+    tcrit = quantile(TDist(reg_output.dof_residual), 1-α/2)
+    # Use √(1 + 1/n) correction because both the mean (predicted value) and the variance are unknown estimated parameters
+    width = tcrit * df[!, :SE] * √(1 + 1/n)
+    df[!, :y_lb] = df[!, :yhat] - width
+    df[!, :y_ub] = df[!, :yhat] + width
+    #! If the sample size is small, consider using the second-order delta method
+    return df
 end
 
-# Delta method on recentered data (outcome centered on predicted outcome at 20°C)
-∂fβ_∂β = Matrix(df_plot[!,r"$column_stem"])
-df_plot[!, :SE] = .√(get_diagonal(∂fβ_∂β * VCOV * ∂fβ_∂β'))
-df_plot[!, :y_lb] = df_plot[!, :yhat] - 1.96*df_plot[!, :SE]
-df_plot[!, :y_ub] = df_plot[!, :yhat] + 1.96*df_plot[!, :SE]
 
+# Initialize dataframe used for plotting (x-axis with temperatures, spline variables)
+df_plot = plotdf_init(reg122)
+# Delta method on recentered data (outcome centered on predicted outcome at 20°C)
+df_plot = deltamethod_CIbounds!(df_plot, reg122)
 
 
 
@@ -750,16 +760,30 @@ df_plot[!, :y_ub] = df_plot[!, :yhat] + 1.96*df_plot[!, :SE]
 function prediction_sample(df, df_plot)
     reg_ = reg(df, formula122, Vcov.cluster(:fips))
     df2 = DataFrame(tAvg=0:0.25:40)
-    df2[!, :yhat] = Matrix(df_plot[!,r"splineC"]) * reg_.coef
+    df2[!, :yhat] = Matrix(df_plot[!,r"splinerelativeC"]) * reg_.coef
     return df2[!, [:tAvg, :yhat]]
 end
 
 
-"""Return dataframe of bootstrapped """
+"""Return DF of confidence intervals for each temperature for bootstraped simulation results"""
+function confidence_interval(df, α)
+    df_bs = @chain df begin
+        groupby(:tAvg)
+        combine(:yhat => mean => :y_mean,
+                :yhat => (x -> quantile!(x, α/2)) => :y_lb,
+                :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
+                :yhat => minimum => :y_min, :yhat => maximum => :y_max)
+    end
+    return df_bs
+end
+
+
+"""Return dataframe of bootstrapped predictions with α confidence intervals."""
 function bootstrap_predicted_outcome(df::DataFrame,
                                      prediction_function::Function;
-                                     screenwidth=50
-                                     nsimulations=10000
+                                     screenwidth=50,
+                                     nsimulations=10000,
+                                     α=0.05
                                      )
     println("\nStarting simple bootstrap")
     cols = [:year, :fips, :tAvg, :inc_farm_prop_inc_lpc, :splineC1, :splineC2, :splineC3, :splineC4]
@@ -768,99 +792,100 @@ function bootstrap_predicted_outcome(df::DataFrame,
         k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
         sample_rows = sample(1:nrow(df), nrow(df), replace=true)
         df_sample = df[sample_rows, cols]
-        append!(preds, [prediction_sample(df_sample, df_plot)])
+        append!(preds, [prediction_function(df_sample, df_plot)])
     end
-    print("$(t.time) seconds")
+    # Vertically concatenate the bootstrap predictions
+    preds_comb = reduce(vcat, preds)
+    # Get mean and 95% CI for each value of tAvg
+    df_bs = confidence_interval(preds_comb, α)
+    print("$(t.time) seconds\n")
+    return df_bs
 end
-# Simple Bootstrap (over all individuals)
 
 
-# Clustered Bootstrap (over each fips county code)
-# Need to sample 3055 counties of 3055 counties (with replacement)
-# Requires repeating some counties in the data and keeping all years
-# of their data
-println("\nStarting clustered bootstrap")
-preds2 = []
-df_grouped = groupby(df, :fips)
-ngroups = length(df_grouped)
-t = @timed for k ∈ 1:nsimulations
-    k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
-    sample_idx = sample(1:ngroups, ngroups; replace = true, ordered = false)
-    df_sample = reduce(vcat, [df_grouped[i] for i in sample_idx])
-    append!(preds2, [prediction_sample(df_sample, df_plot)])
+"""Return dataframe of cluster-bootstrapped predictions with α confidence intervals.
+
+    Clustered Bootstrap (over each fips county code)
+    Need to sample 3055 counties of 3055 counties (with replacement)
+    Requires repeating some counties in the data and keeping all years
+    of their data
+"""
+function bootstrap_predicted_outcome(df::DataFrame,
+                                     prediction_function::Function,
+                                     cluster::Union{Symbol, String};
+                                     screenwidth=50,
+                                     nsimulations=10000,
+                                     α=0.05
+                                     )
+    println("\nStarting clustered bootstrap")
+    cols = [:year, :fips, :tAvg, :inc_farm_prop_inc_lpc, :splineC1, :splineC2, :splineC3, :splineC4]
+    preds = []
+    df_grouped = groupby(df[!, cols], cluster)
+    ngroups = length(df_grouped)
+    t = @timed for k ∈ 1:nsimulations
+        k%ceil(nsimulations/screenwidth) == 0 ? print("⋅") : nothing
+        sample_idx = sample(1:ngroups, ngroups; replace = true, ordered = false)
+        df_sample = reduce(vcat, [df_grouped[i] for i in sample_idx])
+        append!(preds, [prediction_function(df_sample, df_plot)])
+    end
+    # Vertically concatenate the bootstrap predictions
+    preds_comb = reduce(vcat, preds)
+    # Get mean and 95% CI for each value of tAvg
+    df_bs = confidence_interval(preds_comb, α)
+    print("$(t.time) seconds\n")
+    return df_bs
 end
-print("$(t.time) seconds")
 
-# Combine all the bootstrapped predictions
-preds_comb = reduce(vcat, preds)
-preds_comb_cluster = reduce(vcat, preds2)
 
-# Get mean and 95% CI for each value of tAvg
-α = 0.05
-df_bs = @chain preds_comb begin
-    groupby(:tAvg)
-    combine(:yhat => mean => :y_mean,
-            :yhat => (x -> quantile!(x, α/2)) => :y_lb,
-            :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
-            :yhat => minimum => :y_min, :yhat => maximum => :y_max)
-end
-df_bs_cluster = @chain preds_comb_cluster begin
-    groupby(:tAvg)
-    combine(:yhat => mean => :y_mean,
-            :yhat => (x -> quantile!(x, α/2)) => :y_lb,
-            :yhat => (x -> quantile!(x, 1-α/2)) => :y_ub,
-            :yhat => minimum => :y_min, :yhat => maximum => :y_max)
-end
-df_plot2 = DataFrame(tAvg = df_bs[!, :tAvg],
-                     y = df_bs[!, :y_mean],        # predicted outcome
-                     y_lb_dm = df_plot[!, :y_lb],  # delta method CI
-                     y_ub_dm = df_plot[!, :y_ub],
-                     y_lb_bs = df_bs[!, :y_lb],    # simple bootstrap CI
-                     y_ub_bs = df_bs[!, :y_ub],
-                     y_lb_bsc = df_bs_cluster[!, :y_lb],  # clustered bootstrap CI
-                     y_ub_bsc = df_bs_cluster[!, :y_ub],
-                     )
 
+# Get mean and 95% CI for each value of tAvg using bootstraps
+nsimulations = 100
+# Simple bootstrap (over all individuals)
+df_bs = bootstrap_predicted_outcome(df, prediction_sample, nsimulations=nsimulations)
+# Clustered bootstrap
+df_bs_cluster = bootstrap_predicted_outcome(df, prediction_sample, :fips; nsimulations=nsimulations)   
 
 # Plot it!
-# pboth = @df df_plot plot(:tAvg, [:yhat, :yhat_new])
-# p2 = @df df_plot plot(:tAvg, [:yhat, :yhat_new], ribbon=:SE_new)
-# p3 = @df df_plot plot(:tAvg, :yhat_new, ribbon=:SE_new)
-# p4 = @df df_ plot(:tAvg, [:y_mean, :y_lb, :y_ub])
-# p5 = plot(df_plot[!,:tAvg],
-#         [df_plot[!, :yhat_new],df_plot[!, :y_lb],df_plot[!, :y_ub],
-#          df_[!, :y_mean], df_[!, :y_lb], df_[!, :y_ub]])
-# savefig(p3, "plot122-dm.png")
-# savefig(p4, "plot122-bs.png")
 
-using Plots:plot,plot!
-
+# Plot Delta method confidence intervals and predicted outcome
 s = 0; dpi=400;
-@df df_plot2 plot(:tAvg, :y_lb_dm, w=0, msw = 0, ms = s, c=1,
-    fillrange=:y_ub_dm, fillalpha=0.35,
-    label="95% CI Delta Method", dpi=dpi)
-@df df_plot2 plot!(:tAvg, :y_lb_bs, w=0, msw = 0, ms = s, c=2,
-    fillrange=:y_ub_bs, fillalpha=0.35,
-    label="95% CI BootStrap ($nsimulations)", dpi=dpi)
-p6 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=dpi, legend=:bottomleft)
-savefig(p6, "plot122-both.svg")
+@df df_plot plot(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI Delta Method")
+@df df_bs plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=2,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI BootStrap ($nsimulations)")
+@df df_bs_cluster plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=3,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI BootStrap-clustered ($nsimulations, FIPS)")
+p8 = @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft)
+savefig(p8, "plot122-delta-boot-bootcluster.svg")
+
+plot(df_plot[!,:tAvg], repeat([0], nrow(df_plot)), c="gray", s=:dash, label="")
+@df df_plot plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI")
+xlabel!("Average Temperature")
+ylabel!("log(Farm Employment per capita)")
+title!("Spline Temperature Response: Farm Employment      ")
+p9 = @df df_plot plot!(:tAvg, :yhat, 
+    label="Predicted Response", legend=:bottomleft, c=2)
+savefig(p9, "plot122-spline.svg")
 
 
-@df df_plot2 plot(:tAvg, :y_lb_dm, w=0, msw = 0, ms = s, c=1,
-    fillrange=:y_ub_dm, fillalpha=0.35,
-    label="95% CI Delta Method", dpi=dpi)
-@df df_plot2 plot!(:tAvg, :y_lb_bs, w=0, msw = 0, ms = s, c=2,
-    fillrange=:y_ub_bs, fillalpha=0.35,
-    label="95% CI BootStrap ($nsimulations)", dpi=dpi)
-@df df_plot2 plot!(:tAvg, :y_lb_bsc, w=0, msw = 0, ms = s, c=3,
-    fillrange=:y_ub_bsc, fillalpha=0.35,
-    label="95% CI BootStrap-clustered ($nsimulations, FIPS)", dpi=dpi)
-p7 = @df df_plot2 plot!(:tAvg, :y, label="Predicted Response", dpi=dpi, legend=:bottomleft)
-savefig(p7, "plot122-delta-boot-bootcluster.svg")
 
 
 
- 
+
+
+
+
+
+
+
+
+
+
 
 
 
