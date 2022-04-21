@@ -108,8 +108,8 @@ end
 
 """Return a dataframe, with types Float64 and no missing for given columns."""
 function convert_float32(df, cols)
-    df1 = dropmissing(df[!, cols], disallowmissing=true)
-    df1 = transform!(df1, names(df1) .=> ByRow(Float64), renamecols=false)
+    df1 = dropmissing(df, cols=cols; disallowmissing=true)
+    df1 = transform!(df1, cols .=> ByRow(Float64), renamecols=false)
     return df1
 end
 
@@ -964,6 +964,7 @@ function reg123(df, y; cluster=:fips, regex=r"temp(?!20to24).*_dev")
 end
 
 
+# Plot deviance bins: above avg # of days this year that were in this bin (days above the 10-year average # of days)
 labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income per capita")
 Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
 for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
@@ -982,7 +983,7 @@ for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
 end
 
 
-
+# Plot basic bins again: # of days in a county-year that day's avg temp was in this bin
 for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
     temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
     plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
@@ -997,39 +998,6 @@ for y ∈ [:emp_farm_ln, :inc_farm_prop_inc_lpc]
         legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
     savefig(p121, "plot123 $(labels[y]) bins.svg")
 end
-
-
-
-
-
-
-
-# formula123a = @formula(emp_farm_ln ~ tempB0_dev + temp0to4_dev + temp4to8_dev + 
-#     temp8to12_dev + temp12to16_dev + temp16to20_dev + temp24to28_dev + temp28to32_dev + tempA32_dev +
-#     fe(fips) + fe(year)
-# )
-# formula123b = @formula(inc_farm_prop_inc_lpc ~ tempB0_dev + temp0to4_dev + temp4to8_dev + 
-#     temp8to12_dev + temp12to16_dev + temp16to20_dev + temp24to28_dev + temp28to32_dev + tempA32_dev +
-#     fe(fips) + fe(year)
-# )
-# # Reference category = temp20to24 (days in county-year where tAvg ∈ (20, 24]C)
-
-# reg123a = @time reg(df, formula123a, Vcov.cluster(:fips))
-# reg123b = @time reg(df, formula123b, Vcov.cluster(:fips))
-# regtable(reg121, 
-#          renderSettings = latexOutput("reg121_$(Dates.now()).tex")
-# )
-# se121 = .√[reg121.vcov[i,i] for i in 1:length(reg121.coef)]
-# ub121 = reg121.coef + 1.96*se121
-# lb121 = reg121.coef - 1.96*se121
-# df121 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
-#                   yhat=reg121.coef,
-#                   yerror=1.96*se121,
-#                   y_ub=ub121,
-#                   y_lb=lb121)
-# df121 = reduce(vcat, [[df121]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
-# df121 = sort!(df121, :tAvg)
-
 
 
 
@@ -1125,25 +1093,96 @@ Using the observable measures of economic shocks
 this.
 =================================================#
 # Remove missing and convert to Float64
-df1 = convert_float32(pollution, [:dlhouse, :dgtsp, :pop7080])
+# df1 = convert_float32(pollution, [:dlhouse, :dgtsp, :pop7080])
+# df212 = convert_float32(pollution, [[:dlhouse, :pop7080]; cols212])
+# reg211 = regression(df1, @formula(dlhouse ~ dgtsp); weights="pop7080", filestub="reg211")
+
 # Reg: dlhouse on dgtsp, weight with pop7080
-reg211 = regression(df1, @formula(dlhouse ~ dgtsp); weights="pop7080", filestub="reg211")
+reg211 = @time reg(pollution, @formula(dlhouse ~ dgtsp), Vcov.robust(); weights=:pop7080)
+regtable(reg211, renderSettings = latexOutput("reg211base_$(Dates.now()).tex"))
 
 # Reg: dlhouse on dgtsp, weight with pop7080,
 # controlling for ddens dwhite dfeml dage65
 # dhs dcoll durban dpoverty dvacant downer
 # dplumb dtaxprop (depend?)
-cols212 = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-df212 = convert_float32(pollution, [[:dlhouse, :pop7080]; cols212])
-formula212 = (term(:dlhouse) ~ sum(term.(Symbol.(cols212))))
-reg212 = regression(df212, formula212; weights="pop7080", filestub="reg212")
-reg212[:reg]
+cols221 = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula221 = (term(:dlhouse) ~ sum(term.(Symbol.(cols221))))
+reg221 = @time reg(pollution, formula221, Vcov.robust(); weights=:pop7080)
+regtable(reg221, renderSettings = latexOutput("reg221controls_$(Dates.now()).tex"))
 
-#! Save output to CSV, then use web to create latex tables for now
+#! What do your estimates imply and do they make sense?
+#! Describe the potential omitted variables biases
+#=
+both these seem to indicate that increased pollution increases
+housing values! This doesn't makes sense since air pollution
+should be a disamenity. This result could be caused by OVB,
+if the omitted variable has correlation with housing price in
+the same direction as the correlation with pollution (ie,
+if x2 is the OV, cov(x2, pollution) and cov(x2, houseprice) are both >0 or both <0).
+For example, if there is a recession, and the economy slows, 
+this generally decreases the amount of pollution being produced
+by firms supplying goods to the economy. So an indicator of positive
+economic activity would be positively correlated with pollution. At the same
+time, a recession would likely cause the average price of housing to decrease.
+So an indicator of positive
+economic activity would be positively correlated with housing price.
+Then bias from an omitted economic variable that is positively correlated with
+both pollution and housing prices would cause an upward bias in our estimate
+of the partial derivative of house price changes w.r.t. pollution changes.
+If the bias is large enough, it could flip the sign of the coefficient,
+and since our coeffience on pollution is nearly statistically indistinguishable from 0
+after controlling for other observed housing determinants, upward OVB could
+be likely here.
+
+There was a large recession in the 70s, so variables describing the impact of 
+the recession on the supply and demand for housing seem like they
+would be important to control for. For example, many manufacturing jobs were lost
+during the recession (more relative to other sectors)
+which affects the housing market. We can test three of our economic
+indicators to see how correlated with pollution they are in order to see if
+we should be concerned about OVB.
+=#
 
 
 
 
+#! What is the likely relationship between economic
+#! shocks and pollution and housing price changes?
+#! Using the observable measures of economic shocks
+#! (dincome, dunemp, dmnfcg), provide evidence on
+#! this.
+#=
+Economic shocks can change pollution because pollution
+is generated by economic activity (i.e., if there is 
+a recession, there will be less pollution) and economic shocks
+can change what people are able/willing to pay for a house 
+(ie, recession -> house prices decrease), which creates
+endogeniety (house price is correlated with the error term)=#
+# Regress economic shocks on pollution
+reg221b = @time reg(pollution, @formula(dgtsp ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
+regtable(reg221b, renderSettings = latexOutput("reg221pollution-econshocks_$(Dates.now()).tex"))
+
+#! Change in manufacturing employment has a strong effect on change in pollution
+#! A 10% increase in manufacturing employment between 1970 and 1980 is correlated
+#! with an increase in the 1970-1980 change in mean TSPs by about 10.6 units.
+#! the change 
+
+
+
+
+
+#=
+We could further
+control for unemployment more generally and average county
+income changes to ensure we are comparing willingness to pay across
+similar counties.  After controlling for these three economic 
+indicators, we see the hedonic estimate of willingness to pay for
+changes in pollution become statistically indistinguishable from zero.
+=#
+cols221c = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :dincome, :dunemp, :dmnfcg]
+formula221c = (term(:dlhouse) ~ sum(term.(Symbol.(cols221c))))
+reg221c = @time reg(pollution, formula221c, Vcov.robust(); weights=:pop7080)
+regtable(reg221c, renderSettings = latexOutput("reg221controls-econshocks_$(Dates.now()).tex"))
 
 
 
@@ -1166,8 +1205,13 @@ indicator and the observable economic shock
 measures. Interpret your findings.
 =================================================#
 
+reg222 = @time reg(pollution, @formula(tsp7576 ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
+regtable(reg222, renderSettings = latexOutput("reg222status-econshocks_$(Dates.now()).tex"))
 
-
+#=
+1. Relevance - first stage, next question
+2. Exogeneity - not correlated with the economic shocks
+=#
 
 
 
@@ -1197,12 +1241,64 @@ conditioning on other observables). Interpret the
 results.
 =================================================#
 
+#! first-stage relationship between regulation and air pollution changes
+#! Relevance
+
+# Reg: dgtsp on tsp7576, weight with pop7080
+reg223a = @time reg(pollution, @formula(dgtsp ~ tsp7576), Vcov.robust(); weights=:pop7080)
+regtable(reg223a, renderSettings = latexOutput("reg223afirst-base_$(Dates.now()).tex"))
+
+# Reg: dgtsp on tsp7576, weight with pop7080, with controls
+cols223b = [:tsp7576, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula223b = (term(:dgtsp) ~ sum(term.(Symbol.(cols223b))))
+reg223b = @time reg(pollution, formula223b, Vcov.robust(); weights=:pop7080)
+regtable(reg223b, renderSettings = latexOutput("reg223bfirst-controls_$(Dates.now()).tex"))
+
+# Don't need to include econ shocks because I showed in previous question it was exogenous to the shocks
+
+
+#! reduced form relationship between regulation and housing price changes
+#! Reduced form estimate
+
+# Reg: dlhouse on tsp7576, weight with pop7080
+reg223c = @time reg(pollution, @formula(dlhouse ~ tsp7576), Vcov.robust(); weights=:pop7080)
+regtable(reg223c, renderSettings = latexOutput("reg223creduced-base_$(Dates.now()).tex"))
+
+# Reg: dlhouse on tsp7576, weight with pop7080, with controls
+cols223d = [:tsp7576, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula223d = (term(:dlhouse) ~ sum(term.(Symbol.(cols223d))))
+reg223d = @time reg(pollution, formula223d, Vcov.robust(); weights=:pop7080)
+regtable(reg223d, renderSettings = latexOutput("reg223dreduced-controls_$(Dates.now()).tex"))
+
+#! How does two-stage least squares use these two equations?
+#=
+These are the first two coef. ratio: e = c / a,  f = d / b
+=#
 
 
 
 
+#! air quality changes on housing price changes using two-stage least squares and the tsp7576 indicator as an instrument
+#! IV estimate
 
-#! python 2sls function? IV2SLS from StatsModels
+# 2SLS Reg: dlhouse on dgtsp, weight with pop7080
+reg223e = @time reg(pollution, @formula(dlhouse ~ (dgtsp ~ tsp7576)), Vcov.robust(); weights=:pop7080)
+regtable(reg223e, renderSettings = latexOutput("reg223eIV-base_$(Dates.now()).tex"))
+
+# 2SLS Reg: dlhouse on dgtsp, weight with pop7080, with controls
+cols223f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula223f = (term(:dlhouse) ~ sum(term.(Symbol.(cols223f))) + (term(:dgtsp) ~ term(:tsp7576)))
+reg223f = @time reg(pollution, formula223f, Vcov.robust(); weights=:pop7080)
+regtable(reg223f, renderSettings = latexOutput("reg223fIV-controls_$(Dates.now()).tex"))
+
+
+#! Interpret the results.
+#=
+A 1-unit increase in mean TSPs from 1970 to 1980 results in an average
+housing price change from 1970 to 1980 being 0.7 percentage points larger (more positive).
+=#
+
+
 
 
 
@@ -1224,6 +1320,55 @@ above 260 units in 1974. Based on this notion,
 redo part (3) using mtspgm74 as an instrument for
 pollution changes. Interpret your findings.
 =================================================#
+
+# Create an indicator for mtspgm74<75
+pollution[!, :above75] = pollution[!, :mtspgm74] .> 75
+
+
+#! Exogeniety
+reg224_ = @time reg(pollution, @formula(above75 ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
+regtable(reg224_, renderSettings = latexOutput("reg224_status-econshocks_$(Dates.now()).tex"))
+
+
+
+#! first-stage relationship between regulation and air pollution changes
+#! Relevance
+# Reg: dgtsp on above75, weight with pop7080
+reg224a = @time reg(pollution, @formula(dgtsp ~ above75), Vcov.robust(); weights=:pop7080)
+regtable(reg224a, renderSettings = latexOutput("reg224afirst-base_$(Dates.now()).tex"))
+
+# Reg: dgtsp on above75, weight with pop7080, with controls
+cols224b = [:above75, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula224b = (term(:dgtsp) ~ sum(term.(Symbol.(cols224b))))
+reg224b = @time reg(pollution, formula224b, Vcov.robust(); weights=:pop7080)
+regtable(reg224b, renderSettings = latexOutput("reg224bfirst-controls_$(Dates.now()).tex"))
+
+
+#! reduced form relationship between regulation and housing price changes
+#! Reduced form estimate
+# Reg: dlhouse on above75, weight with pop7080
+reg224c = @time reg(pollution, @formula(dlhouse ~ above75), Vcov.robust(); weights=:pop7080)
+regtable(reg224c, renderSettings = latexOutput("reg224creduced-base_$(Dates.now()).tex"))
+
+# Reg: dlhouse on above75, weight with pop7080, with controls
+cols224d = [:above75, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula224d = (term(:dlhouse) ~ sum(term.(Symbol.(cols224d))))
+reg224d = @time reg(pollution, formula224d, Vcov.robust(); weights=:pop7080)
+regtable(reg224d, renderSettings = latexOutput("reg224dreduced-controls_$(Dates.now()).tex"))
+
+
+
+#! air quality changes on housing price changes using two-stage least squares and the above75 indicator as an instrument
+#! IV estimate
+# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080
+reg224e = @time reg(pollution, @formula(dlhouse ~ (dgtsp ~ above75)), Vcov.robust(); weights=:pop7080)
+regtable(reg224e, renderSettings = latexOutput("reg224eIV-base_$(Dates.now()).tex"))
+
+# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080, with controls
+cols224f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula224f = (term(:dlhouse) ~ sum(term.(Symbol.(cols224f))) + (term(:dgtsp) ~ term(:above75)))
+reg224f = @time reg(pollution, formula224f, Vcov.robust(); weights=:pop7080)
+regtable(reg224f, renderSettings = latexOutput("reg224fIV-controls_$(Dates.now()).tex"))
 
 
 
@@ -1395,7 +1540,7 @@ research designs underlying the results.
 
 
 #==============================================================================
-                        Extra Notes / leftovers
+Extra Notes / leftovers
 ==============================================================================#
 
 
