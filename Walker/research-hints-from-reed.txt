@@ -94,7 +94,7 @@ John Bound measurement error
 
 
 ===================================================
-Treatment effec heterogeneity
+Treatment effect heterogeneity
 ===================================================
 Burgeoning Interest in Understanding Treatment Eect Heterogeneity
 Separating out sampling variability from fundamental heterogeneity
@@ -121,6 +121,18 @@ Idea from IO handbook chapeter on costs of regulation:
 Contingent Evaluation
 ===================================================
 NOAA NAS panel on CV: came up with guidelines for what would be "best practices" in CV
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
