@@ -1,0 +1,1239 @@
+<!DOCTYPE html>
+<HTML lang = "en">
+<HEAD>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ARE 264 (part b) Problem Set 1</title>
+  
+
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+      tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']]},
+      TeX: { equationNumbers: { autoNumber: "AMS" } }
+    });
+  </script>
+
+  <script type="text/javascript" async src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+<style>
+pre.hljl {
+    border: 1px solid #ccc;
+    margin: 5px;
+    padding: 5px;
+    overflow-x: auto;
+    color: rgb(68,68,68); background-color: rgb(251,251,251); }
+pre.hljl > span.hljl-t { }
+pre.hljl > span.hljl-w { }
+pre.hljl > span.hljl-e { }
+pre.hljl > span.hljl-eB { }
+pre.hljl > span.hljl-o { }
+pre.hljl > span.hljl-k { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kc { color: rgb(59,151,46); font-style: italic; }
+pre.hljl > span.hljl-kd { color: rgb(214,102,97); font-style: italic; }
+pre.hljl > span.hljl-kn { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kp { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kr { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-kt { color: rgb(148,91,176); font-weight: bold; }
+pre.hljl > span.hljl-n { }
+pre.hljl > span.hljl-na { }
+pre.hljl > span.hljl-nb { }
+pre.hljl > span.hljl-nbp { }
+pre.hljl > span.hljl-nc { }
+pre.hljl > span.hljl-ncB { }
+pre.hljl > span.hljl-nd { color: rgb(214,102,97); }
+pre.hljl > span.hljl-ne { }
+pre.hljl > span.hljl-neB { }
+pre.hljl > span.hljl-nf { color: rgb(66,102,213); }
+pre.hljl > span.hljl-nfm { color: rgb(66,102,213); }
+pre.hljl > span.hljl-np { }
+pre.hljl > span.hljl-nl { }
+pre.hljl > span.hljl-nn { }
+pre.hljl > span.hljl-no { }
+pre.hljl > span.hljl-nt { }
+pre.hljl > span.hljl-nv { }
+pre.hljl > span.hljl-nvc { }
+pre.hljl > span.hljl-nvg { }
+pre.hljl > span.hljl-nvi { }
+pre.hljl > span.hljl-nvm { }
+pre.hljl > span.hljl-l { }
+pre.hljl > span.hljl-ld { color: rgb(148,91,176); font-style: italic; }
+pre.hljl > span.hljl-s { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sa { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sb { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sc { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sd { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sdC { color: rgb(201,61,57); }
+pre.hljl > span.hljl-se { color: rgb(59,151,46); }
+pre.hljl > span.hljl-sh { color: rgb(201,61,57); }
+pre.hljl > span.hljl-si { }
+pre.hljl > span.hljl-so { color: rgb(201,61,57); }
+pre.hljl > span.hljl-sr { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ss { color: rgb(201,61,57); }
+pre.hljl > span.hljl-ssB { color: rgb(201,61,57); }
+pre.hljl > span.hljl-nB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nbB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nfB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nh { color: rgb(59,151,46); }
+pre.hljl > span.hljl-ni { color: rgb(59,151,46); }
+pre.hljl > span.hljl-nil { color: rgb(59,151,46); }
+pre.hljl > span.hljl-noB { color: rgb(59,151,46); }
+pre.hljl > span.hljl-oB { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-ow { color: rgb(102,102,102); font-weight: bold; }
+pre.hljl > span.hljl-p { }
+pre.hljl > span.hljl-c { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-ch { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cm { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cp { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cpB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-cs { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-csB { color: rgb(153,153,119); font-style: italic; }
+pre.hljl > span.hljl-g { }
+pre.hljl > span.hljl-gd { }
+pre.hljl > span.hljl-ge { }
+pre.hljl > span.hljl-geB { }
+pre.hljl > span.hljl-gh { }
+pre.hljl > span.hljl-gi { }
+pre.hljl > span.hljl-go { }
+pre.hljl > span.hljl-gp { }
+pre.hljl > span.hljl-gs { }
+pre.hljl > span.hljl-gsB { }
+pre.hljl > span.hljl-gt { }
+</style>
+
+
+
+  <style type="text/css">
+  @font-face {
+  font-style: normal;
+  font-weight: 300;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 400;
+}
+@font-face {
+  font-style: normal;
+  font-weight: 600;
+}
+html {
+  font-family: sans-serif; /* 1 */
+  -ms-text-size-adjust: 100%; /* 2 */
+  -webkit-text-size-adjust: 100%; /* 2 */
+}
+body {
+  margin: 0;
+}
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+menu,
+nav,
+section,
+summary {
+  display: block;
+}
+audio,
+canvas,
+progress,
+video {
+  display: inline-block; /* 1 */
+  vertical-align: baseline; /* 2 */
+}
+audio:not([controls]) {
+  display: none;
+  height: 0;
+}
+[hidden],
+template {
+  display: none;
+}
+a:active,
+a:hover {
+  outline: 0;
+}
+abbr[title] {
+  border-bottom: 1px dotted;
+}
+b,
+strong {
+  font-weight: bold;
+}
+dfn {
+  font-style: italic;
+}
+h1 {
+  font-size: 2em;
+  margin: 0.67em 0;
+}
+mark {
+  background: #ff0;
+  color: #000;
+}
+small {
+  font-size: 80%;
+}
+sub,
+sup {
+  font-size: 75%;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sup {
+  top: -0.5em;
+}
+sub {
+  bottom: -0.25em;
+}
+img {
+  border: 0;
+}
+svg:not(:root) {
+  overflow: hidden;
+}
+figure {
+  margin: 1em 40px;
+}
+hr {
+  -moz-box-sizing: content-box;
+  box-sizing: content-box;
+  height: 0;
+}
+pre {
+  overflow: auto;
+}
+code,
+kbd,
+pre,
+samp {
+  font-family: monospace, monospace;
+  font-size: 1em;
+}
+button,
+input,
+optgroup,
+select,
+textarea {
+  color: inherit; /* 1 */
+  font: inherit; /* 2 */
+  margin: 0; /* 3 */
+}
+button {
+  overflow: visible;
+}
+button,
+select {
+  text-transform: none;
+}
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+  -webkit-appearance: button; /* 2 */
+  cursor: pointer; /* 3 */
+}
+button[disabled],
+html input[disabled] {
+  cursor: default;
+}
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+  border: 0;
+  padding: 0;
+}
+input {
+  line-height: normal;
+}
+input[type="checkbox"],
+input[type="radio"] {
+  box-sizing: border-box; /* 1 */
+  padding: 0; /* 2 */
+}
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  height: auto;
+}
+input[type="search"] {
+  -webkit-appearance: textfield; /* 1 */
+  -moz-box-sizing: content-box;
+  -webkit-box-sizing: content-box; /* 2 */
+  box-sizing: content-box;
+}
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+  -webkit-appearance: none;
+}
+fieldset {
+  border: 1px solid #c0c0c0;
+  margin: 0 2px;
+  padding: 0.35em 0.625em 0.75em;
+}
+legend {
+  border: 0; /* 1 */
+  padding: 0; /* 2 */
+}
+textarea {
+  overflow: auto;
+}
+optgroup {
+  font-weight: bold;
+}
+table {
+  font-family: monospace, monospace;
+  font-size : 0.8em;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+td,
+th {
+  padding: 0;
+}
+thead th {
+    border-bottom: 1px solid black;
+    background-color: white;
+}
+tr:nth-child(odd){
+  background-color: rgb(248,248,248);
+}
+
+
+/*
+* Skeleton V2.0.4
+* Copyright 2014, Dave Gamache
+* www.getskeleton.com
+* Free to use under the MIT license.
+* http://www.opensource.org/licenses/mit-license.php
+* 12/29/2014
+*/
+.container {
+  position: relative;
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 20px;
+  box-sizing: border-box; }
+.column,
+.columns {
+  width: 100%;
+  float: left;
+  box-sizing: border-box; }
+@media (min-width: 400px) {
+  .container {
+    width: 85%;
+    padding: 0; }
+}
+@media (min-width: 550px) {
+  .container {
+    width: 80%; }
+  .column,
+  .columns {
+    margin-left: 4%; }
+  .column:first-child,
+  .columns:first-child {
+    margin-left: 0; }
+
+  .one.column,
+  .one.columns                    { width: 4.66666666667%; }
+  .two.columns                    { width: 13.3333333333%; }
+  .three.columns                  { width: 22%;            }
+  .four.columns                   { width: 30.6666666667%; }
+  .five.columns                   { width: 39.3333333333%; }
+  .six.columns                    { width: 48%;            }
+  .seven.columns                  { width: 56.6666666667%; }
+  .eight.columns                  { width: 65.3333333333%; }
+  .nine.columns                   { width: 74.0%;          }
+  .ten.columns                    { width: 82.6666666667%; }
+  .eleven.columns                 { width: 91.3333333333%; }
+  .twelve.columns                 { width: 100%; margin-left: 0; }
+
+  .one-third.column               { width: 30.6666666667%; }
+  .two-thirds.column              { width: 65.3333333333%; }
+
+  .one-half.column                { width: 48%; }
+
+  /* Offsets */
+  .offset-by-one.column,
+  .offset-by-one.columns          { margin-left: 8.66666666667%; }
+  .offset-by-two.column,
+  .offset-by-two.columns          { margin-left: 17.3333333333%; }
+  .offset-by-three.column,
+  .offset-by-three.columns        { margin-left: 26%;            }
+  .offset-by-four.column,
+  .offset-by-four.columns         { margin-left: 34.6666666667%; }
+  .offset-by-five.column,
+  .offset-by-five.columns         { margin-left: 43.3333333333%; }
+  .offset-by-six.column,
+  .offset-by-six.columns          { margin-left: 52%;            }
+  .offset-by-seven.column,
+  .offset-by-seven.columns        { margin-left: 60.6666666667%; }
+  .offset-by-eight.column,
+  .offset-by-eight.columns        { margin-left: 69.3333333333%; }
+  .offset-by-nine.column,
+  .offset-by-nine.columns         { margin-left: 78.0%;          }
+  .offset-by-ten.column,
+  .offset-by-ten.columns          { margin-left: 86.6666666667%; }
+  .offset-by-eleven.column,
+  .offset-by-eleven.columns       { margin-left: 95.3333333333%; }
+
+  .offset-by-one-third.column,
+  .offset-by-one-third.columns    { margin-left: 34.6666666667%; }
+  .offset-by-two-thirds.column,
+  .offset-by-two-thirds.columns   { margin-left: 69.3333333333%; }
+
+  .offset-by-one-half.column,
+  .offset-by-one-half.columns     { margin-left: 52%; }
+
+}
+html {
+  font-size: 62.5%; }
+body {
+  font-size: 1.5em; /* currently ems cause chrome bug misinterpreting rems on body element */
+  line-height: 1.6;
+  font-weight: 400;
+  font-family: "Raleway", "HelveticaNeue", "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #222; }
+h1, h2, h3, h4, h5, h6 {
+  margin-top: 0;
+  margin-bottom: 2rem;
+  font-weight: 300; }
+h1 { font-size: 3.6rem; line-height: 1.2;  letter-spacing: -.1rem;}
+h2 { font-size: 3.4rem; line-height: 1.25; letter-spacing: -.1rem; }
+h3 { font-size: 3.2rem; line-height: 1.3;  letter-spacing: -.1rem; }
+h4 { font-size: 2.8rem; line-height: 1.35; letter-spacing: -.08rem; }
+h5 { font-size: 2.4rem; line-height: 1.5;  letter-spacing: -.05rem; }
+h6 { font-size: 1.5rem; line-height: 1.6;  letter-spacing: 0; }
+
+p {
+  margin-top: 0; }
+a {
+  color: #1EAEDB; }
+a:hover {
+  color: #0FA0CE; }
+.button,
+button,
+input[type="submit"],
+input[type="reset"],
+input[type="button"] {
+  display: inline-block;
+  height: 38px;
+  padding: 0 30px;
+  color: #555;
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 38px;
+  letter-spacing: .1rem;
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+  background-color: transparent;
+  border-radius: 4px;
+  border: 1px solid #bbb;
+  cursor: pointer;
+  box-sizing: border-box; }
+.button:hover,
+button:hover,
+input[type="submit"]:hover,
+input[type="reset"]:hover,
+input[type="button"]:hover,
+.button:focus,
+button:focus,
+input[type="submit"]:focus,
+input[type="reset"]:focus,
+input[type="button"]:focus {
+  color: #333;
+  border-color: #888;
+  outline: 0; }
+.button.button-primary,
+button.button-primary,
+input[type="submit"].button-primary,
+input[type="reset"].button-primary,
+input[type="button"].button-primary {
+  color: #FFF;
+  background-color: #33C3F0;
+  border-color: #33C3F0; }
+.button.button-primary:hover,
+button.button-primary:hover,
+input[type="submit"].button-primary:hover,
+input[type="reset"].button-primary:hover,
+input[type="button"].button-primary:hover,
+.button.button-primary:focus,
+button.button-primary:focus,
+input[type="submit"].button-primary:focus,
+input[type="reset"].button-primary:focus,
+input[type="button"].button-primary:focus {
+  color: #FFF;
+  background-color: #1EAEDB;
+  border-color: #1EAEDB; }
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea,
+select {
+  height: 38px;
+  padding: 6px 10px; /* The 6px vertically centers text on FF, ignored by Webkit */
+  background-color: #fff;
+  border: 1px solid #D1D1D1;
+  border-radius: 4px;
+  box-shadow: none;
+  box-sizing: border-box; }
+/* Removes awkward default styles on some inputs for iOS */
+input[type="email"],
+input[type="number"],
+input[type="search"],
+input[type="text"],
+input[type="tel"],
+input[type="url"],
+input[type="password"],
+textarea {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none; }
+textarea {
+  min-height: 65px;
+  padding-top: 6px;
+  padding-bottom: 6px; }
+input[type="email"]:focus,
+input[type="number"]:focus,
+input[type="search"]:focus,
+input[type="text"]:focus,
+input[type="tel"]:focus,
+input[type="url"]:focus,
+input[type="password"]:focus,
+textarea:focus,
+select:focus {
+  border: 1px solid #33C3F0;
+  outline: 0; }
+label,
+legend {
+  display: block;
+  margin-bottom: .5rem;
+  font-weight: 600; }
+fieldset {
+  padding: 0;
+  border-width: 0; }
+input[type="checkbox"],
+input[type="radio"] {
+  display: inline; }
+label > .label-body {
+  display: inline-block;
+  margin-left: .5rem;
+  font-weight: normal; }
+ul {
+  list-style: circle; }
+ol {
+  list-style: decimal; }
+ul ul,
+ul ol,
+ol ol,
+ol ul {
+  margin: 1.5rem 0 1.5rem 3rem;
+  font-size: 90%; }
+li > p {margin : 0;}
+th,
+td {
+  padding: 12px 15px;
+  text-align: left;
+  border-bottom: 1px solid #E1E1E1; }
+th:first-child,
+td:first-child {
+  padding-left: 0; }
+th:last-child,
+td:last-child {
+  padding-right: 0; }
+button,
+.button {
+  margin-bottom: 1rem; }
+input,
+textarea,
+select,
+fieldset {
+  margin-bottom: 1.5rem; }
+pre,
+blockquote,
+dl,
+figure,
+table,
+p,
+ul,
+ol,
+form {
+  margin-bottom: 1.0rem; }
+.u-full-width {
+  width: 100%;
+  box-sizing: border-box; }
+.u-max-full-width {
+  max-width: 100%;
+  box-sizing: border-box; }
+.u-pull-right {
+  float: right; }
+.u-pull-left {
+  float: left; }
+hr {
+  margin-top: 3rem;
+  margin-bottom: 3.5rem;
+  border-width: 0;
+  border-top: 1px solid #E1E1E1; }
+.container:after,
+.row:after,
+.u-cf {
+  content: "";
+  display: table;
+  clear: both; }
+
+pre {
+  display: block;
+  padding: 9.5px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  line-height: 1.42857143;
+  word-break: break-all;
+  word-wrap: break-word;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+pre.hljl {
+  margin: 0 0 10px;
+  display: block;
+  background: #f5f5f5;
+  border-radius: 4px;
+  padding : 5px;
+}
+
+pre.output {
+  background: #ffffff;
+}
+
+pre.code {
+  background: #ffffff;
+}
+
+pre.julia-error {
+  color : red
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+  font-size: 0.9em;
+}
+
+
+@media (min-width: 400px) {}
+@media (min-width: 550px) {}
+@media (min-width: 750px) {}
+@media (min-width: 1000px) {}
+@media (min-width: 1200px) {}
+
+h1.title {margin-top : 20px}
+img {max-width : 100%}
+div.title {text-align: center;}
+
+  </style>
+</HEAD>
+
+<BODY>
+  <div class ="container">
+    <div class = "row">
+      <div class = "col-md-12 twelve columns">
+        <div class="title">
+          <h1 class="title">ARE 264 (part b) Problem Set 1</h1>
+          <h5>Aaron C Watt (UCB Grad Student, Ag & Resource Econ)</h5>
+          
+        </div>
+
+        
+<!-- =========================================================================
+PACKAGES
+========================================================================== -->
+
+
+
+
+<!-- =========================================================================
+KEYBOARD SHORTCUTS
+Fold current function: ctrl + shift + [
+Fold all: ctrl+k ctrl+0
+========================================================================== -->
+
+
+<!--  Setup**  -->
+
+
+
+
+<h2>1.1 Temperature Aggregation</h2>
+<h3>1.1.1 Construct 4 temperature response variables</h3>
+<p>See next section.</p>
+<h3>1.1.2 Aggregate to year-county</h3>
+<p>Construction and aggregation of temperature response variables are both  handled in the <code>create_temperature_vars&#40;&#41;</code> function.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-oB'>!</span><span class='hljl-nf'>isfile</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;CountyAnnualTemperature_aaron.csv&quot;</span><span class='hljl-p'>))</span><span class='hljl-t'>
+    </span><span class='hljl-nf'>create_temperature_vars</span><span class='hljl-p'>()</span><span class='hljl-t'>
+</span><span class='hljl-k'>end</span>
+</pre>
+
+
+
+<p>This creates the new file of county-year temperature response variables to regress on &#40;degree days, temperature bins, cubic splines, and piecewise linear&#41;. I have compared the values of these county-year variables with the CountyAnnualTemperature1950to2012.dta file for Autauga County and they match.</p>
+<h2>1.2 US Climate Impacts</h2>
+<h3>1.2.0 Merge Income and Employment onto climate data</h3>
+<p>First I load and merge the climate and economic data. Then I create several variables needed for parts of the analysis later.</p>
+
+
+<pre class='hljl'>
+<span class='hljl-n'>df</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>merge_prep_est_data</span><span class='hljl-p'>()</span>
+</pre>
+
+
+
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 1.2.1 emp<em>farm vs binned temperature     Explore the relationship between log tranformed emp</em>farm      and the vector of binned temperature controls.     Include additional controls for county FE, year FE.     Provide an interpretation of the coefficient of the 32&#43; bin. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;# formula121 &#61; @formula&#40;emp<em>farm</em>ln ~ tempB0 &#43; temp0to4 &#43; temp4to8 &#43; temp8to12 &#43; temp12to16 &#43; temp16to20 &#43; temp24to28 &#43; temp28to32 &#43; tempA32 &#43;     fe&#40;fips&#41; &#43; fe&#40;year&#41; &#41;</p>
+<h1>Reference category &#61; temp20to24 &#40;days in county-year where tAvg ∈ &#40;20, 24&#93;C&#41;</h1>
+<p>reg121 &#61; @time reg&#40;df, formula121, Vcov.cluster&#40;:fips&#41;&#41; regtable&#40;reg121,           renderSettings &#61; latexOutput&#40;&quot;reg121<em>:&#40;Dates.now&#40;&#41;&#41;.tex&quot;&#41; &#41; se121 &#61; .√&#91;reg121.vcov&#91;i,i&#93; for i in 1:length&#40;reg121.coef&#41;&#93; ub121 &#61; reg121.coef &#43; 1.96<em>se121 lb121 &#61; reg121.coef - 1.96</em>se121 df121 &#61; DataFrame&#40;tAvg&#61;&#91;-2,2,6,10,14,18,26,30,34&#93;,                   yhat&#61;reg121.coef,                   yerror&#61;1.96*se121,                   y</em>ub&#61;ub121,                   y<em>lb&#61;lb121&#41; df121 &#61; reduce&#40;vcat, &#91;&#91;df121&#93;; &#91;DataFrame&#40;tAvg&#61;22,yhat&#61;0,yerror&#61;0,y</em>lb&#61;0,y_ub&#61;0&#41;&#93;&#93;&#41; df121 &#61; sort&#33;&#40;df121, :tAvg&#41;</p>
+<p>plot&#40;df121&#91;&#33;,:tAvg&#93;, repeat&#40;&#91;0&#93;, nrow&#40;df121&#41;&#41;, c&#61;&quot;gray&quot;, s&#61;:dash, label&#61;&quot;&quot;&#41; @df df121 plot&#33;&#40;:tAvg, :y<em>lb, w&#61;0, msw &#61; 0, ms &#61; 0, c&#61;1,     fillrange&#61;:y</em>ub, fillalpha&#61;0.35,     label&#61;&quot;95&#37; CI&quot;&#41; xlabel&#33;&#40;&quot;Average Temperature&quot;&#41; ylabel&#33;&#40;&quot;log&#40;Farm Employment&#41;&quot;&#41; title&#33;&#40;&quot;Binned Temperature Response: Farm Employment      &quot;&#41; p121 &#61; @df df121 plot&#33;&#40;:tAvg, :yhat,      label&#61;&quot;Predicted Response&quot;,      legend&#61;:bottomright, c&#61;2, shape&#61;:circle, markerstrokewidth&#61;0&#41; savefig&#40;p121, &quot;plot121-bins.svg&quot;&#41;</p>
+<p>#&#33; &#37; change in employees for the average county for each day above 32.</p>
+<h2>TEMPERATURE FUNCTIONS</h2>
+
+
+<pre class='hljl'>
+<span class='hljl-s'>&quot;&quot;&quot;Save single county (01001) to compare to built results fo temperature variables&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>save_autauga_county</span><span class='hljl-p'>()</span><span class='hljl-t'>
+        </span><span class='hljl-n'>f</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;CountyAnnualTemperature1950to2012.csv&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-oB'>!</span><span class='hljl-nf'>isfile</span><span class='hljl-p'>(</span><span class='hljl-n'>f</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>df_ex</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>subset</span><span class='hljl-p'>(</span><span class='hljl-n'>df_ex</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:fips</span><span class='hljl-t'> </span><span class='hljl-oB'>=&gt;</span><span class='hljl-t'> </span><span class='hljl-nf'>ByRow</span><span class='hljl-p'>(</span><span class='hljl-oB'>==</span><span class='hljl-p'>(</span><span class='hljl-ni'>01001</span><span class='hljl-p'>)),</span><span class='hljl-t'> </span><span class='hljl-n'>skipmissing</span><span class='hljl-oB'>=</span><span class='hljl-kc'>true</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>CSV</span><span class='hljl-oB'>.</span><span class='hljl-nf'>write</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;CountyAnnualTemperature1950to2012.csv&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-n'>df_ex</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Degree day calculation from Snyder 1985, using integral of sine.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>degree_day_calc</span><span class='hljl-p'>(</span><span class='hljl-n'>MAX</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>MIN</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>THR</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>M</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>MAX</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>MIN</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'>  </span><span class='hljl-cs'># average temp</span><span class='hljl-t'>
+        </span><span class='hljl-n'>W</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>MAX</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>MIN</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'>  </span><span class='hljl-cs'># half temp range</span><span class='hljl-t'>
+        </span><span class='hljl-n'>θ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>asin</span><span class='hljl-p'>((</span><span class='hljl-n'>THR</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>M</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-n'>W</span><span class='hljl-p'>)</span><span class='hljl-t'>  </span><span class='hljl-cs'># radian between -π/2 and π/2 where sine crosses THR</span><span class='hljl-t'>
+        </span><span class='hljl-n'>DD</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>((</span><span class='hljl-n'>M</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>THR</span><span class='hljl-p'>)</span><span class='hljl-oB'>*</span><span class='hljl-p'>(</span><span class='hljl-n'>π</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>θ</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>W</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-nf'>cos</span><span class='hljl-p'>(</span><span class='hljl-n'>θ</span><span class='hljl-p'>))</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-n'>π</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>DD</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return degree days above threshold temperature for single day based on max and min temperatures.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>degree_day_single_day</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-t'> </span><span class='hljl-oB'>≥</span><span class='hljl-t'> </span><span class='hljl-n'>Tmax</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-t'> </span><span class='hljl-oB'>≤</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-t'>
+        </span><span class='hljl-k'>else</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-nf'>degree_day_calc</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return dataframe with degree day columns, degree days over each threshold in t.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>add_degree_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-oB'>::</span><span class='hljl-n'>DataFrame</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-oB'>::</span><span class='hljl-n'>Vector</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Adding degree days above thresholds in t.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>∈</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;dday</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>C&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>degree_day_single_day</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return temperature threshold after converting to -1,1 interval (for sine function)&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>convert_temp_threshold</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Thresh</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>proportion</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>Thresh</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-ni'>2</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-n'>proportion</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return portion (0 to 1) of day&#39;s temperature above temperature Threshold,
+        given max and min temperature, 
+        based on sinusoidal curve to model diurnal temperature cycle.
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>fraction_above_threshold</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>α</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>convert_temp_threshold</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>α</span><span class='hljl-t'> </span><span class='hljl-oB'>≥</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-ni'>0</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>α</span><span class='hljl-t'> </span><span class='hljl-oB'>≤</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+        </span><span class='hljl-k'>else</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>π</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-nf'>asin</span><span class='hljl-p'>(</span><span class='hljl-n'>α</span><span class='hljl-p'>))</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-ni'>2</span><span class='hljl-n'>π</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return portion (0 to 1) of day&#39;s temperature between temperature Thresholds,
+        given max and min temperature, 
+        based on sinusoidal curve to model diurnal temperature cycle.
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>fraction_between_thresholds</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold_lower</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold_upper</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># Fraction between = (fraction above lower) - (fraction above upper)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>lower</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fraction_above_threshold</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold_lower</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>upper</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>fraction_above_threshold</span><span class='hljl-p'>(</span><span class='hljl-n'>Tmax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Tmin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>Threshold_upper</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>lower</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>upper</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return dataframe with binned temperature variables columns (indicator for tAvg in bin).&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>add_bin_indicator_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-oB'>::</span><span class='hljl-n'>DataFrame</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>edges</span><span class='hljl-oB'>::</span><span class='hljl-n'>Vector</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Adding inidicator for average daily temperature in each bin&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>∈</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+                </span><span class='hljl-cs'># tAvg below lowest threshold</span><span class='hljl-t'>
+                </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;tempB</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>.&lt;</span><span class='hljl-t'> </span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+            </span><span class='hljl-k'>else</span><span class='hljl-t'>
+                </span><span class='hljl-cs'>#  tAvg between this threshold and previous threshold</span><span class='hljl-t'>
+                </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;temp</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-s'>to</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>.≤</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>.&lt;</span><span class='hljl-t'> </span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+
+                </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>)</span><span class='hljl-t'>
+                    </span><span class='hljl-cs'># tAvg above threshold</span><span class='hljl-t'>
+                    </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;tempA</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>.≥</span><span class='hljl-t'> </span><span class='hljl-n'>edges</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+                </span><span class='hljl-k'>end</span><span class='hljl-t'>
+            </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return dataframe with binned temperature variables columns (portion of day in bin).&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>add_bin_portion_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-oB'>::</span><span class='hljl-n'>DataFrame</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>bins</span><span class='hljl-oB'>::</span><span class='hljl-n'>Vector</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Adding portion of days between bin edges in bins.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>∈</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+                </span><span class='hljl-cs'># Portion of day below lowest threshold</span><span class='hljl-t'>
+                </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;tempPropB</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>fraction_above_threshold</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+            </span><span class='hljl-k'>else</span><span class='hljl-t'>
+                </span><span class='hljl-cs'># Portion of day between this threshold and previous threshold</span><span class='hljl-t'>
+                </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;tempProp</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-s'>to</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>fraction_between_thresholds</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+
+                </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>)</span><span class='hljl-t'>
+                    </span><span class='hljl-cs'># Portion of day above threshold</span><span class='hljl-t'>
+                    </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;tempPropA</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>fraction_above_threshold</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>bins</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'>
+                </span><span class='hljl-k'>end</span><span class='hljl-t'>
+            </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;(⋅)₊ function from Harrell 2001&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-nf'>m</span><span class='hljl-p'>(</span><span class='hljl-n'>a</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>maximum</span><span class='hljl-p'>([</span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>a</span><span class='hljl-p'>])</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return jth restricted cubic spline variable using the list of knots t.
+        From Frank Harrell&#39;s Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>cubic_spline_var_harrell</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>j</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>j</span><span class='hljl-t'> </span><span class='hljl-oB'>&lt;</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>|</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>j</span><span class='hljl-t'> </span><span class='hljl-oB'>&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Out of Bounds (j=</span><span class='hljl-si'>$j</span><span class='hljl-s'>): j is &lt; 1 or &gt; k-1. Not a valid variable.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>j</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>x</span><span class='hljl-t'>
+        </span><span class='hljl-k'>else</span><span class='hljl-t'>
+            </span><span class='hljl-n'>xⱼ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>m</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>j</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'>
+                </span><span class='hljl-n'>m</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>j</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'>
+                </span><span class='hljl-n'>m</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>x</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>j</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'>
+            </span><span class='hljl-cs'># Divide by the scale factor from the stata formula (range of the knots)</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>xⱼ</span><span class='hljl-t'> </span><span class='hljl-oB'>/</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-n'>k</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-n'>t</span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-oB'>^</span><span class='hljl-ni'>2</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return ith restricted cubic spline variable using the list of knots k.
+        From stata&#39;s mkspline documentation
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>cubic_spline_var_stata</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>&lt;</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>|</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-oB'>-</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Out of Bounds (i=</span><span class='hljl-si'>$i</span><span class='hljl-s'>, n=</span><span class='hljl-si'>$n</span><span class='hljl-s'>): i &lt; 1 or i &gt; n-1. Not a valid variable.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>V</span><span class='hljl-t'>
+        </span><span class='hljl-k'>else</span><span class='hljl-t'>
+            </span><span class='hljl-n'>Vᵢ</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>m</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'>
+                </span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-p'>]</span><span class='hljl-oB'>-</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-oB'>^</span><span class='hljl-p'>(</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>m</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-p'>]</span><span class='hljl-oB'>-</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.^</span><span class='hljl-t'> </span><span class='hljl-ni'>3</span><span class='hljl-t'> </span><span class='hljl-oB'>*</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-oB'>-</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])))</span><span class='hljl-t'> </span><span class='hljl-oB'>./</span><span class='hljl-t'>
+                </span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-p'>]</span><span class='hljl-oB'>-</span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-oB'>^</span><span class='hljl-ni'>2</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>Vᵢ</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Add restricted cubic spline basis variables to dataframe df.
+        Using continuous variable varname from dataframe and list of knots.
+
+        After trying both the stata and Harrell formulas, neither matched the example file given. After comparing the formulas, I recognized the only difference was a scaling factor of 
+            `julia 1/(knots[last] - knots[first])^2`
+        so I added that scaling factor to the Harrell formula and it produces results that match the example file. So I probably just messed up the stata formula somehow. I assume the example file was created in stata with mksplines.
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>add_cubic_spline_vars</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>varname</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>;</span><span class='hljl-t'> </span><span class='hljl-n'>newbasename</span><span class='hljl-oB'>=</span><span class='hljl-s'>&quot;splineC&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-p'>(</span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>newname</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;</span><span class='hljl-si'>$newbasename$i</span><span class='hljl-s'>&quot;</span><span class='hljl-t'>
+            </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Making </span><span class='hljl-si'>$newname</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>newname</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>cubic_spline_var_harrell</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>varname</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return vector of element-wise minimum between a vector and constant.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-nf'>min_vecs</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>c</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>minimum</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-nf'>zip</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>repeat</span><span class='hljl-p'>([</span><span class='hljl-n'>c</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>))))</span><span class='hljl-t'>
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return vector of element-wise maximum between a vector and constant.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-nf'>max_vecs</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>c</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>maximum</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-nf'>zip</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>repeat</span><span class='hljl-p'>([</span><span class='hljl-n'>c</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>vec</span><span class='hljl-p'>))))</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return ith linear piecewise variable using the list of knots k.
+        From stata&#39;s mkspline documentation
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>piecewise_linear_var_stata</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>k</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+        </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-nf'>min_vecs</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-p'>])</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>&gt;</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>&amp;&amp;</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>&lt;</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-nf'>max_vecs</span><span class='hljl-p'>(</span><span class='hljl-nf'>min_vecs</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-p'>]),</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-k'>elseif</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-t'>
+            </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-nf'>max_vecs</span><span class='hljl-p'>(</span><span class='hljl-n'>V</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>.-</span><span class='hljl-t'> </span><span class='hljl-n'>k</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-k'>else</span><span class='hljl-t'>
+            </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Out of Bounds (i=</span><span class='hljl-si'>$i</span><span class='hljl-s'>, n=</span><span class='hljl-si'>$n</span><span class='hljl-s'>): i &lt; 1 or i &gt; n-1. Not a valid variable.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return dataframe with piecewise linear basis variable columns using given knots.&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>add_piecewise_linear_vars</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>varname</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>;</span><span class='hljl-t'> </span><span class='hljl-n'>newbasename</span><span class='hljl-oB'>=</span><span class='hljl-s'>&quot;piece&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Adding piecewise linear basis variable columns with breakpoints.&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>length</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-oB'>+</span><span class='hljl-ni'>1</span><span class='hljl-t'>
+        </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-oB'>:</span><span class='hljl-n'>n</span><span class='hljl-t'>
+            </span><span class='hljl-n'>e</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-t'> </span><span class='hljl-oB'>?</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;B</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-t'> </span><span class='hljl-oB'>:</span><span class='hljl-t'>
+                </span><span class='hljl-n'>i</span><span class='hljl-t'> </span><span class='hljl-oB'>==</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-oB'>?</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;A</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-t'> </span><span class='hljl-oB'>:</span><span class='hljl-t'>
+                </span><span class='hljl-cm'>#= o.w =#</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-oB'>-</span><span class='hljl-ni'>1</span><span class='hljl-p'>])</span><span class='hljl-s'>to</span><span class='hljl-si'>$</span><span class='hljl-p'>(</span><span class='hljl-n'>knots</span><span class='hljl-p'>[</span><span class='hljl-n'>i</span><span class='hljl-p'>])</span><span class='hljl-s'>&quot;</span><span class='hljl-t'>
+            </span><span class='hljl-n'>newname</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;</span><span class='hljl-si'>$newbasename$e</span><span class='hljl-s'>&quot;</span><span class='hljl-t'>
+            </span><span class='hljl-nf'>println</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;Making </span><span class='hljl-si'>$newname</span><span class='hljl-s'>&quot;</span><span class='hljl-p'>)</span><span class='hljl-t'>
+            </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>newname</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>piecewise_linear_var_stata</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>varname</span><span class='hljl-p'>],</span><span class='hljl-t'> </span><span class='hljl-n'>i</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-k'>end</span><span class='hljl-t'>
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Return grid-day data aggregated to county-year level&quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>aggregate_df</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>tags</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># List of columns to average over</span><span class='hljl-t'>
+        </span><span class='hljl-n'>avg_list</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:prec</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># List of columns to sum over the year (all cols with a substring from tags)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>sum_list</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-k'>for</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-t'> </span><span class='hljl-kp'>in</span><span class='hljl-t'> </span><span class='hljl-nf'>names</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-k'>if</span><span class='hljl-t'> </span><span class='hljl-nf'>any</span><span class='hljl-p'>(</span><span class='hljl-n'>occursin</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>tags</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>n</span><span class='hljl-p'>))]</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Sum over all days in each year, for each grid point</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;date&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>Date</span><span class='hljl-p'>(</span><span class='hljl-ni'>1960</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>1</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>+</span><span class='hljl-t'> </span><span class='hljl-n'>Day</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-oB'>.</span><span class='hljl-n'>dateNum</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;year&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-n'>Year</span><span class='hljl-oB'>.</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-oB'>.</span><span class='hljl-n'>date</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>gd_gy</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>groupby</span><span class='hljl-p'>(</span><span class='hljl-n'>df</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-sc'>:gridNumber</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:year</span><span class='hljl-p'>])</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_gy</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>combine</span><span class='hljl-p'>(</span><span class='hljl-n'>gd_gy</span><span class='hljl-p'>,</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>avg_list</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>mean</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>avg_list</span><span class='hljl-p'>,</span><span class='hljl-t'>
+                        </span><span class='hljl-n'>sum_list</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>sum</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>sum_list</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># Take the average over all grid points in the county</span><span class='hljl-t'>
+        </span><span class='hljl-n'>gd_y</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>groupby</span><span class='hljl-p'>(</span><span class='hljl-n'>df_gy</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:year</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_y</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>combine</span><span class='hljl-p'>(</span><span class='hljl-n'>gd_y</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-nf'>valuecols</span><span class='hljl-p'>(</span><span class='hljl-n'>gd_y</span><span class='hljl-p'>)</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-n'>mean</span><span class='hljl-t'> </span><span class='hljl-oB'>.=&gt;</span><span class='hljl-t'> </span><span class='hljl-nf'>valuecols</span><span class='hljl-p'>(</span><span class='hljl-n'>gd_y</span><span class='hljl-p'>))</span><span class='hljl-t'>
+
+        </span><span class='hljl-k'>return</span><span class='hljl-t'> </span><span class='hljl-n'>df_y</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span><span class='hljl-t'>
+
+
+    </span><span class='hljl-s'>&quot;&quot;&quot;Save temperature variables
+        
+        1.1.1 Construct 4 temperature response variables
+        1.1.2 Aggregate to year-county
+        - sum each new temperaature variable in each grid point over each year
+        - average tMin, tMax, tAvg, perc in each gridpoint over each year
+        - take a simple average over all grid points in the county to get county-year level
+    &quot;&quot;&quot;</span><span class='hljl-t'>
+    </span><span class='hljl-k'>function</span><span class='hljl-t'> </span><span class='hljl-nf'>create_temperature_vars</span><span class='hljl-p'>()</span><span class='hljl-t'>
+        </span><span class='hljl-cs'># Extract county fips file from zip if not present, and read</span><span class='hljl-t'>
+        </span><span class='hljl-n'>county_fn</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;fips1001.dta&quot;</span><span class='hljl-t'>
+        </span><span class='hljl-nf'>extract_file_from_zip</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>zip_fn</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>county_fn</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Load data and create average daily temp</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>DataFrame</span><span class='hljl-p'>(</span><span class='hljl-nf'>load</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>county_fn</span><span class='hljl-p'>)))</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMax</span><span class='hljl-p'>]</span><span class='hljl-t'> </span><span class='hljl-oB'>.+</span><span class='hljl-t'> </span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>[</span><span class='hljl-oB'>!</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tMin</span><span class='hljl-p'>])</span><span class='hljl-t'> </span><span class='hljl-oB'>./</span><span class='hljl-t'> </span><span class='hljl-ni'>2</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Add degree days for each day-gridpoint</span><span class='hljl-t'>
+        </span><span class='hljl-n'>thresholds</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>30</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>32</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>34</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>add_degree_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>thresholds</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Add binned temperature variables</span><span class='hljl-t'>
+        </span><span class='hljl-n'>bin_edges</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>0</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>4</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>8</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>12</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>16</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>20</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>24</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>28</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>32</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>add_bin_indicator_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>bin_edges</span><span class='hljl-p'>)</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>add_bin_portion_days</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>bin_edges</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Add cubic spline basis variables for each day-gridpoint</span><span class='hljl-t'>
+        </span><span class='hljl-n'>knots</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>0</span><span class='hljl-t'> </span><span class='hljl-ni'>8</span><span class='hljl-t'> </span><span class='hljl-ni'>16</span><span class='hljl-t'> </span><span class='hljl-ni'>24</span><span class='hljl-t'> </span><span class='hljl-ni'>32</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>add_cubic_spline_vars</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Add piecewise linear basis variables for each day-gridpoint</span><span class='hljl-t'>
+        </span><span class='hljl-n'>knots</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-ni'>28</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-ni'>32</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp1</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>add_piecewise_linear_vars</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-sc'>:tAvg</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>knots</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># sum over year, then average over all grid points in county</span><span class='hljl-t'>
+        </span><span class='hljl-n'>column_tags</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-p'>[</span><span class='hljl-s'>&quot;dday&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;temp&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;splineC&quot;</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;piece&quot;</span><span class='hljl-p'>]</span><span class='hljl-t'>
+        </span><span class='hljl-n'>df_temp</span><span class='hljl-t'> </span><span class='hljl-oB'>=</span><span class='hljl-t'> </span><span class='hljl-nf'>aggregate_df</span><span class='hljl-p'>(</span><span class='hljl-n'>df_temp1</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-n'>column_tags</span><span class='hljl-p'>)</span><span class='hljl-t'>
+
+        </span><span class='hljl-cs'># Save the new file</span><span class='hljl-t'>
+        </span><span class='hljl-n'>CSV</span><span class='hljl-oB'>.</span><span class='hljl-nf'>write</span><span class='hljl-p'>(</span><span class='hljl-nf'>joinpath</span><span class='hljl-p'>(</span><span class='hljl-n'>root</span><span class='hljl-p'>,</span><span class='hljl-t'> </span><span class='hljl-s'>&quot;CountyAnnualTemperature_aaron.csv&quot;</span><span class='hljl-p'>),</span><span class='hljl-t'> </span><span class='hljl-n'>df_temp</span><span class='hljl-p'>)</span><span class='hljl-t'>
+    </span><span class='hljl-k'>end</span>
+</pre>
+
+
+
+<h2>ANALYSIS FUNCTIONS</h2>
+
+
+<pre class='hljl'>
+
+</pre>
+
+
+
+<h2>ADMIN FUNCTIONS</h2>
+
+
+<pre class='hljl'>
+<span class='hljl-nf'>include</span><span class='hljl-p'>(</span><span class='hljl-s'>&quot;ps1-functions-admin.jl&quot;</span><span class='hljl-p'>)</span>
+</pre>
+
+
+<pre class="output">
+Main.##WeaveSandBox#284.merge_prep_est_data
+</pre>
+
+
+<pre><code class="language-latex">\input&#123;scripts/ps1-functions-admin.jl&#125;</code></pre>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 1.2.2 per capita farm prop income vs cubic spline temperature     Explore the relationship between log tranformed      inc<em>farm</em>prop_income/population &#40;i.e. log&#40;per capita      farm prop income&#41; using the restricted cubic spline.      Include additional controls for county FE and year FE.     Plot the predicted marginal effects with associated      confidence intervals, and compare to the binned      temperature response function above.</p>
+<pre><code>We want to construct the estimated effect of average 
+temperature of a day on inc_farm_prop_inc_lpc
+Calculate point estimates and Conf Intervals 
+for linear combination of parameters</code></pre>
+<p>&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<h1>Regress inc<em>farm</em>prop<em>inc</em>lpc on spline variables and fixed effects</h1>
+<p>formula122 &#61; @formula&#40;inc<em>farm</em>prop<em>inc</em>lpc ~ splineC1 &#43; splineC2 &#43; splineC3 &#43; splineC4 &#43;                                     fe&#40;year&#41; &#43; fe&#40;fips&#41;&#41; reg122 &#61; @time reg&#40;df, formula122, Vcov.cluster&#40;:fips&#41;&#41; regtable&#40;reg122,renderSettings &#61; latexOutput&#40;&quot;reg122_:&#40;Dates.now&#40;&#41;&#41;.tex&quot;&#41;&#41;</p>
+<p>&quot;&quot;&quot;Return DF of avg temp, cubic spline, and predicted outcome variables needed for regressions and plotting.</p>
+<pre><code>@param: reg_output: output from a regression on 4 cubic spline variables
+
+- create an x-axis for plotting: define an array of avg temps from 0 to 40°C, 0.25 steps
+- define the spline knots/breakpoints
+- Create spline basis variables. After regressing, the absolute level of the outcome &#40;y-axis&#41;
+    is not identified because the county &amp; year fixed effects shift the intercept around.
+    So these basis will be compared to the spline basis variables created for X°C.
+- Create spline basis variables for X°C
+- Create relative basis variables &#40;base - X°C variables&#41; which is equivalent to shifting
+    the base prediction by the X°C prediction, but allows for adjusted standard errors
+    in the delta method calculation.</code></pre>
+<p>&quot;&quot;&quot; function plotdf<em>init&#40;reg</em>output; X&#61;20&#41;     df &#61; DataFrame&#40;tAvg&#61;0:0.25:40&#41;      # Initialize x-axis     knots &#61; &#91;0 8 16 24 32&#93;              # breakpoints in spline     # Create base basis spline variables     df &#61; add<em>cubic</em>spline<em>vars&#40;df, :tAvg, knots, newbasename&#61;&quot;splinebaseC&quot;&#41;     # Create X°C basis spline variables     df&#91;&#33;, &quot;XC&quot;&#93; &#61; repeat&#40;&#91;X&#93;, nrow&#40;df&#41;&#41;     df &#61; add</em>cubic<em>spline</em>vars&#40;df, &quot;XC&quot;, knots, newbasename&#61;&quot;XC&quot;&#41;     # Create relative basis spline variables &#40;relative to X°C&#41;     for k in 1:4         df&#91;&#33;, &quot;splinerelativeC<span class="math">$k"] = df[!, "splinebaseC$</span>k&quot;&#93; - df&#91;&#33;, &quot;XC<span class="math">$k"]     end     # Construct the predicted spline outcome     df[!, :yhat] = Matrix(df[!,r"splinerelativeC"]) * reg_output.coef     # Return the x-axis, predicted outcome, splinerelCnd relative spline variables (for delta method SE estimation)     return df[!, [["tAvg", "yhat"]; ["splinerelativeC$</span>k&quot; for k ∈ 1:4&#93;&#93;&#93; end</p>
+<p>#&#61; Standard Errors can be calculated using:</p>
+<ul>
+<li><p>the delta method</p>
+</li>
+<li><p>analytically using additivity of variance and covariance &#40;b/c linear&#41;</p>
+</li>
+<li><p>bootstrap resampling</p>
+</li>
+</ul>
+<p>&#61;#</p>
+<p>#&#61; Let&#39;s try the analytical method&#33;     Define x &#61; a single day&#39;s average temperature     Define f&#40;x&#41; &#61; the effect of moving a single day&#39;s average temperature from 20°C to x     We want to estimate the 95&#37; confidence interval of f&#40;x&#41; for each x ∈ &#91;0°C, 40°C&#93;     Each of our spline basis variables is a function of the average temperature x     Let Zₖ &#61; gₖ&#40;X&#41; to be the spline basis variables for k ∈ &#123;1,2,3,4&#125;     We run a regression on the spline basis variables to fit the spline to farm employment:         y &#61; ΣₖZₖβₖ &#43; year &#43; county &#40;year and county fixed effects&#41;     After running our regression on the spline basis variables and fixed effects,         our predicted response of percapita farm employment from moving a day          with average temp 0°C to average temp x is:         f&#40;x&#41; &#61; ΣₖZₖβₖ     Then we would want to calculate the variance of the prediction f&#40;x&#41; at each value of x     So Var&#40;f&#40;x&#41;&#41; &#61; Var&#40;ΣₖZₖβₖ&#41; &#61; ΣₖZₖ² Var&#40;βₖ&#41; &#43; 2 Σ&#123;k&#125;Σ&#123;j&gt;k&#125; ZₖZⱼ Cov&#40;βₖ,βⱼ&#41;     ... turns out this is identical to the delta method formula, even after making f&#40;x&#41;     relative to a specific temperature &#40;20°C&#41; &#61;#</p>
+<h1>Let&#39;s try the Delta Method&#33;</h1>
+<p>function get<em>diagonal&#40;M::Matrix&#41;     n,</em> &#61; size&#40;M&#41;     return &#91;M&#91;i,i&#93; for i∈1:n&#93; end</p>
+<p>&quot;&quot;&quot;Return DF with upper and lower bounds created from delta method.</p>
+<pre><code>Delta method: SE &#61;  √&#40;∂f&#40;β&#41;/∂β ⋅ VCOV ⋅ ∂f&#40;β&#41;/∂β&#41;
+Calculate the β-derivative of the function of parameters
+f&#40;β&#41; &#61; Σxₖ⋅βₖ ⟹ ∂f∂βₖ &#61; xₖ
+∂fβ_∂β &#61; Matrix&#40;df_plot&#91;&#33;,r&quot;splineC&quot;&#93;&#41;
+SEs are the diagonal of .√&#40;∂fβ_∂β * VCOV * ∂fβ_∂β&#39;&#41;&#41;
+where VCOV is the variance-covariance matrix of parameter estimates
+from the regression results</code></pre>
+<p>&quot;&quot;&quot; function deltamethod<em>CIbounds&#33;&#40;df, reg</em>output; column<em>stem&#61;&quot;splinerelativeC&quot;, α&#61;0.05&#41;     VCOV &#61; reg</em>output.vcov     ∂fβ<em>∂β &#61; Matrix&#40;df&#91;&#33;, Regex&#40;column</em>stem&#41;&#93;&#41;     n &#61; reg<em>output.nobs     df&#91;&#33;, :SE&#93; &#61; .√&#40;get</em>diagonal&#40;∂fβ<em>∂β * VCOV * ∂fβ</em>∂β&#39;&#41;&#41;     # Use a t-distribution just in case the sample is small     tcrit &#61; quantile&#40;TDist&#40;reg<em>output.dof</em>residual&#41;, 1-α/2&#41;     # Use √&#40;1 &#43; 1/n&#41; correction because both the mean &#40;predicted value&#41; and the variance are unknown estimated parameters     width &#61; tcrit * df&#91;&#33;, :SE&#93; * √&#40;1 &#43; 1/n&#41;     df&#91;&#33;, :y<em>lb&#93; &#61; df&#91;&#33;, :yhat&#93; - width     df&#91;&#33;, :y</em>ub&#93; &#61; df&#91;&#33;, :yhat&#93; &#43; width     #&#33; If the sample size is small, consider using the second-order delta method     return df end</p>
+<h1>Let&#39;s try bootstrapping&#33;</h1>
+<p>&quot;&quot;&quot;Given a dataframe sample and dataframe with tAvg values to predict on,     estimate the prediction vector&quot;&quot;&quot; function prediction<em>sample&#40;df, df</em>plot&#41;     reg_ &#61; reg&#40;df, formula122, Vcov.cluster&#40;:fips&#41;&#41;     df2 &#61; DataFrame&#40;tAvg&#61;0:0.25:40&#41;     df2&#91;&#33;, :yhat&#93; &#61; Matrix&#40;df<em>plot&#91;&#33;,r&quot;splinerelativeC&quot;&#93;&#41; * reg</em>.coef     return df2&#91;&#33;, &#91;:tAvg, :yhat&#93;&#93; end</p>
+<p>&quot;&quot;&quot;Return DF of confidence intervals for each temperature for bootstraped simulation results&quot;&quot;&quot; function confidence<em>interval&#40;df, α&#41;     df</em>bs &#61; @chain df begin         groupby&#40;:tAvg&#41;         combine&#40;:yhat &#61;&gt; mean &#61;&gt; :y<em>mean,                 :yhat &#61;&gt; &#40;x -&gt; quantile&#33;&#40;x, α/2&#41;&#41; &#61;&gt; :y</em>lb,                 :yhat &#61;&gt; &#40;x -&gt; quantile&#33;&#40;x, 1-α/2&#41;&#41; &#61;&gt; :y<em>ub,                 :yhat &#61;&gt; minimum &#61;&gt; :y</em>min, :yhat &#61;&gt; maximum &#61;&gt; :y<em>max&#41;     end     return df</em>bs end</p>
+<p>&quot;&quot;&quot;Return dataframe of bootstrapped predictions with α confidence intervals.&quot;&quot;&quot; function bootstrap<em>predicted</em>outcome&#40;df::DataFrame,                                      prediction<em>function::Function;                                      screenwidth&#61;50,                                      nsimulations&#61;10000,                                      α&#61;0.05                                      &#41;     println&#40;&quot;\nStarting simple bootstrap&quot;&#41;     cols &#61; &#91;:year, :fips, :tAvg, :inc</em>farm<em>prop</em>inc<em>lpc, :splineC1, :splineC2, :splineC3, :splineC4&#93;     preds &#61; &#91;&#93;     t &#61; @timed for k ∈ 1:nsimulations         k&#37;ceil&#40;nsimulations/screenwidth&#41; &#61;&#61; 0 ? print&#40;&quot;⋅&quot;&#41; : nothing         sample</em>rows &#61; sample&#40;1:nrow&#40;df&#41;, nrow&#40;df&#41;, replace&#61;true&#41;         df<em>sample &#61; df&#91;sample</em>rows, cols&#93;         append&#33;&#40;preds, &#91;prediction<em>function&#40;df</em>sample, df<em>plot&#41;&#93;&#41;     end     # Vertically concatenate the bootstrap predictions     preds</em>comb &#61; reduce&#40;vcat, preds&#41;     # Get mean and 95&#37; CI for each value of tAvg     df<em>bs &#61; confidence</em>interval&#40;preds<em>comb, α&#41;     print&#40;&quot;:&#40;t.time&#41; seconds\n&quot;&#41;     return df</em>bs end</p>
+<p>&quot;&quot;&quot;Return dataframe of cluster-bootstrapped predictions with α confidence intervals.</p>
+<pre><code>Clustered Bootstrap &#40;over each fips county code&#41;
+Need to sample 3055 counties of 3055 counties &#40;with replacement&#41;
+Requires repeating some counties in the data and keeping all years
+of their data</code></pre>
+<p>&quot;&quot;&quot; function bootstrap<em>predicted</em>outcome&#40;df::DataFrame,                                      prediction<em>function::Function,                                      cluster::Union&#123;Symbol, String&#125;;                                      screenwidth&#61;50,                                      nsimulations&#61;10000,                                      α&#61;0.05                                      &#41;     println&#40;&quot;\nStarting clustered bootstrap&quot;&#41;     cols &#61; &#91;:year, :fips, :tAvg, :inc</em>farm<em>prop</em>inc<em>lpc, :splineC1, :splineC2, :splineC3, :splineC4&#93;     preds &#61; &#91;&#93;     df</em>grouped &#61; groupby&#40;df&#91;&#33;, cols&#93;, cluster&#41;     ngroups &#61; length&#40;df<em>grouped&#41;     t &#61; @timed for k ∈ 1:nsimulations         k&#37;ceil&#40;nsimulations/screenwidth&#41; &#61;&#61; 0 ? print&#40;&quot;⋅&quot;&#41; : nothing         sample</em>idx &#61; sample&#40;1:ngroups, ngroups; replace &#61; true, ordered &#61; false&#41;         df<em>sample &#61; reduce&#40;vcat, &#91;df</em>grouped&#91;i&#93; for i in sample<em>idx&#93;&#41;         append&#33;&#40;preds, &#91;prediction</em>function&#40;df<em>sample, df</em>plot&#41;&#93;&#41;     end     # Vertically concatenate the bootstrap predictions     preds<em>comb &#61; reduce&#40;vcat, preds&#41;     # Get mean and 95&#37; CI for each value of tAvg     df</em>bs &#61; confidence<em>interval&#40;preds</em>comb, α&#41;     print&#40;&quot;:&#40;t.time&#41; seconds\n&quot;&#41;     return df_bs end</p>
+<h1>Initialize dataframe used for plotting &#40;x-axis with temperatures, spline variables&#41;</h1>
+<p>df<em>plot &#61; plotdf</em>init&#40;reg122&#41;</p>
+<h1>Delta method on recentered data &#40;outcome centered on predicted outcome at 20°C&#41;</h1>
+<p>df<em>plot &#61; deltamethod</em>CIbounds&#33;&#40;df_plot, reg122&#41;</p>
+<h1>Get mean and 95&#37; CI for each value of tAvg using bootstraps</h1>
+<p>if 1&#61;&#61;0     nsimulations &#61; 100     # Simple bootstrap &#40;over all individuals&#41;     df<em>bs &#61; bootstrap</em>predicted<em>outcome&#40;df, prediction</em>sample, nsimulations&#61;nsimulations&#41;     # Clustered bootstrap     df<em>bs</em>cluster &#61; bootstrap<em>predicted</em>outcome&#40;df, prediction_sample, :fips; nsimulations&#61;nsimulations&#41;   </p>
+<pre><code># Plot Delta method and bootstraps confidence intervals and predicted outcome
+s &#61; 0; dpi&#61;400;
+@df df_plot plot&#40;:tAvg, :y_lb, w&#61;0, msw &#61; 0, ms &#61; s, c&#61;1,
+    fillrange&#61;:y_ub, fillalpha&#61;0.35,
+    label&#61;&quot;95&#37; CI Delta Method&quot;&#41;
+@df df_bs plot&#33;&#40;:tAvg, :y_lb, w&#61;0, msw &#61; 0, ms &#61; s, c&#61;2,
+    fillrange&#61;:y_ub, fillalpha&#61;0.35,
+    label&#61;&quot;95&#37; CI BootStrap &#40;&#36;nsimulations&#41;&quot;&#41;
+@df df_bs_cluster plot&#33;&#40;:tAvg, :y_lb, w&#61;0, msw &#61; 0, ms &#61; s, c&#61;3,
+    fillrange&#61;:y_ub, fillalpha&#61;0.35,
+    label&#61;&quot;95&#37; CI BootStrap-clustered &#40;&#36;nsimulations, FIPS&#41;&quot;&#41;
+p8 &#61; @df df_plot plot&#33;&#40;:tAvg, :yhat, label&#61;&quot;Predicted Response&quot;, legend&#61;:bottomleft&#41;
+savefig&#40;p8, &quot;plot122-delta-boot-bootcluster.svg&quot;&#41;</code></pre>
+<p>end</p>
+<h1>Plot Delta method confidence intervals and predicted outcome</h1>
+<p>plot&#40;df<em>plot&#91;&#33;,:tAvg&#93;, repeat&#40;&#91;0&#93;, nrow&#40;df</em>plot&#41;&#41;, c&#61;&quot;gray&quot;, s&#61;:dash, label&#61;&quot;&quot;&#41; @df df<em>plot plot&#33;&#40;:tAvg, :y</em>lb, w&#61;0, msw &#61; 0, ms &#61; 0, c&#61;1,     fillrange&#61;:y<em>ub, fillalpha&#61;0.35,     label&#61;&quot;95&#37; CI&quot;&#41; xlabel&#33;&#40;&quot;Average Temperature&quot;&#41; ylabel&#33;&#40;&quot;log&#40;Farm Income per capita&#41;&quot;&#41; title&#33;&#40;&quot;Spline Temperature Response: Farm Employment      &quot;&#41; p9 &#61; @df df</em>plot plot&#33;&#40;:tAvg, :yhat,      label&#61;&quot;Predicted Response&quot;, legend&#61;:bottomleft, c&#61;2&#41; savefig&#40;p9, &quot;plot122-spline.svg&quot;&#41;</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 1.2.3 Treatment heterogeneity     Use the binned temperature estimator to design a      test for whether we observe treatment effect     heterogeneity. One possibility for this test is      to interact the temperature bins with the average     # of days in a county for which the temperature      falls into each respective bin &#40;i.e. are counties     that experience more 32&#43; days more/less responsive      to temperature&#41;. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;# #&#33; the temperature bin variables are degree-days in the bin #&#33; which are averaged over all grid points in the county #&#33; so aren&#39;t they already &quot;the average # of days in a county #&#33; for which the temperature falls inot each bin&quot;? #&#33; Simon &#61;&#61;&gt; use 10-year rolling averages</p>
+<p>function add<em>moving</em>avgs&#33;&#40;df; windowsize&#61;10&#41;     # group each county     cols &#61; &#91;&#91;&quot;fips&quot;, &quot;Date&quot;&#93;; names&#40;df, r&quot;temp<a href="#footnote-P" class="footnote">[P]</a>&quot;&#41;&#93;     gdf &#61; groupby&#40;df&#91;&#33;, cols&#93;, :fips&#41;     dfs &#61; &#91;&#93;     # for each county, calculate a 10-year backward-looking moving average     for group in gdf         # Create TimeArray         temp &#61; TimeArray&#40;group, timestamp &#61; :Date&#41;         # create moving average of last 10 years         temp &#61; moving&#40;mean, temp, windowsize&#41;         # convert back to dataframe         temp &#61; DataFrame&#40;temp&#41;         append&#33;&#40;dfs, &#91;temp&#93;&#41;     end     # concatenate county dataframes and leftjoin onto df using fips and Date     df<em>avg &#61; reduce&#40;vcat, dfs&#41;     renamingdict &#61; &#91;names&#40;df, r&quot;temp<a href="#footnote-P" class="footnote">[P]</a>&quot;&#41; .&#61;&gt; names&#40;df, r&quot;temp<a href="#footnote-P" class="footnote">[P]</a>&quot;&#41; .* &quot;</em>avg&quot;; &#91;&quot;timestamp&quot; &#61;&gt; &quot;Date&quot;&#93;&#93;     df<em>avg &#61; DataFrames.rename&#40;df</em>avg, renamingdict&#41;     df &#61; leftjoin&#40;df, df_avg, on&#61;&#91;:fips, :Date&#93;&#41;     return df end</p>
+<h1>For each bin, add the 10-year moving average</h1>
+<p>df &#61; add<em>moving</em>avgs&#33;&#40;df&#41;</p>
+<h1>Calculate the deviance from the running mean</h1>
+<p>for col in names&#40;df, r&quot;temp<a href="#footnote-P" class="footnote">[P]</a>.*&#40;?&lt;&#33;<em>avg&#41;<span class="math">$")     df[!, "$</span>&#40;col&#41;</em>dev&quot;&#93; &#61; df&#91;&#33;, col&#93; - df&#91;&#33;, &quot;col_avg&quot;&#93; end</p>
+<h1>Regress the outcomes on the deviance from the running average bins</h1>
+<p>function reg123&#40;df, y; cluster&#61;:fips, regex&#61;r&quot;temp&#40;?&#33;20to24&#41;.<em><em>dev&quot;&#41;     formula</em> &#61; term&#40;y&#41; ~ sum&#40;&#91;term.&#40;names&#40;df, regex&#41;&#41;; &#91;term&#40;fe&#40;:fips&#41;&#41;, term&#40;fe&#40;:year&#41;&#41;&#93;&#93;&#41;     reg_ &#61; @time reg&#40;df, formula<em>, Vcov.cluster&#40;cluster&#41;&#41;     se &#61; .√&#91;reg</em>.vcov&#91;i,i&#93; for i in 1:length&#40;reg<em>.coef&#41;&#93;     ub &#61; reg</em>.coef &#43; 1.96</em>se     lb &#61; reg<em>.coef - 1.96*se     df2 &#61; DataFrame&#40;tAvg&#61;&#91;-2,2,6,10,14,18,26,30,34&#93;,                     yhat&#61;reg</em>.coef,                     yerror&#61;1.96*se,                     y<em>ub&#61;ub,                     y</em>lb&#61;lb&#41;     df2 &#61; reduce&#40;vcat, &#91;&#91;df2&#93;; &#91;DataFrame&#40;tAvg&#61;22,yhat&#61;0,yerror&#61;0,y<em>lb&#61;0,y</em>ub&#61;0&#41;&#93;&#93;&#41;     df2 &#61; sort&#33;&#40;df2, :tAvg&#41;     return df2 end</p>
+<h1>Plot deviance bins: above avg # of days this year that were in this bin &#40;days above the 10-year average # of days&#41;</h1>
+<p>labels &#61; Dict&#40;:emp<em>farm</em>ln &#61;&gt; &quot;Farm Employment&quot;, :inc<em>farm</em>prop<em>inc</em>lpc &#61;&gt; &quot;Farm Income per capita&quot;&#41; Dict&#40;:emp<em>farm</em>ln &#61;&gt; &quot;log&#40;Farm Employment&#41;&quot;, :inc<em>farm</em>prop<em>inc</em>lpc &#61;&gt; &quot;log&#40;Farm Income per capita&#41;&quot;&#41; for y ∈ &#91;:emp<em>farm</em>ln, :inc<em>farm</em>prop<em>inc</em>lpc&#93;     temp &#61; reg123&#40;df, y&#41;     plot&#40;temp&#91;&#33;,:tAvg&#93;, repeat&#40;&#91;0&#93;, nrow&#40;temp&#41;&#41;, c&#61;&quot;gray&quot;, s&#61;:dash, label&#61;&quot;&quot;&#41;     @df temp plot&#33;&#40;:tAvg, :y<em>lb, w&#61;0, msw &#61; 0, ms &#61; 0, c&#61;1,     fillrange&#61;:y</em>ub, fillalpha&#61;0.35,     label&#61;&quot;95&#37; CI&quot;&#41;     xlabel&#33;&#40;&quot;Average Temperature&quot;&#41;     ylabel&#33;&#40;&quot;log&#40;:&#40;labels&#91;y&#93;&#41;&#41;&quot;&#41;     title&#33;&#40;&quot;Binned DDay Deviance from Avg: :&#40;labels&#91;y&#93;&#41;          &quot;&#41;     p121 &#61; @df temp plot&#33;&#40;:tAvg, :yhat,          label&#61;&quot;Predicted Response&quot;,          legend&#61;:bottomright, c&#61;2, shape&#61;:circle, markerstrokewidth&#61;0&#41;     savefig&#40;p121, &quot;plot123 :&#40;labels&#91;y&#93;&#41; deviance.svg&quot;&#41; end</p>
+<h1>Plot basic bins again: # of days in a county-year that day&#39;s avg temp was in this bin</h1>
+<p>for y ∈ &#91;:emp<em>farm</em>ln, :inc<em>farm</em>prop<em>inc</em>lpc&#93;     temp &#61; reg123&#40;df, y; regex&#61;r&quot;^temp&#40;?&#33;20to24&#41;<a href="#footnote-P" class="footnote">[P]</a>.*<a href="#footnote-vg" class="footnote">[vg]</a><span class="math">$")     plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")     @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,     fillrange=:y_ub, fillalpha=0.35,     label="95% CI")     xlabel!("Average Temperature")     ylabel!("log($</span>&#40;labels&#91;y&#93;&#41;&#41;&quot;&#41;     title&#33;&#40;&quot;Binned Temperature Response: :&#40;labels&#91;y&#93;&#41;         &quot;&#41;     p121 &#61; @df temp plot&#33;&#40;:tAvg, :yhat,          label&#61;&quot;Predicted Response&quot;,          legend&#61;:bottomright, c&#61;2, shape&#61;:circle, markerstrokewidth&#61;0&#41;     savefig&#40;p121, &quot;plot123 :&#40;labels&#91;y&#93;&#41; bins.svg&quot;&#41; end</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2 Hedonic Air Quality Analysis     Does Air Quality Get Capitalized into Housing Prices? The outcome of interest     is  the change in county housing prices during the 1970s. We want to estimate     the  “causal” effect of air pollution changes on housing price changes.     According  to hedonic price theory, the housing market may be used to estimate     the  implicit prices of clean air and the economic value of pollution     reductions to individuals. A statistically significant negative relationship     between changes in property values and pollution levels across counties is     interpreted as  evidence that clean air has economic benefits. &#40;For a summary     of the theory,  you could read: Rosen, Sherwin, “The Theory of Equalizing     Differences,” Chapter 12 in Handbook of Labor Economics, Volume 1, 1986, pp.     641-92.&#41; A basic model for the change in housing prices at the county level     could be:  Change in housing price &#61; g&#40;economic shocks, changes in county     characteristics,  change in air pollution&#41; &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;# #&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.0 Load Data &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;# println&#40;&quot;Reading pollution_fn from zip folder.&quot;&#41; extract<em>file</em>from<em>zip&#40;root, zip</em>fn, pollution<em>fn&#41; pollution &#61; DataFrame&#40;load&#40;joinpath&#40;root, pollution</em>fn&#41;&#41;&#41;</p>
+<h1>dlhouse &#61; change in log-housing values from 1970 to 1980</h1>
+<h1>dgtsp &#61; change in the annual mean of TSPs from 69-72 to 77-80</h1>
+<h1>tsp7576 &#61; indicator: county was regulated EPA in 1975 or 1976</h1>
+<h1>mtspgm74 &#61; annual geometric mean of TSPs in 1974.</h1>
+<h1>pop7080 &#61; 1970 &#43; 1980 county populations; weight for regressions</h1>
+<h1>dincome &#61; change in income per-capita.</h1>
+<h1>dunemp &#61; change in unemployment rate.</h1>
+<h1>dmnfcg &#61; change in &#37; manufacturing employment.</h1>
+<h1>ddens &#61; 1970-80 change in population density.</h1>
+<h1>dwhite &#61; change in fraction of population that is white.</h1>
+<h1>dage65 &#61; change in fraction over 65 years old.</h1>
+<h1>dhs &#61; change in fraction with at least a high school degree.</h1>
+<h1>dcoll &#61; change in fraction with at least a college degree.</h1>
+<h1>durban &#61; change in fraction living in urban area.</h1>
+<h1>downer &#61; change in fraction of houses that are owner-occupied.</h1>
+<h1>dplumb &#61; change in fraction of houses with plumbing.</h1>
+<h1>drevenue &#61; change in government revenue per-capita.</h1>
+<h1>dtaxprop &#61; change in property taxes per-capita,</h1>
+<h1>depend &#61; change in general expenditures per-capita.</h1>
+<h1>Other varaible definitions in Walker-ProblemSet1.pdf</h1>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.1  Housing prices vs air pollution</p>
+<p>Estimate the relationship between changes in air pollution and housing prices, both not adjusting and adjusting for other housing price determinants &#40;use pop7080 as weights&#41;. What do your estimates imply and do they make sense? Describe the potential omitted variables biases. What is the likely relationship between economic shocks and pollution and housing price changes? Using the observable measures of economic shocks &#40;dincome, dunemp, dmnfcg&#41;, provide evidence on this. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<h1>Remove missing and convert to Float64</h1>
+<h1>df1 &#61; convert_float32&#40;pollution, &#91;:dlhouse, :dgtsp, :pop7080&#93;&#41;</h1>
+<h1>df212 &#61; convert_float32&#40;pollution, &#91;&#91;:dlhouse, :pop7080&#93;; cols212&#93;&#41;</h1>
+<h1>reg211 &#61; regression&#40;df1, @formula&#40;dlhouse ~ dgtsp&#41;; weights&#61;&quot;pop7080&quot;, filestub&#61;&quot;reg211&quot;&#41;</h1>
+<h1>Reg: dlhouse on dgtsp, weight with pop7080</h1>
+<p>reg211 &#61; @time reg&#40;pollution, @formula&#40;dlhouse ~ dgtsp&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>Reg: dlhouse on dgtsp, weight with pop7080,</h1>
+<h1>controlling for ddens dwhite dfeml dage65</h1>
+<h1>dhs dcoll durban dpoverty dvacant downer</h1>
+<h1>dplumb dtaxprop &#40;depend?&#41;</h1>
+<p>cols221 &#61; &#91;:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula221 &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols221&#41;&#41;&#41;&#41; reg221 &#61; @time reg&#40;pollution, formula221, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<p>#&#33; What do your estimates imply and do they make sense? #&#33; Describe the potential omitted variables biases #&#61; both these seem to indicate that increased pollution increases housing values&#33; This doesn&#39;t makes sense since air pollution should be a disamenity. This result could be caused by OVB, if the omitted variable has correlation with housing price in the same direction as the correlation with pollution &#40;ie, if x2 is the OV, cov&#40;x2, pollution&#41; and cov&#40;x2, houseprice&#41; are both &gt;0 or both &lt;0&#41;. For example, if there is a recession, and the economy slows,  this generally decreases the amount of pollution being produced by firms supplying goods to the economy. So an indicator of positive economic activity would be positively correlated with pollution. At the same time, a recession would likely cause the average price of housing to decrease. So an indicator of positive economic activity would be positively correlated with housing price. Then bias from an omitted economic variable that is positively correlated with both pollution and housing prices would cause an upward bias in our estimate of the partial derivative of house price changes w.r.t. pollution changes. If the bias is large enough, it could flip the sign of the coefficient, and since our coeffience on pollution is nearly statistically indistinguishable from 0 after controlling for other observed housing determinants, upward OVB could be likely here.</p>
+<p>There was a large recession in the 70s, so variables describing the impact of  the recession on the supply and demand for housing seem like they would be important to control for. For example, many manufacturing jobs were lost during the recession &#40;more relative to other sectors&#41; which affects the housing market. We can test three of our economic indicators to see how correlated with pollution they are in order to see if we should be concerned about OVB. &#61;#</p>
+<p>#&#33; What is the likely relationship between economic #&#33; shocks and pollution and housing price changes? #&#33; Using the observable measures of economic shocks #&#33; &#40;dincome, dunemp, dmnfcg&#41;, provide evidence on #&#33; this. #&#61; Economic shocks can change pollution because pollution is generated by economic activity &#40;i.e., if there is  a recession, there will be less pollution&#41; and economic shocks can change what people are able/willing to pay for a house  &#40;ie, recession -&gt; house prices decrease&#41;, which creates endogeniety &#40;house price is correlated with the error term&#41;&#61;#</p>
+<h1>Regress economic shocks on pollution</h1>
+<p>reg221b &#61; @time reg&#40;pollution, @formula&#40;dgtsp ~ dincome &#43; dunemp &#43; dmnfcg&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg221b, renderSettings &#61; latexOutput&#40;&quot;reg221-pollution-econshocks.tex&quot;&#41;&#41;</p>
+<p>#&#33; Change in manufacturing employment has a strong effect on change in pollution #&#33; A 10&#37; increase in manufacturing employment between 1970 and 1980 is correlated #&#33; with an increase in the 1970-1980 change in mean TSPs by about 10.6 units. #&#33; the change </p>
+<p>#&#61; We could further control for unemployment more generally and average county income changes to ensure we are comparing willingness to pay across similar counties.  After controlling for these three economic  indicators, we see the hedonic estimate of willingness to pay for changes in pollution become statistically indistinguishable from zero. &#61;# cols221c &#61; &#91;:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :dincome, :dunemp, :dmnfcg&#93; formula221c &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols221c&#41;&#41;&#41;&#41; reg221c &#61; @time reg&#40;pollution, formula221c, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg211, reg221, reg221c, renderSettings &#61; latexOutput&#40;&quot;reg221-price-pollution.tex&quot;&#41;&#41;</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.2  Attainment status as IV for pollution changes</p>
+<p>Suppose that federal EPA pollution regulation is a potential instrumental variable for pollution changes during the 1970s. What are the assumptions required for mid-decade regulatory status &#40;tsp7576&#41; to be a valid instrument for pollution changes when the outcome of interest is housing price changes? Provide evidence on the relationship between the regulatory status indicator and the observable economic shock measures. Interpret your findings. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>reg222 &#61; @time reg&#40;pollution, @formula&#40;tsp7576 ~ dincome &#43; dunemp &#43; dmnfcg&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg222, renderSettings &#61; latexOutput&#40;&quot;reg222-exogenousIV.tex&quot;&#41;&#41;</p>
+<p>#&#61;</p>
+<ol>
+<li><p>Relevance - first stage, next question</p>
+</li>
+<li><p>Exogeneity - not correlated with the economic shocks</p>
+</li>
+</ol>
+<p>&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.3 First stage, reduced form</p>
+<p>Document the first-stage relationship between regulation and air pollution changes and the reduced form relationship between regulation and housing price changes, both not adjusting and adjusting for other covariates. Interpret your findings. How does two-stage least squares use these two equations? Now estimate the effect of air quality changes on housing price changes using two-stage least squares and the tsp7576 indicator as an instrument &#40;not conditioning and conditioning on other observables&#41;. Interpret the results. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#33; first-stage relationship between regulation and air pollution changes #&#33; Relevance</p>
+<h1>Reg: dgtsp on tsp7576, weight with pop7080</h1>
+<p>reg223a &#61; @time reg&#40;pollution, @formula&#40;dgtsp ~ tsp7576&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>Reg: dgtsp on tsp7576, weight with pop7080, with controls</h1>
+<p>cols223b &#61; &#91;:tsp7576, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula223b &#61; &#40;term&#40;:dgtsp&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols223b&#41;&#41;&#41;&#41; reg223b &#61; @time reg&#40;pollution, formula223b, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg223a, reg223b, renderSettings &#61; latexOutput&#40;&quot;reg223-firststage.tex&quot;&#41;&#41;</p>
+<h1>Don&#39;t need to include econ shocks because I showed in previous question it was exogenous to the shocks</h1>
+<p>#&#33; reduced form relationship between regulation and housing price changes #&#33; Reduced form estimate</p>
+<h1>Reg: dlhouse on tsp7576, weight with pop7080</h1>
+<p>reg223c &#61; @time reg&#40;pollution, @formula&#40;dlhouse ~ tsp7576&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>Reg: dlhouse on tsp7576, weight with pop7080, with controls</h1>
+<p>cols223d &#61; &#91;:tsp7576, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula223d &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols223d&#41;&#41;&#41;&#41; reg223d &#61; @time reg&#40;pollution, formula223d, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg223c, reg223d, renderSettings &#61; latexOutput&#40;&quot;reg223-reducedform.tex&quot;&#41;&#41;</p>
+<p>#&#33; How does two-stage least squares use these two equations? #&#61; These are the first two coef. ratio: e &#61; c / a,  f &#61; d / b &#61;#</p>
+<p>#&#33; air quality changes on housing price changes using two-stage least squares and the tsp7576 indicator as an instrument #&#33; IV estimate</p>
+<h1>2SLS Reg: dlhouse on dgtsp, weight with pop7080</h1>
+<p>reg223e &#61; @time reg&#40;pollution, @formula&#40;dlhouse ~ &#40;dgtsp ~ tsp7576&#41;&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>2SLS Reg: dlhouse on dgtsp, weight with pop7080, with controls</h1>
+<p>cols223f &#61; &#91;:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula223f &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols223f&#41;&#41;&#41; &#43; &#40;term&#40;:dgtsp&#41; ~ term&#40;:tsp7576&#41;&#41;&#41; reg223f &#61; @time reg&#40;pollution, formula223f, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg223e, reg223f, renderSettings &#61; latexOutput&#40;&quot;reg223-IV.tex&quot;&#41;&#41;</p>
+<p>#&#33; Interpret the results. #&#61; A 1-unit increase in mean TSPs from 1970 to 1980 results in an average housing price change from 1970 to 1980 being 0.7 percentage points larger &#40;more positive&#41;. &#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.4 Mean of TSPs as IV for pollution changes</p>
+<p>In principle, the regulation indicator variable should be a discrete function of pollution levels in 1974. Specifically, the EPA is supposed to regulate those counties in 1975 who had either an annual geometric mean of TSPs above 75 units &#40;mg/m3&#41; or a 2nd highest daily concentration above 260 units in 1974. Based on this notion, redo part &#40;3&#41; using mtspgm74 as an instrument for pollution changes. Interpret your findings. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<h1>Create an indicator for mtspgm74&lt;75</h1>
+<p>pollution&#91;&#33;, :above75&#93; &#61; pollution&#91;&#33;, :mtspgm74&#93; .&gt; 75</p>
+<p>#&#33; Exogeniety reg224_ &#61; @time reg&#40;pollution, @formula&#40;above75 ~ dincome &#43; dunemp &#43; dmnfcg&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg224_, renderSettings &#61; latexOutput&#40;&quot;reg224-exogenousIV.tex&quot;&#41;&#41;</p>
+<p>#&#33; first-stage relationship between regulation and air pollution changes #&#33; Relevance</p>
+<h1>Reg: dgtsp on above75, weight with pop7080</h1>
+<p>reg224a &#61; @time reg&#40;pollution, @formula&#40;dgtsp ~ above75&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>Reg: dgtsp on above75, weight with pop7080, with controls</h1>
+<p>cols224b &#61; &#91;:above75, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula224b &#61; &#40;term&#40;:dgtsp&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols224b&#41;&#41;&#41;&#41; reg224b &#61; @time reg&#40;pollution, formula224b, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg224a, reg224b, renderSettings &#61; latexOutput&#40;&quot;reg224-firststage.tex&quot;&#41;&#41;</p>
+<p>#&#33; reduced form relationship between regulation and housing price changes #&#33; Reduced form estimate</p>
+<h1>Reg: dlhouse on above75, weight with pop7080</h1>
+<p>reg224c &#61; @time reg&#40;pollution, @formula&#40;dlhouse ~ above75&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>Reg: dlhouse on above75, weight with pop7080, with controls</h1>
+<p>cols224d &#61; &#91;:above75, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula224d &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols224d&#41;&#41;&#41;&#41; reg224d &#61; @time reg&#40;pollution, formula224d, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg224c, reg224d, renderSettings &#61; latexOutput&#40;&quot;reg224-reducedform.tex&quot;&#41;&#41;</p>
+<p>#&#33; air quality changes on housing price changes using two-stage least squares and the above75 indicator as an instrument #&#33; IV estimate</p>
+<h1>2SLS Reg: dlhouse on dgtsp &#40;above75 as IV&#41;, weight with pop7080</h1>
+<p>reg224e &#61; @time reg&#40;pollution, @formula&#40;dlhouse ~ &#40;dgtsp ~ above75&#41;&#41;, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41;</p>
+<h1>2SLS Reg: dlhouse on dgtsp &#40;above75 as IV&#41;, weight with pop7080, with controls</h1>
+<p>cols224f &#61; &#91;:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop&#93; formula224f &#61; &#40;term&#40;:dlhouse&#41; ~ sum&#40;term.&#40;Symbol.&#40;cols224f&#41;&#41;&#41; &#43; &#40;term&#40;:dgtsp&#41; ~ term&#40;:above75&#41;&#41;&#41; reg224f &#61; @time reg&#40;pollution, formula224f, Vcov.robust&#40;&#41;; weights&#61;:pop7080&#41; regtable&#40;reg224e, reg224f, renderSettings &#61; latexOutput&#40;&quot;reg224-IV.tex&quot;&#41;&#41;</p>
+<p>#&#33; Interpret the results. #&#61; A 1-unit increase in mean TSPs from 1970 to 1980 results in an average housing price change from 1970 to 1980 being 0.7 percentage points larger &#40;more positive&#41;. &#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.5 Regression Discontinuity, Diff-in-Diffs?</p>
+<p>Describe how one could use this discontinuity in treatment assignment to derive an alternative estimate of the capitalization of pollution changes. Under what conditions will this estimate be valid? Based on this concept, estimate the nonparametric bivariate relationships between pollution changes and 1974 TSPs levels and housing price changes and 1974 TSPs levels. Do this using the lowess STATA command or a similar command in R &#40;experiment with relatively small bandwidths between 2-4&#41;. Plot the two conditional mean functions on either side of the discontinutiy &#40;changes in air quality for discrete 1974 values on either side of threshold&#41;. Interpret your findings and relate them to the results in &#40;4&#41;. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.6 </p>
+<p>Now use linear regression to estimate the predicted change in housing prices based on the control variables &#40;excluding the change in TSPs&#41;. This provides a single-index measure of the housing price changes predicted to occur due to other variables changing. Estimate the nonparametric bivariate relation between this index and 1974 TSPs levels and plot it against the smoothed housing price changes from &#40;5&#41;. Explain how this provides an indirect test of the smoothness condition required by the regression discontinuity design and interpret your findings. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.7 </p>
+<p>A number of counties with annual geometric mean TSPs below 75 units in 1974 were regulated due to having as few as 2 bad days. This implies that we can compare regulated and unregulated counties with identical average TSPs levels in the regulation selection year &#40;be- low 75 units&#41;. For those counties with 1974 mean TSPs between 50 and 75 units, estimate the bivariate relation between TSPs changes and 1974 TSPs levels separately for regulated and unregulated counties and plot the results. Now do the same for the relation between log-housing price changes and 1974 TSPs levels. Interpret your findings. Since there are fewer observations, you may need to use bigger bandwidths than those in part &#40;5&#41; &#40;e.g., bandwidths between 6-9&#41;. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.8 </p>
+<p>Under what assumptions will two-stage least squares identify the average treatment effect &#40;ATE&#41;? If ATE is not identified, describe what may be identifiable with two-stage least squares estimation. Under what conditions is this effect identified? Give some intuition on what this effect may represent when one uses EPA regulation as an instrument variable. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; 2.2.9 </p>
+<p>Provide a concise synthesis/summary of your results. Discuss the credibility of the various research designs underlying the results. &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61; Extra Notes / leftovers &#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;&#61;#</p>
+<p>#&#61; Merge gridNumber with latlon then with Decennial Census Block population counts. Or are they weighted using crop weights like in degreeDays.do? </p>
+<h1>lat-lon from degreeDays.do</h1>
+<p>use ../metaData/cropArea, clear; gen longitude &#61; -125 &#43; mod&#40;gridNumber-1,1405&#41;/24; label var longitude &quot;longitude of grid centroid &#40;decimal degrees&#41;&quot;; gen latitude  &#61; 49.9375&#43;1/48 - ceil&#40;gridNumber/1405&#41;/24; label var latitude  &quot;latitude of grid centroid &#40;decimal degrees&#41;&quot;; merge 1:1 gridNumber using ../metaData/linkGridnumberFIPS;</p>
+<h1>Decennial census block population counts</h1>
+<p>&#61;#</p>
+<pre><code># combine&#40;groupby&#40;combine&#40;gd, :tMax &#61;&gt; mean &#61;&gt; :tMax&#41;, :year&#41;, :tMax &#61;&gt; mean&#41;
+# Weighted average using Decennial Census Block population counts as weights
+# gridnum_fips_fn &#61; &quot;linkGridnumberFIPS.dta&quot;
+# lookup &#61; DataFrame&#40;load&#40;joinpath&#40;root, gridnum_fips_fn&#41;&#41;&#41;</code></pre>
+
+
+        <HR/>
+        <div class="footer">
+          <p>
+            Published from <a href="ps1.jmd">ps1.jmd</a>
+            using <a href="http://github.com/JunoLab/Weave.jl">Weave.jl</a> v0.10.10 on 2022-04-23.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</BODY>
+
+</HTML>
