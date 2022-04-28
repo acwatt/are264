@@ -46,116 +46,38 @@ begin
 end
 
 # ╔═╡ 220c7746-b558-4b42-9e47-e227730a1aad
-md"# ARE 264 PS3"
-
-# ╔═╡ 39ee727f-d0fa-44a8-8c86-b532d82c2671
-# Set local directory paths and filenames
-begin
-root = dirname(@__FILE__)
-zip_fn = "Walker-ProblemSet1-Data.zip"
-county_fn = "fips1001.dta"
-employment_fn = "reis_combine.dta"
-example_fn = "CountyAnnualTemperature1950to2012.dta"
-pollution_fn = "poll7080.dta"
-example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
-
-macro seeprints(expr)
-	quote
-		stdout_bk = stdout
-		rd, wr = redirect_stdout()
-		$expr
-		redirect_stdout(stdout_bk)
-		close(wr)
-		read(rd, String) |> Text
-	end
-end
-macro with_stdout(expr)
-        escaped_expr = esc(expr)
-	return quote
-		stdout_bk = stdout
-		rd, wr = redirect_stdout()
-		result = ($escaped_expr)
-		redirect_stdout(stdout_bk)
-		close(wr)
-		print_result = read(rd, String) |> Text
-		print_result
-	end
-end
-macro with_stdout_string(expr)
-        escaped_expr = esc(expr)
-	return quote
-		stdout_bk = stdout
-		rd, wr = redirect_stdout()
-		result = ($escaped_expr)
-		redirect_stdout(stdout_bk)
-		close(wr)
-		print_result = read(rd, String)
-		print_result
-	end
-end
-end;
+html"<span style='font-size:4em;'>ARE 264-b Problem Set 1</span>"
 
 # ╔═╡ 8a325a10-4c17-43a1-a75f-9bc68f72fbdb
-md"## Problem 1"
+md"# Problem 1"
+
+# ╔═╡ 00edd77c-be64-44fc-b510-28234152ca56
+md"See the code appendix at the end for function definitions."
 
 # ╔═╡ ac7d2e34-53a5-4c0e-b413-c1129378d91a
-md"### 1.1 Temperature Aggregation"
+md"## 1.1 Temperature Aggregation"
 
 # ╔═╡ 22681583-0918-49da-87b8-3a86c027cf81
-md"#### 1.1.1 Construct 4 temperature response variables
+md"### 1.1.1 Construct 4 temperature response variables
 See next section."
 
 # ╔═╡ b0a24d4d-016f-45a4-9124-90d463d1db93
-md"#### 1.1.2 Aggregate to year-county
+md"### 1.1.2 Aggregate to year-county
 Construction and aggregation are both handled in the `create_temperature_vars()` function."
 
-# ╔═╡ 4d0870b4-12bd-4000-a8c4-2caabb5242cc
-md"This creates the new file of county-year temperature response variables to regress on (degree days, temperature bins, cubic splines, and piecewise linear). I have compared the values of these county-year variables with the $example_fn file for Autauga County and they match."
-
 # ╔═╡ 28d5ff08-5fbd-45c8-9816-dacbe9d20493
-
-
-# ╔═╡ 8a815256-ce60-4b8a-98e1-1c24b3aadfa6
-
-
-# ╔═╡ 530e118d-f171-45fb-970e-23aa88069c46
-
-
-# ╔═╡ 63ac5fdb-0398-48c3-8665-4abddaaec3c0
-
-
-# ╔═╡ dfdfb887-1345-43c8-a746-996b70345115
-
-
-# ╔═╡ fd36b348-d493-4be1-b8e3-82d1cb06b168
-
+html"<br><br><br><br><br><br><br><br>"
 
 # ╔═╡ f9fbde9e-b9fd-4407-a63d-992a28408245
-md"### 1.2 US Climate Impacts: County-Year Damages"
-
-# ╔═╡ 4058a3aa-7ec2-4fce-91d3-5ca5c65c74e7
-md"""`emp_farm_ln` = log(# of farm employees in each county)"""
-
-# ╔═╡ bfcb7eec-d5c9-4e76-8e54-7d92b751e98b
-md"`inc_farm_prop_inc_lpc` = log(per capita farm prop income)"
-
-# ╔═╡ 12b180ac-715f-4630-af4f-8bdadd97cd3a
-
-
-# ╔═╡ c69ba3cf-9df0-46e4-8604-3dc7ce96b4a4
-md"`tAvg` = Average daily temperature for each year in each county"
-
-# ╔═╡ 318d9637-0da4-4480-8a51-1ef4855b85e9
-
-
-# ╔═╡ cb77d8fb-507a-47d1-b420-a0bf086e5a06
-
-
-# ╔═╡ 0d2707d2-88e0-48c9-b092-7a7a2e2fbc15
-
+md"## 1.2 US Climate Impacts: County-Year Damages"
 
 # ╔═╡ 65cebd89-47ba-4773-9b7f-98ce0ef42d4b
-md"#### 1.2.1 log-transformed farm employment vs binned temperature"
+md"### 1.2.1 log-transformed farm employment vs binned temperature"
+
+# ╔═╡ c94aac41-7071-4cbd-acd6-9f1cd53176cd
+md"
+> Explore the relationship between log tranformed emp_farm and the vector of binned temperature controls. Include additional controls for county FE, year FE. Provide an interpretation of the coefficient of the 32+ bin.
+"
 
 # ╔═╡ 225f183d-aa3b-46ce-8edf-4336bba8da30
 md"Below, I produce a plot of the coefficients on the temperature bin variables and their 95% confidence intervals, where the points are plotted at the midpoint of their respective bins. I used the 20-24°C bin as the reference bin in the regression, so all coefficients represent percent of annual Farm Employment in the county changed by moving a single day's average temperature from the 20-24°C bin to each respective bin. For example, the second point from the left should be interpreted as: *On average, if we move a single day that has a daily average of 22°C to a daily average of 2°C, we expect to see a decrease in that county's farm employment by roughly 0.1 percentage points, all other days held constant*."
@@ -163,58 +85,33 @@ md"Below, I produce a plot of the coefficients on the temperature bin variables 
 # ╔═╡ 7214407b-7850-4a69-8798-59c463394cf2
 md"Note that the left-most and right-most bin represent *below 0°C* and *above 32°C* average temperature, respectively. Thus the right most point in the plot represents: *% change in farm employees for the average county for each additional day above 32°C that would have been between 20°C and 24°C*"
 
-# ╔═╡ b32e0d81-2cee-4c7e-a1b9-bf0377fa95ca
-
-
-# ╔═╡ 2606a776-1665-4627-baea-c75dd57a6315
-
-
 # ╔═╡ 9cf39312-272b-4b73-867c-faf98da039f7
-md"#### 1.2.2 per capita farm property income vs cubic spline temperature"
+md"### 1.2.2 per capita farm property income vs cubic spline temperature"
 
-# ╔═╡ 16c998d5-486b-42c4-976a-50dc18b503fb
-formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 + splineC3 + splineC4 + fe(year) + fe(fips));
+# ╔═╡ fe21bed1-dcd3-47fa-997c-9827db649e3f
+md"
+> Explore the relationship between log tranformed `inc_farm_prop_income`/ population (i.e. log(per capita farm prop income) using the restricted cubic spline. Include additional controls for county FE and year FE. Plot the predicted marginal effects with associated confidence intervals, and compare to the binned temperature response function above.
+"
 
 # ╔═╡ 84fbd2e7-82cd-45ea-bb89-d75a621f79ca
-md"Bootstrapping was also explored -- clustered bootstrapping (at the county level,w ith 10,000 iterations) resulted in confidence intervals that were nearly identical to the delta method confidence intervals. The bootstrapping results are omitted here for brevity."
+md"
+Let's compare the shift from 20°C days to cooler days between the plot above and the spline plot below. In the previous plot, we saw that farm employment decreases when shifting to cooler days, but in the below plot, the farm's income (normalized to the county population) seems to be fairly steady when moving moderate days to cooler days. Perhaps this is because it takes fewer hands to harvest when the season is cooler because the product ripens slower. 
 
-# ╔═╡ e38183bf-7403-49b7-987d-d4f6df7562e5
-# ╠═╡ disabled = true
-#=╠═╡
-# Get mean and 95% CI for each value of tAvg using bootstraps
-nsimulations = 100
-# Simple bootstrap (over all individuals)
-df_bs = bootstrap_predicted_outcome(df, prediction_sample, nsimulations=nsimulations)
-# Clustered bootstrap
-df_bs_cluster = bootstrap_predicted_outcome(df, prediction_sample, :fips; nsimulations=nsimulations)   
+In the plot above, farm employment incrases when shifting 20°C days to hotter days, and in the plot below, the farm's income seems to be signficantly decreasing when more moderate days are made hot. Similarly, perhaps hotter seasons require more intense (faster) harvesting of the produce. So more people could be employed in the county, but the farm may not make as much due to more product over-ripening.
 
-
-# Plot Delta method and bootstraps confidence intervals and predicted outcome
-s = 0; dpi=400;
-@df df_plot plot(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
-	fillrange=:y_ub, fillalpha=0.35,
-	label="95% CI Delta Method")
-@df df_bs plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=2,
-	fillrange=:y_ub, fillalpha=0.35,
-	label="95% CI BootStrap ($nsimulations)")
-@df df_bs_cluster plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=3,
-	fillrange=:y_ub, fillalpha=0.35,
-	label="95% CI BootStrap-clustered ($nsimulations, FIPS)")
-p8 = @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft)
-savefig(p8, "plot122-delta-boot-bootcluster.svg")
-  ╠═╡ =#
-
-# ╔═╡ 5b245628-62db-4ee7-a22a-f2a1661ffa4d
-
+The confidence intervals were created using the delta method. Bootstrapping was also explored -- clustered bootstrapping (at the county level,w ith 10,000 iterations) resulted in confidence intervals that were nearly identical to the delta method confidence intervals. The bootstrapping results are omitted here for brevity."
 
 # ╔═╡ aa60b5ef-3aeb-42ff-b679-e00b28205267
 
 
 # ╔═╡ 6a978c31-51c4-47a8-b626-14ca00de0370
-md"#### 1.2.3 Treatment heterogeneity"
+md"### 1.2.3 Treatment heterogeneity"
 
 # ╔═╡ 952ba66d-3264-405e-ad52-9f0a951e244c
-md"To estimate treatment heterogeniety, I first calculated the 10-year moving average (backward looking) for each year-county-temperature bin. This is functionally a medium-term historical average of days of the year with average temperatures in each bin. So the first 10 years of data are now unused for these plots. For each year-county-bin, I then calculated the difference of the bin from the 10-year average (the deviance from the average). I then regressed both Farm Employment and Farm Income per capita on the new deviance bins. "
+md"
+> Use the binned temperature estimator to design a test for whether we observe treatment effect heterogeneity. One possibility for this test is to interact the temperature bins with the average # of days in a county for which the temperature falls into each respective bin (i.e. are counties that experience more 32+ days more/less responsive to temperature).
+
+To estimate treatment heterogeniety, I first calculated the 10-year moving average (backward looking) for each year-county-temperature bin. This is functionally a medium-term historical average of days of the year with average temperatures in each bin. So the first 10 years of data are now unused for these plots. For each year-county-bin, I then calculated the difference of the bin from the 10-year average (the deviance from the average). I then regressed both Farm Employment and Farm Income per capita on the new deviance bins. "
 
 # ╔═╡ 9a4d0f65-7c09-4c92-99fb-ff31b0453054
 md"To compare, I again plot the basic temperature bins' effects, but for both Farm Employment and Farm Income"
@@ -232,10 +129,10 @@ md"To compare, I again plot the basic temperature bins' effects, but for both Fa
 
 
 # ╔═╡ 714b920e-a30a-4930-bd05-fb070dc4f641
-md"## Problem 2"
+md"# Problem 2"
 
 # ╔═╡ 8255f716-16ad-44c2-9c87-1710f95ff1f6
-md"### 2.2 Hedonic Air Quality Analysis"
+md"## 2.2 Hedonic Air Quality Analysis"
 
 # ╔═╡ 478897a9-13e7-453a-ad0a-4b4031e7932d
 # ╠═╡ disabled = true
@@ -244,10 +141,11 @@ md"Load pollution data"
   ╠═╡ =#
 
 # ╔═╡ a613f88c-ea92-4e66-8a62-6f9012437cb9
-md"#### 2.2.1  Housing prices vs air pollution"
+md"### 2.2.1  Housing prices vs air pollution"
 
 # ╔═╡ 71b0a94f-67ae-4240-ba7a-5e9ebd33af45
-md"**Convert latex file to png (overleaf, screenshot?) and display here.**"
+md"
+> Estimate the relationship between changes in air pollution and housing prices, both not adjusting and adjusting for other housing price determinants (use pop7080 as weights). What do your estimates imply and do they make sense? Describe the potential omitted variables biases. What is the likely relationship between economic shocks and pollution and housing price changes? Using the observable measures of economic shocks (dincome, dunemp, dmnfcg), provide evidence on this."
 
 # ╔═╡ cac486e4-3bd6-45ab-b6d0-24dbafc0da71
 md"
@@ -289,9 +187,6 @@ indicators, regression (3) above shows that the hedonic estimate of willingness 
 changes in pollution become statistically indistinguishable from zero.
 "
 
-# ╔═╡ 635497dc-b888-4d9e-94df-79d3f79f2be7
-
-
 # ╔═╡ af154adc-56f4-45d8-9c5c-7647fc7ed12e
 md"
 Above is the regression of changes in pollution levels on changes in various eocnomic indicators. Economic shocks can change pollution because pollution
@@ -308,30 +203,18 @@ endogeniety (house price is correlated with the error term).
 # ╔═╡ fb3ad8e9-08f9-4ffa-891b-e6bd926897a7
 
 
-# ╔═╡ d21ec663-116c-4dfc-bde9-29af28634a0f
-
-
-# ╔═╡ 3022a244-6356-46b0-b519-8eeadc09072c
-
-
-# ╔═╡ cbde9da7-16ac-438b-8bcf-75f6eb70538a
-
-
-# ╔═╡ 091c703f-ceaa-4ec6-b2c2-95c329b2ff31
-
-
 # ╔═╡ bd0603ce-3a15-4428-af4d-c2ee2127e537
-md"#### 2.2.2  Attainment status as IV for pollution changes"
+md"### 2.2.2  Attainment status as IV for pollution changes"
 
 # ╔═╡ d084de41-4f40-4e51-8dca-54ec0608e72b
 md"""
-**Suppose that federal EPA pollution regulation is
-a potential instrumental variable for pollution
-changes during the 1970s. What are the
-assumptions required for mid-decade regulatory
-status (tsp7576) to be a valid instrument for
-pollution changes when the outcome of interest is
-housing price changes?**
+> Suppose that federal EPA pollution regulation is
+> a potential instrumental variable for pollution
+> changes during the 1970s. What are the
+> assumptions required for mid-decade regulatory
+> status (tsp7576) to be a valid instrument for
+> pollution changes when the outcome of interest is
+> housing price changes?
 
 *Assumptions*:
 
@@ -340,15 +223,12 @@ housing price changes?**
 2. Exogeneity: tsp7576 only affects housing prices through it's effect on changes in pollution.
 """
 
-# ╔═╡ b70b8bc1-488e-4890-a702-dccc0f322b82
-
-
 # ╔═╡ 1185d096-15c8-42e1-bbff-8047722dbabc
 md"""
-**Provide evidence on the
-relationship between the regulatory status
-indicator and the observable economic shock
-measures. Interpret your findings.**
+> Provide evidence on the
+> relationship between the regulatory status
+> indicator and the observable economic shock
+> measures. Interpret your findings.
 """
 
 # ╔═╡ 0df4996b-c5e2-4ae1-9909-09b442cc9ff2
@@ -362,33 +242,24 @@ The above regression of the regulator status indicator on our measures of econom
 # ╔═╡ bc11f842-1b19-4250-a969-81b85a9f7dc4
 
 
-# ╔═╡ f546059b-a7b0-4c54-a079-346af27c9d5b
-
-
-# ╔═╡ a62d80c3-e948-4e4d-bea2-c66081150f5a
-md"\newpage"
-
 # ╔═╡ d9face0e-651d-4256-8aab-3c257a18619d
-md"#### 2.2.3 First stage, reduced form"
+md"### 2.2.3 First stage, reduced form"
 
 # ╔═╡ 6bbe502f-3750-4321-87c1-a01d67e228a1
 md"""
-**Document the first-stage relationship between
-regulation and air pollution changes and the
-reduced form relationship between regulation and
-housing price changes, both not adjusting and
-adjusting for other covariates. Interpret your
-findings. How does two-stage least squares use
-these two equations? Now estimate the effect of
-air quality changes on housing price changes
-using two-stage least squares and the tsp7576
-indicator as an instrument (not conditioning and
-conditioning on other observables). Interpret the
-results.**
+> Document the first-stage relationship between
+> regulation and air pollution changes and the
+> reduced form relationship between regulation and
+> housing price changes, both not adjusting and
+> adjusting for other covariates. Interpret your
+> findings. How does two-stage least squares use
+> these two equations? Now estimate the effect of
+> air quality changes on housing price changes
+> using two-stage least squares and the tsp7576
+> indicator as an instrument (not conditioning and
+> conditioning on other observables). Interpret the
+> results.
 """
-
-# ╔═╡ 9f49388e-9bbf-4d6a-849c-81fb2bbd9da3
-
 
 # ╔═╡ 95412c61-3a1b-40bf-9b7c-ddd54ce17ba7
 md"*First-stage* (relevance) relationship between regulation and air pollution changes; and **Reduced form* relationship between regulation and housing price changes. (SE in parentheses)"
@@ -442,33 +313,25 @@ md"*Testing the 2SLS regression coefficients (regressions `223e` and `223f`) for
 
 
 # ╔═╡ f89066c8-39d0-4e85-b924-3e493aabda88
-md"#### 2.2.4 Mean of TSPs as IV for pollution changes"
+md"### 2.2.4 Mean of TSPs as IV for pollution changes"
 
 # ╔═╡ 22802ab4-ed98-40fe-9c20-4207843c2cb2
-md"**In principle, the regulation indicator variable
-should be a discrete function of pollution levels
-in 1974. Specifically, the EPA is supposed to
-regulate those counties in 1975 who had either an
-annual geometric mean of TSPs above 75 units
-(mg/m3) or a 2nd highest daily concentration
-above 260 units in 1974. Based on this notion,
-redo part (3) using mtspgm74 as an instrument for
-pollution changes. Interpret your findings.**"
+md"
+> In principle, the regulation indicator variable
+> should be a discrete function of pollution levels
+> in 1974. Specifically, the EPA is supposed to
+> regulate those counties in 1975 who had either an
+> annual geometric mean of TSPs above 75 units
+> (mg/m3) or a 2nd highest daily concentration
+> above 260 units in 1974. Based on this notion,
+> redo part (3) using mtspgm74 as an instrument for
+> pollution changes. Interpret your findings."
 
 # ╔═╡ 4aaa6d2c-1ea7-400b-a8e1-9e0993c9a5f7
 md"*First stage and reduced form regressions* (SE in parentheses)"
 
 # ╔═╡ b989539a-09f4-4ecc-8f24-d3efb5962035
 md"*2SLS Regression using an indicator for above 75 pollution units as an IV for pollution changes* (SE in parentheses)"
-
-# ╔═╡ 0338d1d3-0624-492e-bac1-631cb1d31aa7
-
-
-# ╔═╡ 1701534d-4ea1-4ef9-ac87-056844ba66fe
-
-
-# ╔═╡ 3ec30211-8247-4927-924d-0192e5841404
-
 
 # ╔═╡ ae43ae55-ad11-43a9-9f25-9123ee28a885
 
@@ -477,7 +340,7 @@ md"*2SLS Regression using an indicator for above 75 pollution units as an IV for
 
 
 # ╔═╡ 2f203087-0dab-49a9-9115-e3b8477d3089
-md"#### 2.2.5 Discontinuity in treatment assignment"
+md"### 2.2.5 Discontinuity in treatment assignment"
 
 # ╔═╡ 78ac5bab-75c5-4ccf-aa63-1681bce62b9c
 md"
@@ -530,41 +393,10 @@ begin
 		ys = predict(model, xs)
 		return xs, ys
 	end
-end
-
-# ╔═╡ 36f14f2c-330b-473a-a03b-05289d360983
-function left_right_plot(df_in, xcol, ycol; bandwidth, plotwidth, threshold=75, npoints=200)
-	# Plot all observations as circles
-	df = dropmissing(df_in, [xcol, ycol])
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df[!, xcol], df[!, ycol], 
-		seriestype=:scatter, 
-		markeralpha=0.3,
-		label="observations",
-		xlabel="1974 TSPs levels",
-		ylabel="$(ylabels[ycol]) changes",
-		title="LOESS regressions: $(ylabels[ycol]) Changes",
-		xlims = (75-plotwidth, 75+plotwidth), #75±width
-		ylims = extrema(df[!, ycol]),
-		legend=:bottomleft
-	)
-	thickness = 3
-	vline!([threshold], label="$xcol threshold", w=thickness)
-	# Plot Loess below threshold
-	df1 = subset(df, xcol => ByRow(<(threshold)))
-	xs1, ys1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
-	plot!(xs1, ys1, label="loess regression (below)", w=thickness)
-	# Plot Loess above threshold
-	df2 = subset(df, xcol => ByRow(≥(threshold)))
-	xs2, ys2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
-	plot!(xs2, ys2, label="loess regression (above)", w=thickness)
-end
+	end;
 
 # ╔═╡ 2d5817b1-a1cd-4882-9c3d-ac53eb9362f2
 PlotWidth=@bind plotwidth Slider(0.2:0.2:100, default=10)
-
-# ╔═╡ ebc2a623-a276-454d-b422-3b8a191f7561
-bandwidth, plotwidth
 
 # ╔═╡ 0c8a7d25-7233-45d5-b3c1-f46bd423cb94
 md"But when we zoom out, the nonparametric estimation further away from the threshold is even more noisey. So how do we know the difference in the estimates near the threshold aren't just due to sampling variation? One way to examine the variance due to sampling this is to use permutation inference: hold the bandwidth constant, and resample the data many times, plotting the mean of the LOESS estimate and the 2.5``^{th}`` and 97.5``^{th}`` percentiles of the prediction at each point."
@@ -590,7 +422,7 @@ So, here we see that less improvement in pollution levels (just below the thresh
 
 
 # ╔═╡ d4dee95d-f991-44ea-9c52-95d51f8c1ab2
-md"#### 2.2.6 The Smoothness Criteria of RD"
+md"### 2.2.6 The Smoothness Criteria of RD"
 
 # ╔═╡ bd95a3c4-553e-418f-9831-dda93068a9be
 md"
@@ -601,39 +433,6 @@ md"The second assumption about RD from part (5) describes covariate balance betw
 This is roughly equivalent to a smoothness condition across the cutoff: the predicted change in housing prices due to all other variables
 should be smooth across the cutoff, so that we can attribute any observed discontinuity in the change in housing prices
 across the cutoff to the treatment (regulation)."
-
-# ╔═╡ ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
-function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, threshold=75, npoints=200)
-	thickness = 3
-    alpha = 0.4
-	c3 = 3
-	# Plot all observations as circles
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df[!, xcol], df[!, ycol1], seriestype=:scatter, markeralpha=alpha, label="observations", c=1)
-	plot!(df[!, xcol], df[!, ycol2], seriestype=:scatter, label="controls' prediction", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
-	# Plot Loess below threshold
-	df1 = subset(df, xcol => ByRow(<(threshold)))
-	x1, y1 = get_loess_prediction(df1, xcol, ycol1; bandwidth=bandwidth,  npoints=npoints)
-	x2, y2 = get_loess_prediction(df1, xcol, ycol2; bandwidth=bandwidth,  npoints=npoints)
-	plot!(x1, y1,
-        label="obseservations conditioned on TSP", 
-        xlabel="1974 TSPs levels",
-		ylabel="$(ylabels[ycol1]) changes",
-		title="LOESS regressions: $(ylabels[ycol1]) Changes",
-		xlims = (75-plotwidth, 75+plotwidth), #75±width
-		ylims = extrema([df[!, ycol1]; df[!, ycol2]]),
-		legend=:topleft,
-        w=thickness, c=1)
-    plot!(x2, y2, label="predictions conditioned on TSP", w=thickness, c=c3)
-	# Plot Loess above threshold
-	df2 = subset(df, xcol => ByRow(≥(threshold)))
-	x3, y3 = get_loess_prediction(df2, xcol, ycol1; bandwidth=bandwidth, npoints=npoints)
-	x4, y4 = get_loess_prediction(df2, xcol, ycol2; bandwidth=bandwidth, npoints=npoints)
-	plot!(x3, y3, label="", w=thickness, c=1)
-	plot!(x4, y4, label="", w=thickness, c=c3)
-    # Vertical line at the threshold
-	vline!([threshold], label="$xcol threshold", w=thickness, c=2)
-end
 
 # ╔═╡ 4b46b382-5349-4bc7-bb03-229c303f37be
 md"
@@ -659,18 +458,6 @@ there is some discontinuity happening at the threshold that is not accounted for
 by the control variables.
 "
 
-# ╔═╡ 65618793-7c48-4127-87da-6580f07c02d1
-
-
-# ╔═╡ 614f7093-b347-475e-a146-064081df32ce
-
-
-# ╔═╡ 9b0eee90-1ce0-4f71-9431-40e720a8da3c
-
-
-# ╔═╡ 148a20fe-ce9d-4710-81ef-4c77b5f36694
-
-
 # ╔═╡ 98857139-6cd1-4e39-9e1e-8a35f2629e28
 
 
@@ -678,43 +465,11 @@ by the control variables.
 
 
 # ╔═╡ bdf52a46-4f47-4bc5-9e07-a20fb7b76dbf
-md"#### 2.2.7 Regulated vs Unregulated"
+md"### 2.2.7 Regulated vs Unregulated"
 
 # ╔═╡ ce91dbb9-70ec-43e5-978a-68cd7817a6fd
 md"
 > A number of counties with annual geometric mean TSPs below 75 units in 1974 were regulated due to having as few as 2 bad days. This implies that we can compare regulated and unregulated counties with identical average TSPs levels in the regulation selection year (below 75 units). For those counties with 1974 mean TSPs between 50 and 75 units, estimate the bivariate relation between TSPs changes and 1974 TSPs levels separately for regulated and unregulated counties and plot the results. Now do the same for the relation between log-housing price changes and 1974 TSPs levels. Interpret your findings. Since there are fewer observations, you may need to use bigger bandwidths than those in part (5) (e.g., bandwidths between 6-9). "
-
-# ╔═╡ 0840bad5-a2c8-4ac6-a62b-edee2715eb12
-function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
-	thickness = 3
-    alpha = 0.2
-    c3=3
-	# Plot all observations as circles
-    df1 = @subset(df, :tsp7576 .== 0)
-	df2 = @subset(df, :tsp7576 .== 1)
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df1[!, xcol], df1[!, ycol], 
-        xlabel="1974 TSPs levels",
-        ylabel="$(ylabels[ycol]) changes",
-        title="LOESS regressions: $(ylabels[ycol]) Changes",
-        xlims = (50, 75),
-        ylims = extrema(df[!, ycol]),
-        seriestype=:scatter,
-        markeralpha=alpha, 
-        label="Unregulated observations",
-        c=1)
-	plot!(df2[!, xcol], df2[!, ycol], seriestype=:scatter, 
-        label="Regulated observations", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
-	# Plot unregulated
-	x1, y1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
-	plot!(x1, y1,
-        label="Unregulated Kernel Regression", 
-		legend=:bottomright,
-        w=thickness, c=1)
-	# Plot regulated
-	x2, y2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
-	plot!(x2, y2, label="Regulated Kernel Regression", w=thickness, c=c3)
-end
 
 # ╔═╡ 948f96b3-6f50-4687-8d4f-db309c8e29a2
 BandwidthPollChange = @bind bwdgtsp Slider(0.04:0.005:1.0, default=0.325)
@@ -744,19 +499,45 @@ to house buyers)."
 
 
 # ╔═╡ 40b4be47-8c52-466a-8130-cfc9b256452d
-md"#### 2.2.8 2SLS and the ATE"
+md"### 2.2.8 2SLS and the ATE"
 
 # ╔═╡ da4a328f-ef3f-44d4-90cb-b22b1519fad0
+md"
+> Under what assumptions will two-stage least squares identify the average treatment effect (ATE)? If ATE is not identified, describe what may be identifiable with two-stage least squares estimation. Under what conditions is this effect identified? Give some intuition on what this effect may represent when one uses EPA regulation as an instrument variable.
+"
+
+# ╔═╡ 57754134-0b34-41b5-9366-fe7e469ee1af
+md"
+
+"
+
+# ╔═╡ 872ffa35-9f86-461c-bf77-29f4a8ad5e26
+
+
+# ╔═╡ b5cf0297-5489-488f-a75f-586adca9f222
 
 
 # ╔═╡ 730c1994-cbee-4ec9-95a8-51e0923ef4ed
-md"#### 2.2.9 Summary of TSP regulation effects on House Price Changes"
+md"### 2.2.9 Summary of TSP regulation effects on House Price Changes"
 
 # ╔═╡ 26d3b991-cc5c-455e-b38d-5925069cd713
+md"
+> Provide a concise synthesis/summary of your results. Discuss the credibility of the various research designs underlying the results.
+"
+
+# ╔═╡ 5f31d109-b75e-4cc5-9cae-a06493009221
+md"
+
+"
+
+# ╔═╡ 96ba58aa-8028-4db7-bd76-ef3fc7f24637
+
+
+# ╔═╡ 01ce9f00-209a-4f4b-bd63-d7b02767f5a0
 
 
 # ╔═╡ 8b3041fe-3b6d-4ef2-9223-5f81a6366019
-md"# Functions"
+md"# Code Appendix: Functions"
 
 # ╔═╡ 7d7b39f2-1db6-4c0b-a41b-710030b7537d
 md"## File Functions"
@@ -781,270 +562,12 @@ function extract_file_from_zip(root_dir, zip_name, file_name)
     write(save_path, read(zarchive.files[idx]))
 end
 
-# ╔═╡ e786bc92-cb7f-4ab5-8a60-bfe77d9a70df
-begin
-	extract_file_from_zip(root, zip_fn, pollution_fn)
-	pollution = DataFrame(load(joinpath(root, pollution_fn)));
-end;
-
-# ╔═╡ 4a83b89f-1ad4-477c-8508-c2a15bf18663
-# ╠═╡ show_logs = false
-begin
-# 
-reg211 = reg(pollution, @formula(dlhouse ~ dgtsp), Vcov.robust(); weights=:pop7080)
-#
-cols221 = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-formula221 = (term(:dlhouse) ~ sum(term.(Symbol.(cols221))))
-reg221 = reg(pollution, formula221, Vcov.robust(); weights=:pop7080)
-#
-cols221c = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :dincome, :dunemp, :dmnfcg]
-formula221c = (term(:dlhouse) ~ sum(term.(Symbol.(cols221c))))
-reg221c = reg(pollution, formula221c, Vcov.robust(); weights=:pop7080)
-means_ = [mean(pollution.dlhouse[reg211.esample]),
-		mean(pollution.dlhouse[reg221.esample]),
-		mean(pollution.dlhouse[reg221c.esample])]
-controls_ = ["N", "Y", "Y"]
-shocks_ = ["N", "N", "Y"]
-mystats = NamedTuple{(:means, :controls, :shocks)}((means_, controls_, shocks_))
-@with_stdout regtable(reg211, reg221, reg221c,
-	regressors = ["dgtsp"], print_estimator_section=false,
-	custom_statistics=mystats,
-	labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-	"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
-	renderSettings = asciiOutput())
-end
-
-# ╔═╡ 3ae3a3a0-ce47-49c7-b027-a665129d1807
-# ╠═╡ show_logs = false
-begin
-reg221b = @time reg(pollution, @formula(dgtsp ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
-@with_stdout regtable(reg221b, renderSettings = asciiOutput())
-end
-
-# ╔═╡ bbb320bc-04f6-48f9-a0cb-9e05c360e793
-# ╠═╡ show_logs = false
-begin
-	reg222 = @time reg(pollution, @formula(tsp7576 ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
-	@with_stdout regtable(reg222, renderSettings = asciiOutput())
-end
-
-# ╔═╡ 46146a3f-8c17-4774-8f22-8eeeaa12451f
-begin
-	# Reg: dgtsp on tsp7576, weight with pop7080
-	reg223a = reg(pollution, @formula(dgtsp ~ tsp7576), Vcov.robust(); weights=:pop7080)
-	
-	# Reg: dgtsp on tsp7576, weight with pop7080, with controls
-	cols223b = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :tsp7576]
-	formula223b = (term(:dgtsp) ~ sum(term.(Symbol.(cols223b))))
-	reg223b = reg(pollution, formula223b, Vcov.robust(); weights=:pop7080)
-	
-	# Reg: dlhouse on tsp7576, weight with pop7080
-	reg223c = reg(pollution, @formula(dlhouse ~ tsp7576), Vcov.robust(); weights=:pop7080)
-	
-	# Reg: dlhouse on tsp7576, weight with pop7080, with controls
-	cols223d = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :tsp7576]
-	formula223d = (term(:dlhouse) ~ sum(term.(Symbol.(cols223d))))
-	reg223d = reg(pollution, formula223d, Vcov.robust(); weights=:pop7080)
-	regtable(reg223c, reg223d, renderSettings = latexOutput("reg223-reducedform.tex"))
-	
-	# Make Reg Table
-	mystats223a = NamedTuple{(:means, :controls)}(
-		([mean(pollution.dgtsp[reg223a.esample]),
-			mean(pollution.dgtsp[reg223b.esample]),
-			mean(pollution.dlhouse[reg223c.esample]),
-			mean(pollution.dlhouse[reg223d.esample])], 
-		["N", "Y", "N", "Y"]))
-	@with_stdout regtable(reg223a, reg223b, reg223c, reg223d,
-		regressors = ["tsp7576"], print_estimator_section=false,
-		custom_statistics=mystats223a,
-		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-		"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
-		renderSettings = asciiOutput())
-end
-
-# ╔═╡ ba1525cf-44a4-4704-94c0-9dae18cb2b67
-begin
-	# 2SLS Reg: dlhouse on dgtsp, weight with pop7080
-	reg223e = reg(pollution, @formula(dlhouse ~ (dgtsp ~ tsp7576)), Vcov.robust(); weights=:pop7080)
-	
-	# 2SLS Reg: dlhouse on dgtsp, weight with pop7080, with controls
-	cols223f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-	formula223f = (term(:dlhouse) ~ sum(term.(Symbol.(cols223f))) + (term(:dgtsp) ~ term(:tsp7576)))
-	reg223f = reg(pollution, formula223f, Vcov.robust(); weights=:pop7080)
-	regtable(reg223e, reg223f, renderSettings = latexOutput("reg223-IV.tex"))
-	
-	# Make Reg Table
-	mystats223b = NamedTuple{(:ymeans, :xmeans, :controls)}(
-		([mean(pollution.dlhouse[reg223e.esample]),
-			mean(pollution.dlhouse[reg223f.esample])],
-		[mean(pollution.dgtsp[reg223e.esample]),
-			mean(pollution.dgtsp[reg223f.esample])],
-		["N", "Y"]))
-	@with_stdout regtable(reg223e, reg223f,
-		regressors = ["dgtsp"], print_estimator_section=false,
-		custom_statistics=mystats223b,
-		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-		"__LABEL_CUSTOM_STATISTIC_ymeans__" => "dlhouse Mean",
-		"__LABEL_CUSTOM_STATISTIC_xmeans__" => "dgtsp Mean"),
-		renderSettings = asciiOutput(),
-		regression_statistics = [:nobs, :r2, :adjr2, :f, :f_kp])
-end
-
-# ╔═╡ a33ac919-c4f3-4ce8-89cc-d7adbbb8d044
-begin
-	Δx = -round(mean(pollution.dgtsp[reg223f.esample]), digits=1)
-	Δy = round(mean(pollution.dlhouse[reg223f.esample]), digits=3)
-	Δlny = round((ℯ^mean(pollution.dlhouse[reg223f.esample])-1)*100,digits=1)
-	β100 = -round(100*last(reg223f.coef), digits=1)
-	eβ100 = round(100*(ℯ^last(reg223f.coef)-1), digits=4)
-end;
-
-# ╔═╡ ebce0eca-ff0b-4e07-bfcd-b0e5f9691ae3
-Markdown.parse("
-
-Then, take an average county (County X) that saw a decrease of $Δx units of pollution (an improvement in air quality) and an increase in housing prices by about  \$100(e^{$Δy}-1)\$  = $Δlny% between 1970 and 1980. If instead they saw one unit more of pollution improvement (a $(Δx+1)-unit improvement instead), then we would expect that County X housing prices would have instead increased by
-
-$Δlny% - (100\$\\beta_{IV}\$)% \$\\approx\$ $Δlny% + $β100% = $(round(Δlny+β100, digits=1))%
-
-showing evidence that, on average, pollution decreases caused by the regulation have increased house prices more than they would have otherwise increased.
-")
-
-# ╔═╡ d97e9d6b-9050-487b-a6aa-b947c607a38e
-last(reg223e.coef) ≈ last(reg223c.coef) / last(reg223a.coef)
-
-# ╔═╡ 62d53ad4-5a70-4311-80da-0e5e11269453
-last(reg223f.coef) ≈ last(reg223d.coef) / last(reg223b.coef)
-
-# ╔═╡ ac0f080d-3068-48ca-9995-dfbd7fb122df
-begin
-	# Create an indicator for mtspgm74<75
-	pollution[!, :above75] = pollution[!, :mtspgm74] .> 75	
-	
-	#! first-stage relationship between regulation and air pollution changes
-	#! Relevance
-	# Reg: dgtsp on above75, weight with pop7080
-	reg224a = reg(pollution, @formula(dgtsp ~ above75), Vcov.robust(); weights=:pop7080)
-	
-	# Reg: dgtsp on above75, weight with pop7080, with controls
-	cols224b = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :above75]
-	formula224b = (term(:dgtsp) ~ sum(term.(Symbol.(cols224b))))
-	reg224b = reg(pollution, formula224b, Vcov.robust(); weights=:pop7080)
-	regtable(reg224a, reg224b, renderSettings = latexOutput("reg224-firststage.tex"))
-	
-	#! reduced form relationship between regulation and housing price changes
-	#! Reduced form estimate
-	# Reg: dlhouse on above75, weight with pop7080
-	reg224c = reg(pollution, @formula(dlhouse ~ above75), Vcov.robust(); weights=:pop7080)
-	
-	# Reg: dlhouse on above75, weight with pop7080, with controls
-	cols224d = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :above75]
-	formula224d = (term(:dlhouse) ~ sum(term.(Symbol.(cols224d))))
-	reg224d = reg(pollution, formula224d, Vcov.robust(); weights=:pop7080)
-	
-	# Make Reg Table
-	mystats224a = NamedTuple{(:means, :controls)}(
-		([mean(pollution.dgtsp[reg224a.esample]),
-			mean(pollution.dgtsp[reg224b.esample]),
-			mean(pollution.dlhouse[reg224c.esample]),
-			mean(pollution.dlhouse[reg224d.esample])], 
-		["N", "Y", "N", "Y"]))
-	@with_stdout regtable(reg224a, reg224b, reg224c, reg224d,
-		regressors = ["above75"], print_estimator_section=false,
-		custom_statistics=mystats224a,
-		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-		"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
-		renderSettings = asciiOutput())
-end
-
-# ╔═╡ d279d5d2-c82b-4084-897a-7ecf8d969229
-begin
-	#! air quality changes on housing price changes using two-stage least squares and the above75 indicator as an instrument
-	#! IV estimate
-	# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080
-	reg224e = reg(pollution, @formula(dlhouse ~ (dgtsp ~ above75)), Vcov.robust(); weights=:pop7080)
-	
-	# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080, with controls
-	cols224f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-	formula224f = (term(:dlhouse) ~ sum(term.(Symbol.(cols224f))) + (term(:dgtsp) ~ term(:above75)))
-	reg224f = reg(pollution, formula224f, Vcov.robust(); weights=:pop7080)
-	
-	# Make Reg Table
-	mystats224b = NamedTuple{(:ymeans, :xmeans, :controls)}(
-		([mean(pollution.dlhouse[reg224e.esample]),
-			mean(pollution.dlhouse[reg224f.esample])],
-		[mean(pollution.dgtsp[reg224e.esample]),
-			mean(pollution.dgtsp[reg224f.esample])],
-		["N", "Y"]))
-	@with_stdout regtable(reg224e, reg224f,
-		regressors = ["dgtsp"], print_estimator_section=false,
-		custom_statistics=mystats224b,
-		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-		"__LABEL_CUSTOM_STATISTIC_ymeans__" => "dlhouse Mean",
-		"__LABEL_CUSTOM_STATISTIC_xmeans__" => "dgtsp Mean"),
-		renderSettings = asciiOutput(),
-		regression_statistics = [:nobs, :r2, :adjr2, :f, :f_kp])
-end
-
-# ╔═╡ 259d5729-692b-4bb2-a89a-baefb962a253
-left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=bandwidth, plotwidth, npoints=npoints)
-
-# ╔═╡ 7ecb6794-39b9-40b4-b77c-0c15400eea51
-left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=bandwidth, plotwidth=15, npoints=npoints)
-
-# ╔═╡ c124c041-8bd8-45fc-a32e-7c2b4195c7cd
-left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=bwdlhouse, plotwidth=pwdlhouse, npoints=npoints)
-
-# ╔═╡ a6dca9d2-e63f-4211-bef7-3699e3fb2f9d
-left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=bwdlhouse, plotwidth=15, npoints=npoints)
-
-# ╔═╡ 9dd7da67-0f16-4b08-9847-40e20bd0ffac
-begin
-#! Predict dlhouse using all controls (and not pollution changes)
-cols226 = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-pollution2 = dropmissing(pollution, [cols226; [:dlhouse, :mtspgm74, :dgtsp]])
-formula226 = (term(:dlhouse) ~ sum(term.(Symbol.(cols226))))
-reg226 =  reg(pollution2, formula226, Vcov.robust(); weights=:pop7080)
-pollution2[!, :dlhouse_hat] = convert(Vector{Float64}, StatsModels.predict(reg226, pollution2))
-end;
-
-# ╔═╡ 2fed03d7-c01a-4710-b550-bb6470ce90eb
-controls_smoothed_plot(pollution2, :mtspgm74, :dlhouse, :dlhouse_hat; bandwidth=bwdlhouse, plotwidth=pwdlhouse, npoints=npoints)
-
-# ╔═╡ 76e84935-d551-47b9-97f9-440e67682b95
-controls_smoothed_plot(pollution2, :mtspgm74, :dlhouse, :dlhouse_hat; bandwidth=bwdlhouse, plotwidth=15, npoints=npoints)
-
-# ╔═╡ 16e765de-6a0e-4b23-a47d-f8bc12f3eff8
-pollution3 = @subset(pollution2, 50 .< :mtspgm74 .< 75);
-
-# ╔═╡ 1d1e7307-c4d6-4c6e-9093-56583596b9ea
-un_regulated_plot(pollution3, :mtspgm74, :dgtsp; bandwidth);
-
-# ╔═╡ 35ec6b0f-74a5-472e-963d-24ddf82ca996
-un_regulated_plot(pollution3, :mtspgm74, :dgtsp; bandwidth=bwdgtsp)
-
-# ╔═╡ 325ae653-88a6-45e9-91f2-0e679b2593f3
-un_regulated_plot(pollution3, :mtspgm74, :dlhouse; bandwidth=bwdlhouse2)
-
 # ╔═╡ 892333c3-0c5e-4d58-bc0d-84502afe4c96
 """Return dataframe, after unzipping and saving the file."""
 function df_from_zip(root_dir, zip_name, filename)
     extract_file_from_zip(root_dir, zip_name, filename)
     println("Loading $filename from file.")
     return DataFrame(load(joinpath(root_dir, filename)))
-end
-
-# ╔═╡ ff5cef88-d4d7-42b7-8bd4-5dd591b08def
-"""Read file at save_path to dataframe, if not present, download from url."""
-function df_from_url(url, save_path)
-    if isfile(save_path)
-        println("Loading $save_path from file.")
-        return DataFrame(load(joinpath(root, example_fn)))
-    else
-        println("Downloading $save_path from url.")
-        download(url, joinpath(root, example_fn))
-        println("Loading $save_path from file.")
-        return DataFrame(load(joinpath(root, example_fn)))
-    end
 end
 
 # ╔═╡ af4f8032-c318-4035-913f-351c8e0130f7
@@ -1289,52 +812,6 @@ function aggregate_df(df, tags)
     return df_y
 end
 
-# ╔═╡ 8879e813-c350-4fe0-8c92-44a80e361588
-"""Save temperature variables
-    1.1.1 Construct 4 temperature response variables
-    1.1.2 Aggregate to year-county
-    - sum each new temperaature variable in each grid point over each year
-    - average tMin, tMax, tAvg, perc in each gridpoint over each year
-    - take a simple average over all grid points in the county to get county-year level
-"""
-function create_temperature_vars()
-    # Extract single-county fips file from zip if not present, and read
-    extract_file_from_zip(root, zip_fn, county_fn)
-
-    # Load data and create average daily temp
-    df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-    df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
-
-    # Add degree days for each day-gridpoint
-    thresholds = [30, 32, 34]
-    df_temp1 = add_degree_days(df_temp1, thresholds)
-
-    # Add binned temperature variables
-    bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
-    df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
-    df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
-
-    # Add cubic spline basis variables for each day-gridpoint
-    knots = [0 8 16 24 32]
-    df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
-
-    # Add piecewise linear basis variables for each day-gridpoint
-    knots = [28, 32]
-    df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
-
-    # sum over year, then average over all grid points in county
-    column_tags = ["dday", "temp", "splineC", "piece"]
-    df_temp = aggregate_df(df_temp1, column_tags)
-
-    # Save the new file
-    CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
-end
-
-# ╔═╡ 93470fdb-b32d-4cff-9205-717b0d873447
-if !isfile(joinpath(root, "CountyAnnualTemperature_aaron.csv"))
-    create_temperature_vars()
-end
-
 # ╔═╡ fec1fd19-b0e0-48c4-9ade-140c0c068379
 md"## Analysis Functions"
 
@@ -1407,17 +884,6 @@ function deltamethod_CIbounds!(df, reg_output; column_stem="splinerelativeC", α
     return df
 end
 
-# ╔═╡ a86ea794-73ad-4012-99c2-12778898c56d
-# Let's try bootstrapping!
-"""Given a dataframe sample and dataframe with tAvg values to predict on,
-    estimate the predicted values vector (for bootstrapping)."""
-function prediction_sample(df, df_plot)
-    reg_ = reg(df, formula122, Vcov.cluster(:fips))
-    df2 = DataFrame(tAvg=0:0.25:40)
-    df2[!, :yhat] = Matrix(df_plot[!,r"splinerelativeC"]) * reg_.coef
-    return df2[!, [:tAvg, :yhat]]
-end
-
 # ╔═╡ aa2420c2-8681-49a1-9ad7-87ac6df4466e
 """Return DF of confidence intervals for each temperature for bootstraped simulation results"""
 function confidence_interval(df, α)
@@ -1459,6 +925,477 @@ function add_moving_avgs!(df; windowsize=10)
     return df
 end
 
+# ╔═╡ e2702c60-89f5-45fd-8903-4c27ea878e28
+"""Regress the outcomes on the deviance from the running average bins"""
+function reg123(df, y; cluster=:fips, regex=r"temp(?!20to24).*_dev")
+    formula_ = term(y) ~ sum([term.(names(df, regex)); [term(fe(:fips)), term(fe(:year))]])
+    reg_ = @time reg(df, formula_, Vcov.cluster(cluster))
+    se = .√[reg_.vcov[i,i] for i in 1:length(reg_.coef)]
+    ub = reg_.coef + 1.96*se
+    lb = reg_.coef - 1.96*se
+    df2 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
+                    yhat=reg_.coef,
+                    yerror=1.96*se,
+                    y_ub=ub,
+                    y_lb=lb)
+    df2 = reduce(vcat, [[df2]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
+    df2 = sort!(df2, :tAvg)
+    return df2
+end
+
+# ╔═╡ 4ecef41b-ace5-49fe-9b67-aee256d4884c
+# ╠═╡ show_logs = false
+""" Plot deviance bins: above avg # of days this year that were in this bin (days above the 10-year average # of days)"""
+function plot123(y, df)
+	labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income")
+	ylabels = Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
+	temp = reg123(df, y)
+	plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
+	@df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
+	fillrange=:y_ub, fillalpha=0.35,
+	label="95% CI")
+	xlabel!("Average Temperature Bins")
+	ylabel!(ylabels[y])
+	title!("Deviance from 10-yr Avg Binned Days: $(labels[y])          ")
+	@df temp plot!(:tAvg, :yhat, 
+		label="Predicted Response", 
+		legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+end
+
+# ╔═╡ 02b1800f-6748-49a1-826e-710f4d1f32d6
+"""Plot basic bins: # of days in a county-year that day's avg temp was in this bin"""
+function plot123b(y, df)
+	labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income")
+	ylabels = Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
+	temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
+    plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
+    @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
+    fillrange=:y_ub, fillalpha=0.35,
+    label="95% CI")
+    xlabel!("Average Temperature Bins")
+    ylabel!(ylabels[y])
+    title!("Binned Temperature Response: $(labels[y])         ")
+    @df temp plot!(:tAvg, :yhat, 
+        label="Predicted Response", 
+        legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+end
+
+# ╔═╡ 05a1bce4-fe91-4e89-82cd-09a7457331ad
+md"### Problem 2 Functions (in order of the problems)"
+
+# ╔═╡ 36f14f2c-330b-473a-a03b-05289d360983
+"""2.2.5: Plot separate kernel regressions on either side of the 75-unit threshold."""
+function left_right_plot(df_in, xcol, ycol; bandwidth, plotwidth, threshold=75, npoints=200)
+	# Plot all observations as circles
+	df = dropmissing(df_in, [xcol, ycol])
+	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
+	plot(df[!, xcol], df[!, ycol], 
+		seriestype=:scatter, 
+		markeralpha=0.3,
+		label="observations",
+		xlabel="1974 TSPs levels",
+		ylabel="$(ylabels[ycol]) changes",
+		title="LOESS regressions: $(ylabels[ycol]) Changes",
+		xlims = (75-plotwidth, 75+plotwidth), #75±width
+		ylims = extrema(df[!, ycol]),
+		legend=:bottomleft
+	)
+	thickness = 3
+	vline!([threshold], label="$xcol threshold", w=thickness)
+	# Plot Loess below threshold
+	df1 = subset(df, xcol => ByRow(<(threshold)))
+	xs1, ys1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
+	plot!(xs1, ys1, label="loess regression (below)", w=thickness)
+	# Plot Loess above threshold
+	df2 = subset(df, xcol => ByRow(≥(threshold)))
+	xs2, ys2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
+	plot!(xs2, ys2, label="loess regression (above)", w=thickness)
+end
+
+# ╔═╡ ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
+"""2.2.6: Plot unconditional kernal regression and control-conditioned-prediction kernal regression on either side of the 75-unit threshold."""
+function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, threshold=75, npoints=200)
+	thickness = 3
+    alpha = 0.4
+	c3 = 3
+	# Plot all observations as circles
+	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
+	plot(df[!, xcol], df[!, ycol1], seriestype=:scatter, markeralpha=alpha, label="observations", c=1)
+	plot!(df[!, xcol], df[!, ycol2], seriestype=:scatter, label="controls' prediction", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
+	# Plot Loess below threshold
+	df1 = subset(df, xcol => ByRow(<(threshold)))
+	x1, y1 = get_loess_prediction(df1, xcol, ycol1; bandwidth=bandwidth,  npoints=npoints)
+	x2, y2 = get_loess_prediction(df1, xcol, ycol2; bandwidth=bandwidth,  npoints=npoints)
+	plot!(x1, y1,
+        label="obseservations conditioned on TSP", 
+        xlabel="1974 TSPs levels",
+		ylabel="$(ylabels[ycol1]) changes",
+		title="LOESS regressions: $(ylabels[ycol1]) Changes",
+		xlims = (75-plotwidth, 75+plotwidth), #75±width
+		ylims = extrema([df[!, ycol1]; df[!, ycol2]]),
+		legend=:topleft,
+        w=thickness, c=1)
+    plot!(x2, y2, label="predictions conditioned on TSP", w=thickness, c=c3)
+	# Plot Loess above threshold
+	df2 = subset(df, xcol => ByRow(≥(threshold)))
+	x3, y3 = get_loess_prediction(df2, xcol, ycol1; bandwidth=bandwidth, npoints=npoints)
+	x4, y4 = get_loess_prediction(df2, xcol, ycol2; bandwidth=bandwidth, npoints=npoints)
+	plot!(x3, y3, label="", w=thickness, c=1)
+	plot!(x4, y4, label="", w=thickness, c=c3)
+    # Vertical line at the threshold
+	vline!([threshold], label="$xcol threshold", w=thickness, c=2)
+end
+
+# ╔═╡ 3a721fea-a72f-4645-b45a-48f5d03d469f
+"""2.2.7: Plot Regulated vs Unregulated kernel regressions for 50-75 1974 TSP."""
+function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
+	thickness = 3
+    alpha = 0.2
+    c3=3
+	# Plot all observations as circles
+    df1 = @subset(df, :tsp7576 .== 0)
+	df2 = @subset(df, :tsp7576 .== 1)
+	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
+	plot(df1[!, xcol], df1[!, ycol], 
+        xlabel="1974 TSPs levels",
+        ylabel="$(ylabels[ycol]) changes",
+        title="LOESS regressions: $(ylabels[ycol]) Changes",
+        xlims = (50, 75),
+        ylims = extrema(df[!, ycol]),
+        seriestype=:scatter,
+        markeralpha=alpha, 
+        label="Unregulated observations",
+        c=1)
+	plot!(df2[!, xcol], df2[!, ycol], seriestype=:scatter, 
+        label="Regulated observations", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
+	# Plot unregulated
+	x1, y1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
+	plot!(x1, y1,
+        label="Unregulated Kernel Regression", 
+		legend=:bottomright,
+        w=thickness, c=1)
+	# Plot regulated
+	x2, y2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
+	plot!(x2, y2, label="Regulated Kernel Regression", w=thickness, c=c3)
+end
+
+# ╔═╡ d9fdb9cf-dbb0-4656-8ded-ad7f7c4d3a1f
+md"# Notebook Settings"
+
+# ╔═╡ 9fae08d1-ad8b-47a6-b284-389d7e56e8be
+md"Packages"
+
+# ╔═╡ d0b71169-8720-44da-93cb-03b4fd6566cd
+md"File Name variables and notebook printing macros"
+
+# ╔═╡ a0fcb7a7-e4b4-4f55-826f-63074f2686b9
+# Set local directory paths and filenames
+begin
+root = dirname(@__FILE__)
+zip_fn = "Walker-ProblemSet1-Data.zip"
+county_fn = "fips1001.dta"
+employment_fn = "reis_combine.dta"
+example_fn = "CountyAnnualTemperature1950to2012.dta"
+pollution_fn = "poll7080.dta"
+example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
+
+macro seeprints(expr)
+	quote
+		stdout_bk = stdout
+		rd, wr = redirect_stdout()
+		$expr
+		redirect_stdout(stdout_bk)
+		close(wr)
+		read(rd, String) |> Text
+	end
+end
+macro with_stdout(expr)
+        escaped_expr = esc(expr)
+	return quote
+		stdout_bk = stdout
+		rd, wr = redirect_stdout()
+		result = ($escaped_expr)
+		redirect_stdout(stdout_bk)
+		close(wr)
+		print_result = read(rd, String) |> Text
+		print_result
+	end
+end
+macro with_stdout_string(expr)
+        escaped_expr = esc(expr)
+	return quote
+		stdout_bk = stdout
+		rd, wr = redirect_stdout()
+		result = ($escaped_expr)
+		redirect_stdout(stdout_bk)
+		close(wr)
+		print_result = read(rd, String)
+		print_result
+	end
+end
+end;
+
+# ╔═╡ 4d0870b4-12bd-4000-a8c4-2caabb5242cc
+md"This creates the new file of county-year temperature response variables to regress on (degree days, temperature bins, cubic splines, and piecewise linear). I have compared the values of these county-year variables with the $example_fn file for Autauga County and they match."
+
+# ╔═╡ e786bc92-cb7f-4ab5-8a60-bfe77d9a70df
+begin
+	extract_file_from_zip(root, zip_fn, pollution_fn)
+	pollution = DataFrame(load(joinpath(root, pollution_fn)));
+end;
+
+# ╔═╡ 259d5729-692b-4bb2-a89a-baefb962a253
+left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=bandwidth, plotwidth, npoints=npoints)
+
+# ╔═╡ 7ecb6794-39b9-40b4-b77c-0c15400eea51
+left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=bandwidth, plotwidth=15, npoints=npoints)
+
+# ╔═╡ c124c041-8bd8-45fc-a32e-7c2b4195c7cd
+left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=bwdlhouse, plotwidth=pwdlhouse, npoints=npoints)
+
+# ╔═╡ a6dca9d2-e63f-4211-bef7-3699e3fb2f9d
+left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=bwdlhouse, plotwidth=15, npoints=npoints)
+
+# ╔═╡ 9dd7da67-0f16-4b08-9847-40e20bd0ffac
+begin
+#! Predict dlhouse using all controls (and not pollution changes)
+cols226 = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+pollution2 = dropmissing(pollution, [cols226; [:dlhouse, :mtspgm74, :dgtsp]])
+formula226 = (term(:dlhouse) ~ sum(term.(Symbol.(cols226))))
+reg226 =  reg(pollution2, formula226, Vcov.robust(); weights=:pop7080)
+pollution2[!, :dlhouse_hat] = convert(Vector{Float64}, StatsModels.predict(reg226, pollution2))
+end;
+
+# ╔═╡ 2fed03d7-c01a-4710-b550-bb6470ce90eb
+controls_smoothed_plot(pollution2, :mtspgm74, :dlhouse, :dlhouse_hat; bandwidth=bwdlhouse, plotwidth=pwdlhouse, npoints=npoints)
+
+# ╔═╡ 76e84935-d551-47b9-97f9-440e67682b95
+controls_smoothed_plot(pollution2, :mtspgm74, :dlhouse, :dlhouse_hat; bandwidth=bwdlhouse, plotwidth=15, npoints=npoints)
+
+# ╔═╡ 16e765de-6a0e-4b23-a47d-f8bc12f3eff8
+pollution3 = @subset(pollution2, 50 .< :mtspgm74 .< 75);
+
+# ╔═╡ 1d1e7307-c4d6-4c6e-9093-56583596b9ea
+un_regulated_plot(pollution3, :mtspgm74, :dgtsp; bandwidth);
+
+# ╔═╡ 35ec6b0f-74a5-472e-963d-24ddf82ca996
+un_regulated_plot(pollution3, :mtspgm74, :dgtsp; bandwidth=bwdgtsp)
+
+# ╔═╡ 325ae653-88a6-45e9-91f2-0e679b2593f3
+un_regulated_plot(pollution3, :mtspgm74, :dlhouse; bandwidth=bwdlhouse2)
+
+# ╔═╡ 4a83b89f-1ad4-477c-8508-c2a15bf18663
+# ╠═╡ show_logs = false
+begin
+# 
+reg211 = reg(pollution, @formula(dlhouse ~ dgtsp), Vcov.robust(); weights=:pop7080)
+#
+cols221 = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+formula221 = (term(:dlhouse) ~ sum(term.(Symbol.(cols221))))
+reg221 = reg(pollution, formula221, Vcov.robust(); weights=:pop7080)
+#
+cols221c = [:dgtsp, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :dincome, :dunemp, :dmnfcg]
+formula221c = (term(:dlhouse) ~ sum(term.(Symbol.(cols221c))))
+reg221c = reg(pollution, formula221c, Vcov.robust(); weights=:pop7080)
+means_ = [mean(pollution.dlhouse[reg211.esample]),
+		mean(pollution.dlhouse[reg221.esample]),
+		mean(pollution.dlhouse[reg221c.esample])]
+controls_ = ["N", "Y", "Y"]
+shocks_ = ["N", "N", "Y"]
+mystats = NamedTuple{(:means, :controls, :shocks)}((means_, controls_, shocks_))
+@with_stdout regtable(reg211, reg221, reg221c,
+	regressors = ["dgtsp"], print_estimator_section=false,
+	custom_statistics=mystats,
+	labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
+	"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
+	renderSettings = asciiOutput())
+end
+
+# ╔═╡ 3ae3a3a0-ce47-49c7-b027-a665129d1807
+# ╠═╡ show_logs = false
+begin
+reg221b = @time reg(pollution, @formula(dgtsp ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
+@with_stdout regtable(reg221b, renderSettings = asciiOutput())
+end
+
+# ╔═╡ bbb320bc-04f6-48f9-a0cb-9e05c360e793
+# ╠═╡ show_logs = false
+begin
+	reg222 = @time reg(pollution, @formula(tsp7576 ~ dincome + dunemp + dmnfcg), Vcov.robust(); weights=:pop7080)
+	@with_stdout regtable(reg222, renderSettings = asciiOutput())
+end
+
+# ╔═╡ 46146a3f-8c17-4774-8f22-8eeeaa12451f
+begin
+	# Reg: dgtsp on tsp7576, weight with pop7080
+	reg223a = reg(pollution, @formula(dgtsp ~ tsp7576), Vcov.robust(); weights=:pop7080)
+	
+	# Reg: dgtsp on tsp7576, weight with pop7080, with controls
+	cols223b = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :tsp7576]
+	formula223b = (term(:dgtsp) ~ sum(term.(Symbol.(cols223b))))
+	reg223b = reg(pollution, formula223b, Vcov.robust(); weights=:pop7080)
+	
+	# Reg: dlhouse on tsp7576, weight with pop7080
+	reg223c = reg(pollution, @formula(dlhouse ~ tsp7576), Vcov.robust(); weights=:pop7080)
+	
+	# Reg: dlhouse on tsp7576, weight with pop7080, with controls
+	cols223d = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :tsp7576]
+	formula223d = (term(:dlhouse) ~ sum(term.(Symbol.(cols223d))))
+	reg223d = reg(pollution, formula223d, Vcov.robust(); weights=:pop7080)
+	regtable(reg223c, reg223d, renderSettings = latexOutput("reg223-reducedform.tex"))
+	
+	# Make Reg Table
+	mystats223a = NamedTuple{(:means, :controls)}(
+		([mean(pollution.dgtsp[reg223a.esample]),
+			mean(pollution.dgtsp[reg223b.esample]),
+			mean(pollution.dlhouse[reg223c.esample]),
+			mean(pollution.dlhouse[reg223d.esample])], 
+		["N", "Y", "N", "Y"]))
+	@with_stdout regtable(reg223a, reg223b, reg223c, reg223d,
+		regressors = ["tsp7576"], print_estimator_section=false,
+		custom_statistics=mystats223a,
+		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
+		"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
+		renderSettings = asciiOutput())
+end
+
+# ╔═╡ ba1525cf-44a4-4704-94c0-9dae18cb2b67
+begin
+	# 2SLS Reg: dlhouse on dgtsp, weight with pop7080
+	reg223e = reg(pollution, @formula(dlhouse ~ (dgtsp ~ tsp7576)), Vcov.robust(); weights=:pop7080)
+	
+	# 2SLS Reg: dlhouse on dgtsp, weight with pop7080, with controls
+	cols223f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+	formula223f = (term(:dlhouse) ~ sum(term.(Symbol.(cols223f))) + (term(:dgtsp) ~ term(:tsp7576)))
+	reg223f = reg(pollution, formula223f, Vcov.robust(); weights=:pop7080)
+	regtable(reg223e, reg223f, renderSettings = latexOutput("reg223-IV.tex"))
+	
+	# Make Reg Table
+	mystats223b = NamedTuple{(:ymeans, :xmeans, :controls)}(
+		([mean(pollution.dlhouse[reg223e.esample]),
+			mean(pollution.dlhouse[reg223f.esample])],
+		[mean(pollution.dgtsp[reg223e.esample]),
+			mean(pollution.dgtsp[reg223f.esample])],
+		["N", "Y"]))
+	@with_stdout regtable(reg223e, reg223f,
+		regressors = ["dgtsp"], print_estimator_section=false,
+		custom_statistics=mystats223b,
+		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
+		"__LABEL_CUSTOM_STATISTIC_ymeans__" => "dlhouse Mean",
+		"__LABEL_CUSTOM_STATISTIC_xmeans__" => "dgtsp Mean"),
+		renderSettings = asciiOutput(),
+		regression_statistics = [:nobs, :r2, :adjr2, :f, :f_kp])
+end
+
+# ╔═╡ a33ac919-c4f3-4ce8-89cc-d7adbbb8d044
+begin
+	Δx = -round(mean(pollution.dgtsp[reg223f.esample]), digits=1)
+	Δy = round(mean(pollution.dlhouse[reg223f.esample]), digits=3)
+	Δlny = round((ℯ^mean(pollution.dlhouse[reg223f.esample])-1)*100,digits=1)
+	β100 = -round(100*last(reg223f.coef), digits=1)
+	eβ100 = round(100*(ℯ^last(reg223f.coef)-1), digits=4)
+end;
+
+# ╔═╡ ebce0eca-ff0b-4e07-bfcd-b0e5f9691ae3
+Markdown.parse("
+
+Then, take an average county (County X) that saw a decrease of $Δx units of pollution (an improvement in air quality) and an increase in housing prices by about  \$100(e^{$Δy}-1)\$  = $Δlny% between 1970 and 1980. If instead they saw one unit more of pollution improvement (a $(Δx+1)-unit improvement instead), then we would expect that County X housing prices would have instead increased by
+
+$Δlny% - (100\$\\beta_{IV}\$)% \$\\approx\$ $Δlny% + $β100% = $(round(Δlny+β100, digits=1))%
+
+showing evidence that, on average, pollution decreases caused by the regulation have increased house prices more than they would have otherwise increased.
+")
+
+# ╔═╡ d97e9d6b-9050-487b-a6aa-b947c607a38e
+last(reg223e.coef) ≈ last(reg223c.coef) / last(reg223a.coef)
+
+# ╔═╡ 62d53ad4-5a70-4311-80da-0e5e11269453
+last(reg223f.coef) ≈ last(reg223d.coef) / last(reg223b.coef)
+
+# ╔═╡ ac0f080d-3068-48ca-9995-dfbd7fb122df
+begin
+	# Create an indicator for mtspgm74<75
+	pollution[!, :above75] = pollution[!, :mtspgm74] .> 75	
+	
+	#! first-stage relationship between regulation and air pollution changes
+	#! Relevance
+	# Reg: dgtsp on above75, weight with pop7080
+	reg224a = reg(pollution, @formula(dgtsp ~ above75), Vcov.robust(); weights=:pop7080)
+	
+	# Reg: dgtsp on above75, weight with pop7080, with controls
+	cols224b = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :above75]
+	formula224b = (term(:dgtsp) ~ sum(term.(Symbol.(cols224b))))
+	reg224b = reg(pollution, formula224b, Vcov.robust(); weights=:pop7080)
+	regtable(reg224a, reg224b, renderSettings = latexOutput("reg224-firststage.tex"))
+	
+	#! reduced form relationship between regulation and housing price changes
+	#! Reduced form estimate
+	# Reg: dlhouse on above75, weight with pop7080
+	reg224c = reg(pollution, @formula(dlhouse ~ above75), Vcov.robust(); weights=:pop7080)
+	
+	# Reg: dlhouse on above75, weight with pop7080, with controls
+	cols224d = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :above75]
+	formula224d = (term(:dlhouse) ~ sum(term.(Symbol.(cols224d))))
+	reg224d = reg(pollution, formula224d, Vcov.robust(); weights=:pop7080)
+	
+	# Make Reg Table
+	mystats224a = NamedTuple{(:means, :controls)}(
+		([mean(pollution.dgtsp[reg224a.esample]),
+			mean(pollution.dgtsp[reg224b.esample]),
+			mean(pollution.dlhouse[reg224c.esample]),
+			mean(pollution.dlhouse[reg224d.esample])], 
+		["N", "Y", "N", "Y"]))
+	@with_stdout regtable(reg224a, reg224b, reg224c, reg224d,
+		regressors = ["above75"], print_estimator_section=false,
+		custom_statistics=mystats224a,
+		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
+		"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
+		renderSettings = asciiOutput())
+end
+
+# ╔═╡ d279d5d2-c82b-4084-897a-7ecf8d969229
+begin
+	#! air quality changes on housing price changes using two-stage least squares and the above75 indicator as an instrument
+	#! IV estimate
+	# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080
+	reg224e = reg(pollution, @formula(dlhouse ~ (dgtsp ~ above75)), Vcov.robust(); weights=:pop7080)
+	
+	# 2SLS Reg: dlhouse on dgtsp (above75 as IV), weight with pop7080, with controls
+	cols224f = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
+	formula224f = (term(:dlhouse) ~ sum(term.(Symbol.(cols224f))) + (term(:dgtsp) ~ term(:above75)))
+	reg224f = reg(pollution, formula224f, Vcov.robust(); weights=:pop7080)
+	
+	# Make Reg Table
+	mystats224b = NamedTuple{(:ymeans, :xmeans, :controls)}(
+		([mean(pollution.dlhouse[reg224e.esample]),
+			mean(pollution.dlhouse[reg224f.esample])],
+		[mean(pollution.dgtsp[reg224e.esample]),
+			mean(pollution.dgtsp[reg224f.esample])],
+		["N", "Y"]))
+	@with_stdout regtable(reg224e, reg224f,
+		regressors = ["dgtsp"], print_estimator_section=false,
+		custom_statistics=mystats224b,
+		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
+		"__LABEL_CUSTOM_STATISTIC_ymeans__" => "dlhouse Mean",
+		"__LABEL_CUSTOM_STATISTIC_xmeans__" => "dgtsp Mean"),
+		renderSettings = asciiOutput(),
+		regression_statistics = [:nobs, :r2, :adjr2, :f, :f_kp])
+end
+
+# ╔═╡ ff5cef88-d4d7-42b7-8bd4-5dd591b08def
+"""Read file at save_path to dataframe, if not present, download from url."""
+function df_from_url(url, save_path)
+    if isfile(save_path)
+        println("Loading $save_path from file.")
+        return DataFrame(load(joinpath(root, example_fn)))
+    else
+        println("Downloading $save_path from url.")
+        download(url, joinpath(root, example_fn))
+        println("Loading $save_path from file.")
+        return DataFrame(load(joinpath(root, example_fn)))
+    end
+end
+
 # ╔═╡ 0d56492d-b6c8-4585-8454-8ffe3517d340
 # ╠═╡ show_logs = false
 begin
@@ -1498,9 +1435,6 @@ begin
 	end
 end;
 
-# ╔═╡ 902d00ef-6448-4024-a533-30067e55a291
-reg(df, @formula(emp_farm_ln ~ tAvg), Vcov.cluster(:fips))
-
 # ╔═╡ 309ea09a-12ae-4a5a-b099-0aa366206856
 # ╠═╡ show_logs = false
 begin
@@ -1533,12 +1467,11 @@ begin
 	    legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
 end
 
-# ╔═╡ 35ca2bbf-2601-49e6-abc1-c62c9f0356b8
-reg122 = reg(df, formula122, Vcov.cluster(:fips));
-
 # ╔═╡ 75ffadd1-7c23-4a5b-9a96-aa2c86a7d831
 # ╠═╡ show_logs = false
 begin
+	formula122 = @formula(inc_farm_prop_inc_lpc ~ splineC1 + splineC2 + splineC3 + splineC4 + fe(year) + fe(fips))
+	reg122 = reg(df, formula122, Vcov.cluster(:fips))
 	# Initialize dataframe used for plotting
 	# - x-axis with temperatures 0-40°C at 0.25° intervals
 	# - spline variables
@@ -1559,6 +1492,17 @@ xlabel!("Daily Average Temperature")
 ylabel!("log(Farm Income per capita)")
 title!("Spline Temperature Response: Farm Employment      ")
 @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft, c=2)
+end
+
+# ╔═╡ a86ea794-73ad-4012-99c2-12778898c56d
+# Let's try bootstrapping!
+"""Given a dataframe sample and dataframe with tAvg values to predict on,
+    estimate the predicted values vector (for bootstrapping)."""
+function prediction_sample(df, df_plot)
+    reg_ = reg(df, formula122, Vcov.cluster(:fips))
+    df2 = DataFrame(tAvg=0:0.25:40)
+    df2[!, :yhat] = Matrix(df_plot[!,r"splinerelativeC"]) * reg_.coef
+    return df2[!, [:tAvg, :yhat]]
 end
 
 # ╔═╡ 1cc81fad-6309-4865-9576-e2fb637a02b6
@@ -1620,41 +1564,32 @@ function bootstrap_predicted_outcome(df::DataFrame,
     return df_bs
 end
 
-# ╔═╡ e2702c60-89f5-45fd-8903-4c27ea878e28
-"""Regress the outcomes on the deviance from the running average bins"""
-function reg123(df, y; cluster=:fips, regex=r"temp(?!20to24).*_dev")
-    formula_ = term(y) ~ sum([term.(names(df, regex)); [term(fe(:fips)), term(fe(:year))]])
-    reg_ = @time reg(df, formula_, Vcov.cluster(cluster))
-    se = .√[reg_.vcov[i,i] for i in 1:length(reg_.coef)]
-    ub = reg_.coef + 1.96*se
-    lb = reg_.coef - 1.96*se
-    df2 = DataFrame(tAvg=[-2,2,6,10,14,18,26,30,34],
-                    yhat=reg_.coef,
-                    yerror=1.96*se,
-                    y_ub=ub,
-                    y_lb=lb)
-    df2 = reduce(vcat, [[df2]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
-    df2 = sort!(df2, :tAvg)
-    return df2
+# ╔═╡ e38183bf-7403-49b7-987d-d4f6df7562e5
+begin
+"""Bootstrapping confidence intervals for Problem 1"""
+function run_bootstrap(df, df_plot, prediction_sample)
+	# Get mean and 95% CI for each value of tAvg using bootstraps
+	nsimulations = 100
+	# Simple bootstrap (over all individuals)
+	df_bs = bootstrap_predicted_outcome(df, prediction_sample, nsimulations=nsimulations)
+	# Clustered bootstrap
+	df_bs_cluster = bootstrap_predicted_outcome(df, prediction_sample, :fips; nsimulations=nsimulations)   
+	
+	
+	# Plot Delta method and bootstraps confidence intervals and predicted outcome
+	s = 0; dpi=400;
+	@df df_plot plot(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=1,
+		fillrange=:y_ub, fillalpha=0.35,
+		label="95% CI Delta Method")
+	@df df_bs plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=2,
+		fillrange=:y_ub, fillalpha=0.35,
+		label="95% CI BootStrap ($nsimulations)")
+	@df df_bs_cluster plot!(:tAvg, :y_lb, w=0, msw = 0, ms = s, c=3,
+		fillrange=:y_ub, fillalpha=0.35,
+		label="95% CI BootStrap-clustered ($nsimulations, FIPS)")
+	p8 = @df df_plot plot!(:tAvg, :yhat, label="Predicted Response", legend=:bottomleft)
+	savefig(p8, "plot122-delta-boot-bootcluster.svg")
 end
-
-# ╔═╡ 4ecef41b-ace5-49fe-9b67-aee256d4884c
-# ╠═╡ show_logs = false
-""" Plot deviance bins: above avg # of days this year that were in this bin (days above the 10-year average # of days)"""
-function plot123(y, df)
-	labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income")
-	ylabels = Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
-	temp = reg123(df, y)
-	plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
-	@df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
-	fillrange=:y_ub, fillalpha=0.35,
-	label="95% CI")
-	xlabel!("Average Temperature Bins")
-	ylabel!(ylabels[y])
-	title!("Deviance from 10-yr Avg Binned Days: $(labels[y])          ")
-	@df temp plot!(:tAvg, :yhat, 
-		label="Predicted Response", 
-		legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
 end
 
 # ╔═╡ 37882765-26f6-4e68-af76-e64a5a5068fe
@@ -1665,24 +1600,6 @@ plot123(:emp_farm_ln, df)
 # ╠═╡ show_logs = false
 plot123(:inc_farm_prop_inc_lpc, df)
 
-# ╔═╡ 02b1800f-6748-49a1-826e-710f4d1f32d6
-"""Plot basic bins: # of days in a county-year that day's avg temp was in this bin"""
-function plot123b(y, df)
-	labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income")
-	ylabels = Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
-	temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
-    plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
-    @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
-    fillrange=:y_ub, fillalpha=0.35,
-    label="95% CI")
-    xlabel!("Average Temperature Bins")
-    ylabel!(ylabels[y])
-    title!("Binned Temperature Response: $(labels[y])         ")
-    @df temp plot!(:tAvg, :yhat, 
-        label="Predicted Response", 
-        legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
-end
-
 # ╔═╡ 8f0a8f38-5d62-47e9-a647-e7b607149c35
 # ╠═╡ show_logs = false
 plot123b(:emp_farm_ln, df)
@@ -1690,6 +1607,61 @@ plot123b(:emp_farm_ln, df)
 # ╔═╡ c4261949-5b6a-4727-90e0-bde6ca907186
 # ╠═╡ show_logs = false
 plot123b(:inc_farm_prop_inc_lpc, df)
+
+# ╔═╡ 8879e813-c350-4fe0-8c92-44a80e361588
+"""Save temperature variables
+    1.1.1 Construct 4 temperature response variables
+    1.1.2 Aggregate to year-county
+    - sum each new temperaature variable in each grid point over each year
+    - average tMin, tMax, tAvg, perc in each gridpoint over each year
+    - take a simple average over all grid points in the county to get county-year level
+"""
+function create_temperature_vars()
+    # Extract single-county fips file from zip if not present, and read
+    extract_file_from_zip(root, zip_fn, county_fn)
+
+    # Load data and create average daily temp
+    df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+    df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
+
+    # Add degree days for each day-gridpoint
+    thresholds = [30, 32, 34]
+    df_temp1 = add_degree_days(df_temp1, thresholds)
+
+    # Add binned temperature variables
+    bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
+    df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
+    df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
+
+    # Add cubic spline basis variables for each day-gridpoint
+    knots = [0 8 16 24 32]
+    df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
+
+    # Add piecewise linear basis variables for each day-gridpoint
+    knots = [28, 32]
+    df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
+
+    # sum over year, then average over all grid points in county
+    column_tags = ["dday", "temp", "splineC", "piece"]
+    df_temp = aggregate_df(df_temp1, column_tags)
+
+    # Save the new file
+    CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
+end
+
+# ╔═╡ 93470fdb-b32d-4cff-9205-717b0d873447
+if !isfile(joinpath(root, "CountyAnnualTemperature_aaron.csv"))
+    create_temperature_vars()
+end
+
+# ╔═╡ f46dd00c-afd6-4f48-b860-b326c3d303f7
+md"Table of contents sidebar"
+
+# ╔═╡ 621d4ab7-680e-4ae2-b1d0-4a43817c81b4
+begin
+	# Create table of contents on right side of screen
+	# TableOfContents()
+end
 
 # ╔═╡ 00000000-0000-0000-0000-000000000001
 PLUTO_PROJECT_TOML_CONTENTS = """
@@ -3171,44 +3143,26 @@ version = "0.9.1+5"
 
 # ╔═╡ Cell order:
 # ╟─220c7746-b558-4b42-9e47-e227730a1aad
-# ╠═9bf60494-b58e-495e-adc0-8c9d0585880b
-# ╠═39ee727f-d0fa-44a8-8c86-b532d82c2671
 # ╟─8a325a10-4c17-43a1-a75f-9bc68f72fbdb
+# ╟─00edd77c-be64-44fc-b510-28234152ca56
 # ╟─ac7d2e34-53a5-4c0e-b413-c1129378d91a
 # ╟─22681583-0918-49da-87b8-3a86c027cf81
 # ╟─b0a24d4d-016f-45a4-9124-90d463d1db93
 # ╠═93470fdb-b32d-4cff-9205-717b0d873447
 # ╟─4d0870b4-12bd-4000-a8c4-2caabb5242cc
 # ╟─28d5ff08-5fbd-45c8-9816-dacbe9d20493
-# ╟─8a815256-ce60-4b8a-98e1-1c24b3aadfa6
-# ╟─530e118d-f171-45fb-970e-23aa88069c46
-# ╟─63ac5fdb-0398-48c3-8665-4abddaaec3c0
-# ╟─dfdfb887-1345-43c8-a746-996b70345115
-# ╟─fd36b348-d493-4be1-b8e3-82d1cb06b168
 # ╟─f9fbde9e-b9fd-4407-a63d-992a28408245
-# ╟─0d56492d-b6c8-4585-8454-8ffe3517d340
-# ╟─4058a3aa-7ec2-4fce-91d3-5ca5c65c74e7
-# ╠═bfcb7eec-d5c9-4e76-8e54-7d92b751e98b
-# ╠═12b180ac-715f-4630-af4f-8bdadd97cd3a
-# ╟─c69ba3cf-9df0-46e4-8604-3dc7ce96b4a4
-# ╠═902d00ef-6448-4024-a533-30067e55a291
-# ╠═318d9637-0da4-4480-8a51-1ef4855b85e9
-# ╠═cb77d8fb-507a-47d1-b420-a0bf086e5a06
-# ╠═0d2707d2-88e0-48c9-b092-7a7a2e2fbc15
 # ╟─65cebd89-47ba-4773-9b7f-98ce0ef42d4b
+# ╟─c94aac41-7071-4cbd-acd6-9f1cd53176cd
 # ╟─225f183d-aa3b-46ce-8edf-4336bba8da30
 # ╟─7214407b-7850-4a69-8798-59c463394cf2
-# ╠═309ea09a-12ae-4a5a-b099-0aa366206856
-# ╟─b32e0d81-2cee-4c7e-a1b9-bf0377fa95ca
-# ╟─2606a776-1665-4627-baea-c75dd57a6315
+# ╟─309ea09a-12ae-4a5a-b099-0aa366206856
+# ╟─0d56492d-b6c8-4585-8454-8ffe3517d340
 # ╟─9cf39312-272b-4b73-867c-faf98da039f7
-# ╠═16c998d5-486b-42c4-976a-50dc18b503fb
-# ╠═35ca2bbf-2601-49e6-abc1-c62c9f0356b8
-# ╠═75ffadd1-7c23-4a5b-9a96-aa2c86a7d831
+# ╟─fe21bed1-dcd3-47fa-997c-9827db649e3f
+# ╟─75ffadd1-7c23-4a5b-9a96-aa2c86a7d831
 # ╟─84fbd2e7-82cd-45ea-bb89-d75a621f79ca
-# ╟─e38183bf-7403-49b7-987d-d4f6df7562e5
-# ╠═3a91edc6-18ba-4f0b-9cf9-5aa3b00022e1
-# ╟─5b245628-62db-4ee7-a22a-f2a1661ffa4d
+# ╟─3a91edc6-18ba-4f0b-9cf9-5aa3b00022e1
 # ╟─aa60b5ef-3aeb-42ff-b679-e00b28205267
 # ╟─6a978c31-51c4-47a8-b626-14ca00de0370
 # ╟─952ba66d-3264-405e-ad52-9f0a951e244c
@@ -3229,28 +3183,19 @@ version = "0.9.1+5"
 # ╟─71b0a94f-67ae-4240-ba7a-5e9ebd33af45
 # ╟─4a83b89f-1ad4-477c-8508-c2a15bf18663
 # ╟─cac486e4-3bd6-45ab-b6d0-24dbafc0da71
-# ╠═635497dc-b888-4d9e-94df-79d3f79f2be7
 # ╟─3ae3a3a0-ce47-49c7-b027-a665129d1807
 # ╟─af154adc-56f4-45d8-9c5c-7647fc7ed12e
-# ╠═b27cc951-9bd5-45f6-b30f-51010f2c9537
-# ╠═fb3ad8e9-08f9-4ffa-891b-e6bd926897a7
-# ╠═d21ec663-116c-4dfc-bde9-29af28634a0f
-# ╠═3022a244-6356-46b0-b519-8eeadc09072c
-# ╠═cbde9da7-16ac-438b-8bcf-75f6eb70538a
-# ╠═091c703f-ceaa-4ec6-b2c2-95c329b2ff31
+# ╟─b27cc951-9bd5-45f6-b30f-51010f2c9537
+# ╟─fb3ad8e9-08f9-4ffa-891b-e6bd926897a7
 # ╟─bd0603ce-3a15-4428-af4d-c2ee2127e537
 # ╟─d084de41-4f40-4e51-8dca-54ec0608e72b
-# ╟─b70b8bc1-488e-4890-a702-dccc0f322b82
 # ╟─1185d096-15c8-42e1-bbff-8047722dbabc
 # ╟─bbb320bc-04f6-48f9-a0cb-9e05c360e793
 # ╟─0df4996b-c5e2-4ae1-9909-09b442cc9ff2
-# ╠═adbf35de-93e8-492d-a89d-c61697da3391
-# ╠═bc11f842-1b19-4250-a969-81b85a9f7dc4
-# ╠═f546059b-a7b0-4c54-a079-346af27c9d5b
-# ╠═a62d80c3-e948-4e4d-bea2-c66081150f5a
+# ╟─adbf35de-93e8-492d-a89d-c61697da3391
+# ╟─bc11f842-1b19-4250-a969-81b85a9f7dc4
 # ╟─d9face0e-651d-4256-8aab-3c257a18619d
 # ╟─6bbe502f-3750-4321-87c1-a01d67e228a1
-# ╠═9f49388e-9bbf-4d6a-849c-81fb2bbd9da3
 # ╟─95412c61-3a1b-40bf-9b7c-ddd54ce17ba7
 # ╟─46146a3f-8c17-4774-8f22-8eeeaa12451f
 # ╟─0cc1daaa-9358-4074-a576-3f4263c18e95
@@ -3269,101 +3214,108 @@ version = "0.9.1+5"
 # ╟─ac0f080d-3068-48ca-9995-dfbd7fb122df
 # ╟─b989539a-09f4-4ecc-8f24-d3efb5962035
 # ╟─d279d5d2-c82b-4084-897a-7ecf8d969229
-# ╠═0338d1d3-0624-492e-bac1-631cb1d31aa7
-# ╠═1701534d-4ea1-4ef9-ac87-056844ba66fe
-# ╠═3ec30211-8247-4927-924d-0192e5841404
-# ╠═ae43ae55-ad11-43a9-9f25-9123ee28a885
-# ╠═90903d07-605a-4b51-91e7-b2f5bac56c29
+# ╟─ae43ae55-ad11-43a9-9f25-9123ee28a885
+# ╟─90903d07-605a-4b51-91e7-b2f5bac56c29
 # ╟─2f203087-0dab-49a9-9115-e3b8477d3089
 # ╟─78ac5bab-75c5-4ccf-aa63-1681bce62b9c
 # ╟─573af536-2a9e-4f7a-8a68-0b5e3157bddf
 # ╟─2145f8ab-2e3a-4b88-803b-f73ffdd0b4e6
 # ╟─4df0e4c6-55f4-401d-b18e-c4cba40d0de4
-# ╟─36f14f2c-330b-473a-a03b-05289d360983
-# ╠═ebc2a623-a276-454d-b422-3b8a191f7561
-# ╠═85e03d2c-af57-4feb-9107-dedd0d59ecd0
+# ╟─85e03d2c-af57-4feb-9107-dedd0d59ecd0
 # ╟─f7aaaee5-262c-40cc-8ff6-793a904253fa
 # ╟─3ab934a9-4dc0-473b-be1d-f290761dddd8
-# ╠═2d5817b1-a1cd-4882-9c3d-ac53eb9362f2
-# ╠═259d5729-692b-4bb2-a89a-baefb962a253
+# ╟─2d5817b1-a1cd-4882-9c3d-ac53eb9362f2
+# ╟─259d5729-692b-4bb2-a89a-baefb962a253
 # ╟─0c8a7d25-7233-45d5-b3c1-f46bd423cb94
-# ╠═7ecb6794-39b9-40b4-b77c-0c15400eea51
+# ╟─7ecb6794-39b9-40b4-b77c-0c15400eea51
 # ╟─eb368d82-03b9-47a0-839f-b90f8eb10e09
 # ╟─b59f26c1-9792-4958-86ae-3712f19854fa
 # ╟─9036f9b8-e157-495b-b2a5-b583935170f0
-# ╠═c124c041-8bd8-45fc-a32e-7c2b4195c7cd
+# ╟─c124c041-8bd8-45fc-a32e-7c2b4195c7cd
 # ╟─44aeda75-7419-40cb-9234-f01945e4d9b9
-# ╠═a6dca9d2-e63f-4211-bef7-3699e3fb2f9d
+# ╟─a6dca9d2-e63f-4211-bef7-3699e3fb2f9d
 # ╟─f0a30424-670b-4200-98bd-e9f4ecd38eb2
 # ╟─834fe856-c053-4076-901c-754eae2c8846
 # ╟─d4dee95d-f991-44ea-9c52-95d51f8c1ab2
 # ╟─bd95a3c4-553e-418f-9831-dda93068a9be
 # ╟─202a5a35-7633-44cc-887e-22c73d3019d0
-# ╟─ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
 # ╟─9dd7da67-0f16-4b08-9847-40e20bd0ffac
-# ╠═2fed03d7-c01a-4710-b550-bb6470ce90eb
-# ╠═76e84935-d551-47b9-97f9-440e67682b95
+# ╟─2fed03d7-c01a-4710-b550-bb6470ce90eb
+# ╟─76e84935-d551-47b9-97f9-440e67682b95
 # ╟─4b46b382-5349-4bc7-bb03-229c303f37be
-# ╠═65618793-7c48-4127-87da-6580f07c02d1
-# ╠═614f7093-b347-475e-a146-064081df32ce
-# ╠═9b0eee90-1ce0-4f71-9431-40e720a8da3c
-# ╠═148a20fe-ce9d-4710-81ef-4c77b5f36694
-# ╠═98857139-6cd1-4e39-9e1e-8a35f2629e28
-# ╠═8dc1d528-a9a1-4f99-8b83-a864e5beac6b
+# ╟─98857139-6cd1-4e39-9e1e-8a35f2629e28
+# ╟─8dc1d528-a9a1-4f99-8b83-a864e5beac6b
 # ╟─bdf52a46-4f47-4bc5-9e07-a20fb7b76dbf
 # ╟─ce91dbb9-70ec-43e5-978a-68cd7817a6fd
-# ╟─0840bad5-a2c8-4ac6-a62b-edee2715eb12
 # ╟─16e765de-6a0e-4b23-a47d-f8bc12f3eff8
 # ╟─1d1e7307-c4d6-4c6e-9093-56583596b9ea
 # ╟─948f96b3-6f50-4687-8d4f-db309c8e29a2
-# ╠═35ec6b0f-74a5-472e-963d-24ddf82ca996
+# ╟─35ec6b0f-74a5-472e-963d-24ddf82ca996
 # ╟─16d94c66-4a4e-443a-9f0b-ea2af6e4555f
-# ╠═325ae653-88a6-45e9-91f2-0e679b2593f3
+# ╟─325ae653-88a6-45e9-91f2-0e679b2593f3
 # ╟─e5981e73-8029-4e7b-aedb-76b1080d882a
-# ╠═4321d60b-fc24-4acf-9184-f7a68e7909d8
-# ╠═9d9db365-0799-4699-8c75-c16b1820d322
+# ╟─4321d60b-fc24-4acf-9184-f7a68e7909d8
+# ╟─9d9db365-0799-4699-8c75-c16b1820d322
 # ╟─40b4be47-8c52-466a-8130-cfc9b256452d
-# ╠═da4a328f-ef3f-44d4-90cb-b22b1519fad0
+# ╟─da4a328f-ef3f-44d4-90cb-b22b1519fad0
+# ╠═57754134-0b34-41b5-9366-fe7e469ee1af
+# ╟─872ffa35-9f86-461c-bf77-29f4a8ad5e26
+# ╟─b5cf0297-5489-488f-a75f-586adca9f222
 # ╟─730c1994-cbee-4ec9-95a8-51e0923ef4ed
-# ╠═26d3b991-cc5c-455e-b38d-5925069cd713
+# ╟─26d3b991-cc5c-455e-b38d-5925069cd713
+# ╠═5f31d109-b75e-4cc5-9cae-a06493009221
+# ╟─96ba58aa-8028-4db7-bd76-ef3fc7f24637
+# ╟─01ce9f00-209a-4f4b-bd63-d7b02767f5a0
 # ╟─8b3041fe-3b6d-4ef2-9223-5f81a6366019
 # ╟─7d7b39f2-1db6-4c0b-a41b-710030b7537d
-# ╟─8893d6e2-2e3a-440a-ba2b-e1b60a5b9d73
-# ╟─892333c3-0c5e-4d58-bc0d-84502afe4c96
-# ╟─ff5cef88-d4d7-42b7-8bd4-5dd591b08def
-# ╟─af4f8032-c318-4035-913f-351c8e0130f7
+# ╠═8893d6e2-2e3a-440a-ba2b-e1b60a5b9d73
+# ╠═892333c3-0c5e-4d58-bc0d-84502afe4c96
+# ╠═ff5cef88-d4d7-42b7-8bd4-5dd591b08def
+# ╠═af4f8032-c318-4035-913f-351c8e0130f7
 # ╟─93eae3b1-187b-4026-81e7-a587d1477af9
-# ╟─8879e813-c350-4fe0-8c92-44a80e361588
-# ╟─b0bf6cbc-e1e4-42f1-8d0c-055f5a249faa
-# ╟─cdc1dd7f-683c-40c8-9410-3fcdb4d74322
-# ╟─a72bfb4b-0a93-48c5-81f7-6156c88c4ef4
-# ╟─79bf9c02-b2a1-40a2-b87e-d436d587fe13
-# ╟─ac20872f-f7e9-480f-8155-b1da7c616909
-# ╟─0e4a2b18-9a0f-4acd-a4e8-920a1bac0b87
-# ╟─24c043c5-dc9b-4a7a-a815-bdd4bb1997bb
-# ╟─790ce5d9-6119-4c5c-b057-6e0a52ecdaf2
-# ╟─b9a9e3eb-f707-4e25-87de-9d6d53a9db60
-# ╟─b6218121-c5cb-4d53-bfab-69a10a8aa241
-# ╟─fe94d889-551e-47ea-8363-6c6064a3df1b
-# ╟─07e6f171-e8bb-4d96-acc8-0d0694692141
-# ╟─78d8e678-4148-451d-a2de-9d84986d522b
-# ╟─779e117a-3e39-4e34-9e09-d6d10c8a4f22
-# ╟─d18c8a79-d9c5-4efb-aeae-c2e58e07251c
-# ╟─0cd2f8f9-a72d-4600-89c5-8ee99f3009f7
-# ╟─bcfdbe23-5290-40fa-9965-a1f254c21bee
+# ╠═8879e813-c350-4fe0-8c92-44a80e361588
+# ╠═b0bf6cbc-e1e4-42f1-8d0c-055f5a249faa
+# ╠═cdc1dd7f-683c-40c8-9410-3fcdb4d74322
+# ╠═a72bfb4b-0a93-48c5-81f7-6156c88c4ef4
+# ╠═79bf9c02-b2a1-40a2-b87e-d436d587fe13
+# ╠═ac20872f-f7e9-480f-8155-b1da7c616909
+# ╠═0e4a2b18-9a0f-4acd-a4e8-920a1bac0b87
+# ╠═24c043c5-dc9b-4a7a-a815-bdd4bb1997bb
+# ╠═790ce5d9-6119-4c5c-b057-6e0a52ecdaf2
+# ╠═b9a9e3eb-f707-4e25-87de-9d6d53a9db60
+# ╠═b6218121-c5cb-4d53-bfab-69a10a8aa241
+# ╠═fe94d889-551e-47ea-8363-6c6064a3df1b
+# ╠═07e6f171-e8bb-4d96-acc8-0d0694692141
+# ╠═78d8e678-4148-451d-a2de-9d84986d522b
+# ╠═779e117a-3e39-4e34-9e09-d6d10c8a4f22
+# ╠═d18c8a79-d9c5-4efb-aeae-c2e58e07251c
+# ╠═0cd2f8f9-a72d-4600-89c5-8ee99f3009f7
+# ╠═bcfdbe23-5290-40fa-9965-a1f254c21bee
 # ╟─fec1fd19-b0e0-48c4-9ade-140c0c068379
 # ╟─de2d137d-a9cc-43b2-ba9f-caa0502c6210
-# ╟─45a1bad3-2d2c-409b-a742-8401ff15f166
-# ╟─17ec6db5-aa8c-4488-acfb-595c245f2c23
-# ╟─4ac46ab5-1615-4feb-bfb6-bc9cef26c353
-# ╟─a86ea794-73ad-4012-99c2-12778898c56d
-# ╟─aa2420c2-8681-49a1-9ad7-87ac6df4466e
-# ╟─1cc81fad-6309-4865-9576-e2fb637a02b6
-# ╟─f11d7396-cde5-47fc-9c4f-71c58cd5f906
+# ╠═45a1bad3-2d2c-409b-a742-8401ff15f166
+# ╠═17ec6db5-aa8c-4488-acfb-595c245f2c23
+# ╠═4ac46ab5-1615-4feb-bfb6-bc9cef26c353
+# ╠═a86ea794-73ad-4012-99c2-12778898c56d
+# ╠═aa2420c2-8681-49a1-9ad7-87ac6df4466e
+# ╠═1cc81fad-6309-4865-9576-e2fb637a02b6
+# ╠═f11d7396-cde5-47fc-9c4f-71c58cd5f906
+# ╠═e38183bf-7403-49b7-987d-d4f6df7562e5
 # ╟─ca4b5b53-7eeb-4ee1-b6fd-3306405b78b3
-# ╟─450033bf-3e98-422e-a5c4-a4b934155c12
-# ╟─e2702c60-89f5-45fd-8903-4c27ea878e28
-# ╟─4ecef41b-ace5-49fe-9b67-aee256d4884c
-# ╟─02b1800f-6748-49a1-826e-710f4d1f32d6
+# ╠═450033bf-3e98-422e-a5c4-a4b934155c12
+# ╠═e2702c60-89f5-45fd-8903-4c27ea878e28
+# ╠═4ecef41b-ace5-49fe-9b67-aee256d4884c
+# ╠═02b1800f-6748-49a1-826e-710f4d1f32d6
+# ╟─05a1bce4-fe91-4e89-82cd-09a7457331ad
+# ╠═36f14f2c-330b-473a-a03b-05289d360983
+# ╠═ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
+# ╠═3a721fea-a72f-4645-b45a-48f5d03d469f
+# ╟─d9fdb9cf-dbb0-4656-8ded-ad7f7c4d3a1f
+# ╟─9fae08d1-ad8b-47a6-b284-389d7e56e8be
+# ╟─9bf60494-b58e-495e-adc0-8c9d0585880b
+# ╟─d0b71169-8720-44da-93cb-03b4fd6566cd
+# ╟─a0fcb7a7-e4b4-4f55-826f-63074f2686b9
+# ╟─f46dd00c-afd6-4f48-b860-b326c3d303f7
+# ╟─621d4ab7-680e-4ae2-b1d0-4a43817c81b4
 # ╟─00000000-0000-0000-0000-000000000001
 # ╟─00000000-0000-0000-0000-000000000002
