@@ -94,7 +94,7 @@ John Bound measurement error
 
 
 ===================================================
-Treatment effec heterogeneity
+Treatment effect heterogeneity
 ===================================================
 Burgeoning Interest in Understanding Treatment Eect Heterogeneity
 Separating out sampling variability from fundamental heterogeneity
@@ -121,6 +121,31 @@ Idea from IO handbook chapeter on costs of regulation:
 Contingent Evaluation
 ===================================================
 NOAA NAS panel on CV: came up with guidelines for what would be "best practices" in CV
+
+
+
+
+===================================================
+Production Function
+===================================================
+BLS census has data on input expenditures
+    BLS Producer Price Indicies
+
+Production function approach vs demand-side approach to estimating marginal costs
+    Recent paper comparing/contrasting estimates from different approaches
+    de Loecker and Scott (2017): Beer industry
+
+Manufacturing Energy Consumption Survey
+    Plant-level survey on energy inputs (i.e. coal, gas, oil, electricity)
+    Construct fuel input shares by industry×region×year
+
+Energy Information Administration’s State Energy Data System (SEDS)
+    Electricity generation fossil fuel input shares (BTU) at State×Year level
+    National fuel prices (i.e. coal, natural gas, petroleum)
+
+
+
+
 
 
 

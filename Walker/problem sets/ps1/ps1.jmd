@@ -1,4 +1,5 @@
-#==============================================================================
+---
+title: ARE 264 (part b) Problem Set 1
 file: ps1.jl
 description: work through questions in PS1 of ARE 264 B
 focus: PS1, ARE 264 (part B) course, spring 2022
@@ -6,585 +7,100 @@ instructor: Reed Walker, UC Berkeley
 author: Aaron C Watt (UCB Grad Student, Ag & Resource Econ)
 notes:
     - Setting up structure of problem set
-==============================================================================#
-
-#! FINAL VERSION IN ps1-notebook.jl
+---
 
 
 
-#==============================================================================
+<!--=========================================================================
 PACKAGES
-==============================================================================#
-using Pkg
-# Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra", "TimeSeries", "Loess"])
-using ZipFile  # unzip compressed .zip folders
-using StatFiles  # read Stata files
-using DataFrames, Chain, DataFramesMeta
-using CSV
-# using Econometrics
-using CovarianceMatrices
-using CategoricalArrays
-using Statistics
-using StatsModels
-using StatsModels: TableRegressionModel
-using StatsBase:sample
-using CUDA  # must be run before FixedEffectModels
-using FixedEffectModels
-using RegressionTables
-using Dates
-using Plots
-using Plots:plot,plot!  # just to get rid of wavey syntax lines (VCcode bug)
-using GLM
-using Latexify
-using RDatasets
-using StatsPlots
-using LinearAlgebra
-using Distributions
-using TimeSeries
-import Loess: loess, predict
-Latexify.set_default(fmt = "%.3f")
+==========================================================================-->
+```julia; echo=false
+    using Pkg
+    # Pkg.add(["Plots", "ZipFile", "StatFiles", "GLM", "DataFrames", "Chain", "CSV", "StatsModels", "Econometrics", "Latexify", "FixedEffectModels", "CUDA", "RDatasets", "StatsPlots", "LinearAlgebra", "TimeSeries"])
+    using ZipFile  # unzip compressed .zip folders
+    using StatFiles  # read Stata files
+    using DataFrames, Chain, DataFramesMeta
+    using CSV
+    # using Econometrics
+    using CovarianceMatrices
+    using CategoricalArrays
+    using Statistics
+    using StatsModels
+    using StatsBase:sample
+    using CUDA  # must be run before FixedEffectModels
+    using FixedEffectModels
+    using RegressionTables
+    using Dates
+    using Plots
+    using Plots:plot,plot!  # just to get rid of wavey syntax lines (VCcode bug)
+    using GLM
+    using Latexify
+    using RDatasets
+    using StatsPlots
+    using LinearAlgebra
+    using Distributions
+    using TimeSeries
+    Latexify.set_default(fmt = "%.3f")
+```
 
-
-
-#==============================================================================
-                                    GLOBALS
-==============================================================================#
-# Set local directory paths and filenames
-root = dirname(@__FILE__)
-zip_fn = "Walker-ProblemSet1-Data.zip"
-county_fn = "fips1001.dta"
-employment_fn = "reis_combine.dta"
-example_fn = "CountyAnnualTemperature1950to2012.dta"
-pollution_fn = "poll7080.dta"
-example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
-
-
-
-#==============================================================================
+<!--=========================================================================
 KEYBOARD SHORTCUTS
 Fold current function: ctrl + shift + [
 Fold all: ctrl+k ctrl+0
-==============================================================================#
-
-
-#==============================================================================
-ADMIN FUNCTIONS
-==============================================================================#
-"""Extracts file_name from zip folder zip_name in directory root_dir."""
-function extract_file_from_zip(root_dir, zip_name, file_name)
-    zip_path = joinpath(root_dir, zip_name)
-    save_path = joinpath(root_dir, file_name)
-    # If the file is already extracted, done.
-    if isfile(save_path)
-        return
-    end
-
-    println("Extracting $file_name from $root_dir")
-    # Open zip file
-    zarchive = ZipFile.Reader(zip_path)
-    # Find file_name in zip archive
-    files = [f.name for f in zarchive.files]
-    idx = findfirst(x -> x == file_name, files)
-    # Save file_name to disk
-    write(save_path, read(zarchive.files[idx]))
-end
-
-
-"""Return dataframe, after unzipping and saving the file."""
-function df_from_zip(root_dir, zip_name, filename)
-    extract_file_from_zip(root_dir, zip_name, filename)
-    println("Loading $filename from file.")
-    return DataFrame(load(joinpath(root_dir, filename)))
-end
-
-
-"""Read file at save_path to dataframe, if not present, download from url."""
-function df_from_url(url, save_path)
-    if isfile(save_path)
-        println("Loading $save_path from file.")
-        return DataFrame(load(joinpath(root, example_fn)))
-    else
-        println("Downloading $save_path from url.")
-        download(url, joinpath(root, example_fn))
-        println("Loading $save_path from file.")
-        return DataFrame(load(joinpath(root, example_fn)))
-    end
-end
-
-
-"""Return a dataframe, with types Float64 and no missing for given columns."""
-function convert_float32(df, cols)
-    df1 = dropmissing(df, cols=cols; disallowmissing=true)
-    df1 = transform!(df1, cols .=> ByRow(Float64), renamecols=false)
-    return df1
-end
-
-
-
-#==============================================================================
-TEMPERATURE FUNCTIONS
-==============================================================================#
-"""Degree day calculation from Snyder 1985, using integral of sine."""
-function degree_day_calc(MAX, MIN, THR)
-    M = (MAX + MIN) / 2  # average temp
-    W = (MAX - MIN) / 2  # half temp range
-    θ = asin((THR - M) / W)  # radian between -π/2 and π/2 where sine crosses THR
-    DD = ((M - THR)*(π / 2 - θ) + W * cos(θ)) / π
-    return DD
-end
-
-
-"""Return degree days above threshold temperature for single day based on max and min temperatures."""
-function degree_day_single_day(Tmax, Tmin, Threshold)
-    if Threshold ≥ Tmax
-        return 0
-    elseif Threshold ≤ Tmin
-        return (Tmax + Tmin) / 2 - Threshold
-    else
-        return degree_day_calc(Tmax, Tmin, Threshold)
-    end
-
-end
-
-
-"""Return dataframe with degree day columns, degree days over each threshold in t."""
-function add_degree_days(df::DataFrame, t::Vector)
-    println("Adding degree days above thresholds in t.")
-    for k ∈ 1:length(t)
-        df[!, "dday$(t[k])C"] = degree_day_single_day.(df[!, :tMax], df[!, :tMin], t[k])
-    end
-    return df
-end
-
-
-"""Return temperature threshold after converting to -1,1 interval (for sine function)"""
-function convert_temp_threshold(Tmax, Tmin, Thresh)
-    proportion = (Thresh - Tmin) / (Tmax - Tmin)
-    return (2 * proportion - 1)
-end
-
-
-"""Return portion (0 to 1) of day's temperature above temperature Threshold,
-    given max and min temperature, 
-    based on sinusoidal curve to model diurnal temperature cycle.
-"""
-function fraction_above_threshold(Tmax, Tmin, Threshold)
-    α = convert_temp_threshold(Tmax, Tmin, Threshold)
-    if α ≥ 1
-        return 0
-    elseif α ≤ -1
-        return 1
-    else
-        return (π - 2 * asin(α)) / (2π)
-    end
-end
-
-
-"""Return portion (0 to 1) of day's temperature between temperature Thresholds,
-    given max and min temperature, 
-    based on sinusoidal curve to model diurnal temperature cycle.
-"""
-function fraction_between_thresholds(Tmax, Tmin, Threshold_lower, Threshold_upper)
-    # Fraction between = (fraction above lower) - (fraction above upper)
-    lower = fraction_above_threshold(Tmax, Tmin, Threshold_lower)
-    upper = fraction_above_threshold(Tmax, Tmin, Threshold_upper)
-    return lower - upper
-end
-
-
-"""Return dataframe with binned temperature variables columns (indicator for tAvg in bin)."""
-function add_bin_indicator_days(df::DataFrame, edges::Vector)
-    println("Adding inidicator for average daily temperature in each bin")
-    for k ∈ 1:length(edges)
-        if k == 1
-            # tAvg below lowest threshold
-            df[!, "tempB$(edges[k])"] = (df[!, :tAvg] .< edges[k])
-        else
-            #  tAvg between this threshold and previous threshold
-            df[!, "temp$(edges[k-1])to$(edges[k])"] = (edges[k-1] .≤ df[!, :tAvg] .< edges[k])
-
-            if k == length(edges)
-                # tAvg above threshold
-                df[!, "tempA$(edges[k])"] = (df[!, :tAvg] .≥ edges[k])
-            end
-        end
-    end
-    return df
-end
-
-
-"""Return dataframe with binned temperature variables columns (portion of day in bin)."""
-function add_bin_portion_days(df::DataFrame, bins::Vector)
-    println("Adding portion of days between bin edges in bins.")
-    for k ∈ 1:length(bins)
-        if k == 1
-            # Portion of day below lowest threshold
-            df[!, "tempPropB$(bins[k])"] = 1 .- fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
-        else
-            # Portion of day between this threshold and previous threshold
-            df[!, "tempProp$(bins[k-1])to$(bins[k])"] = fraction_between_thresholds.(df[!, :tMax], df[!, :tMin], bins[k-1], bins[k])
-
-            if k == length(bins)
-                # Portion of day above threshold
-                df[!, "tempPropA$(bins[k])"] = fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
-            end
-        end
-    end
-    return df
-end
-
-
-"""(⋅)₊ function from Harrell 2001"""
-m(a) = maximum([0, a])
-
-
-"""Return jth restricted cubic spline variable using the list of knots t.
-    From Frank Harrell's Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
-"""
-function cubic_spline_var_harrell(x, j, t)
-    k = length(t)
-    if (j < 1) | (j > k - 1)
-        println("Out of Bounds (j=$j): j is < 1 or > k-1. Not a valid variable.")
-    elseif j == 1
-        return x
-    else
-        xⱼ = m.(x .- t[j-1]) .^ 3 .-
-             m.(x .- t[k-1]) .^ 3 * (t[k] - t[j-1]) / (t[k] - t[k-1]) +
-             m.(x .- t[k]) .^ 3 * (t[k-1] - t[j-1]) / (t[k] - t[k-1])
-        # Divide by the scale factor from the stata formula (range of the knots)
-        return xⱼ / (t[k] - t[1])^2
-    end
-end
-
-
-"""Return ith restricted cubic spline variable using the list of knots k.
-    From stata's mkspline documentation
-"""
-function cubic_spline_var_stata(V, i, k)
-    n = length(k)
-    if (i < 1) | (i > n - 1)
-        println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
-    elseif i == 1
-        return V
-    else
-        Vᵢ = (m.(V .- k[i-1]) .^ 3 .- (k[n] - k[n-1])^(-1) *
-                                      (m.(V .- k[n-1]) .^ 3 * (k[n] - k[i-1]) .- (V .- k[n]) .^ 3 * (k[n-1] - k[i-1]))) ./
-             (k[n] - k[1])^2
-        return Vᵢ
-    end
-end
-
-
-"""Add restricted cubic spline basis variables to dataframe df.
-    Using continuous variable varname from dataframe and list of knots.
-
-    After trying both the stata and Harrell formulas, neither matched the example file given. After comparing the formulas, I recognized the only difference was a scaling factor of 
-        `julia 1/(knots[last] - knots[first])^2`
-    so I added that scaling factor to the Harrell formula and it produces results that match the example file. So I probably just messed up the stata formula somehow. I assume the example file was created in stata with mksplines.
-"""
-function add_cubic_spline_vars(df, varname, knots; newbasename="splineC")
-    for i in 1:(length(knots)-1)
-        newname = "$newbasename$i"
-        println("Making $newname")
-        df[!, newname] = cubic_spline_var_harrell(df[!, varname], i, knots)
-    end
-    return df
-end
-
-
-"""Return vector of element-wise minimum between a vector and constant."""
-min_vecs(vec, c) = minimum.(zip(vec, repeat([c], length(vec))))
-"""Return vector of element-wise maximum between a vector and constant."""
-max_vecs(vec, c) = maximum.(zip(vec, repeat([c], length(vec))))
-
-
-"""Return ith linear piecewise variable using the list of knots k.
-    From stata's mkspline documentation
-"""
-function piecewise_linear_var_stata(V, i, k)
-    n = length(k) + 1
-    if i == 1
-        return min_vecs(V, k[i])
-    elseif i > 1 && i < n
-        return max_vecs(min_vecs(V, k[i]), k[i-1]) .- k[i-1]
-    elseif i == n
-        return max_vecs(V, k[n-1]) .- k[n-1]
-    else
-        println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
-    end
-end
-
-
-"""Return dataframe with piecewise linear basis variable columns using given knots."""
-function add_piecewise_linear_vars(df, varname, knots; newbasename="piece")
-    println("Adding piecewise linear basis variable columns with breakpoints.")
-    n = length(knots)+1
-    for i in 1:n
-        e = i == 1 ? "B$(knots[i])" :
-            i == n ? "A$(knots[n-1])" :
-            #= o.w =# "$(knots[i-1])to$(knots[i])"
-        newname = "$newbasename$e"
-        println("Making $newname")
-        df[!, newname] = piecewise_linear_var_stata(df[!, varname], i, knots)
-    end
-    return df
-end
-
-
-"""Return grid-day data aggregated to county-year level"""
-function aggregate_df(df, tags)
-    # List of columns to average over
-    avg_list = [:tMin, :tMax, :tAvg, :prec]
-    # List of columns to sum over the year (all cols with a substring from tags)
-    sum_list = [n for n in names(df) if any(occursin.(tags, n))]
-    # sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]
-
-    # Sum over all days in each year, for each grid point
-    df[!, "date"] = Date(1960, 1, 1) + Day.(df.dateNum)
-    df[!, "year"] = Year.(df.date)
-    gd_gy = groupby(df, [:gridNumber, :year])
-    df_gy = combine(gd_gy,
-                    avg_list .=> mean .=> avg_list,
-                    sum_list .=> sum .=> sum_list)
-    # Take the average over all grid points in the county
-    gd_y = groupby(df_gy, :year)
-    df_y = combine(gd_y, valuecols(gd_y) .=> mean .=> valuecols(gd_y))
-
-    return df_y
-end
-
-
-"""Save temperature variables
-    
-    1.1.1 Construct 4 temperature response variables
-    1.1.2 Aggregate to year-county
-    - sum each new temperaature variable in each grid point over each year
-    - average tMin, tMax, tAvg, perc in each gridpoint over each year
-    - take a simple average over all grid points in the county to get county-year level
-"""
-function create_temperature_vars()
-    # Extract county fips file from zip if not present, and read
-    extract_file_from_zip(root, zip_fn, county_fn)
-
-    # Load data and create average daily temp
-    df_temp1 = DataFrame(load(joinpath(root, county_fn)))
-    df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
-
-    # Add degree days for each day-gridpoint
-    thresholds = [30, 32, 34]
-    df_temp1 = add_degree_days(df_temp1, thresholds)
-
-    # Add binned temperature variables
-    bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
-    df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
-    df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
-
-    # Add cubic spline basis variables for each day-gridpoint
-    knots = [0 8 16 24 32]
-    df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
-
-    # Add piecewise linear basis variables for each day-gridpoint
-    knots = [28, 32]
-    df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
-
-    # sum over year, then average over all grid points in county
-    column_tags = ["dday", "temp", "splineC", "piece"]
-    df_temp = aggregate_df(df_temp1, column_tags)
-
-    # Save the new file
-    CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
-end
-
-
-
-
-
-
-
-
-#==============================================================================
-ANALYSIS FUNCTIONS
-==============================================================================#
-function apply_vcov(reg::StatsModels.TableRegressionModel, SE::AbstractVector)
-    df = DataFrame(coeftable(reg))[!, ["Name", "Coef.", "Std. Error"]]
-    @assert length(SE) == nrow(df)
-    df[!, "Std. Error"] = SE
-    return df
-end
-
-"""Return OLS or WLS regression using dataframe df and formula.
-
-    Weights specified by wts can be string (column name in df) or vector of weights
-    of same length as df. If wts is unspecified, OLS is assumed.
-
-    # Arguments:
-    - `df::DataFrame`: dataframe of data
-    - `formula::FormulaTerm`: @formula with names of columns in df
-    - `weights::Union{String, Vector, Nothing}=nothing`: string columnname of df, or vector, used as weights in WLS
-    - `vcov::Union{String, Nothing}=nothing`: a string indicating which Heteroskedasticity-robust covariance matrix to report and use in standard errors.
-    - `cluster::Union{String, Nothing}=nothing`: string columnname of df to cluster on
-    Long & Ervin (2000) conduct a simulation study of HC estimators (HC0 to HC3) 
-    in the linear regression model, recommending to use HC3 which is thus the default
-
-    Currently only works if there are no missing values in df.
-"""
-function regression(df::DataFrame,
-                    formula::FormulaTerm; 
-                    weights::Union{String, Vector, Nothing}=nothing,
-                    varcov::String="HC3",
-                    cluster::Union{String, Nothing}=nothing,
-                    filestub::Union{String, Nothing}=nothing,
-                    append_time::Bool=true)
-    println("Beginning regression of $formula")
-    # If weights is a string, convert to column vector
-    if typeof(weights) <: String
-        try
-            weights = df[!, weights]
-        catch e
-            if isa(e, ArgumentError)
-                println("ERROR: weights argument ($weights) is not a column in dataframe.\n")
-            end
-            throw(e)
-        end
-    end
-
-    # If weights is given, run WLS
-    if typeof(weights) <: Vector  # run WLS
-        reg = glm(formula, df, Normal(), IdentityLink(), wts=weights)
-    # No weights, run OLS
-    else
-        reg = lm(formula, df)
-    end
-
-    # If not clustering, use Heteroskedastic-consistent
-    if cluster === nothing
-        hc = eval(Symbol(varcov))
-        V = vcov(reg, hc())
-        SE = stderror(reg, hc)
-
-    else  # clustering, use cluster-robust heteroskedasticity-consistent
-        V = vcov(CRHC1(cluster, df), reg)
-        SE = stderror(CRHC1(cluster, df),reg)
-    end
-
-    # Combine new SEs into dataframe with coefficients
-    new_reg = apply_vcov(reg, SE)
-
-
-    latexify(new_reg)
-    filestub = filestub === nothing ? "reg" : filestub
-    filename = append_time ? "$(filestub)_$(Dates.now()).tex" : "$filestub.tex"
-    write(filename, string(latexify(new_reg, env=:tabular)))
-
-    return Dict(:reg => new_reg,
-                :β => coef(reg),
-                :V => V,
-                :SE => SE)
-end
-
-
-function reg2(df::DataFrame,
-    formula::FormulaTerm; 
-    weights::Union{String, Vector, Nothing}=nothing,
-    varcov::String="HC3",
-    cluster::Union{String, Nothing}=nothing,
-    filestub::Union{String, Nothing}=nothing,
-    append_time::Bool=true)
-    #! can I implement Econometrics.jl fit? 
-    # issues:
-    #   - HC3 doesn't seem to work (OutOfMemory() error)
-    #   - latexify(model) does not work on the econometrics.jl model. Can I convert to statsmodel?
-end
-
-
-
-
-
-#==============================================================================
-SETUP
-    key:
-    fn = filename
-    dir = directory
-    df = dataframe
-==============================================================================#
-# Save single county (01001) to compare to built results
-f = joinpath(root, "CountyAnnualTemperature1950to2012.csv")
-if !isfile(f)
-    df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
-    CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
-end
-
-
-# Open linear piecewise stata results
-# df3 = DataFrame(load(joinpath(root, "bestLinearModel", "corn_year1950_2020_month3_8.dta")))
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-#==============================================================================
-1.1 TEMPERATURE AGGREGATION
-==============================================================================#
-#=================================================
-1.1.1 Construct 4 temperature response variables
-1.1.2 Aggregate to year-county
-=================================================#
-# Create a new file with temperature variables for example county (01001)
-# This will be compared to the file given by Reed (example_fn)
+==========================================================================-->
+
+
+
+
+
+
+
+<!-- Setup** -->
+```julia; echo=false; results="hidden"
+# Set local directory paths and filenames
+root = dirname(@__FILE__)
+zip_fn = "Walker-ProblemSet1-Data.zip"
+temp_fn = "CountyAnnualTemperature1950to2012.dta"
+pollution_fn = "poll7080.dta"
+example_url = "https://www.dropbox.com/s/fnl1u0ix4e493vv/CountyAnnualTemperature1950to2012.dta?dl=0"
+```
+
+```julia; echo=false; results="hidden"
+include("ps1-functions-admin.jl")
+```
+
+
+
+
+
+
+## 1.1 Temperature Aggregation
+### 1.1.1 Construct 4 temperature response variables
+See next section.
+
+### 1.1.2 Aggregate to year-county
+
+Construction and aggregation of temperature response variables are both 
+handled in the `create_temperature_vars()` function.
+```julia
 if !isfile(joinpath(root, "CountyAnnualTemperature_aaron.csv"))
     create_temperature_vars()
 end
-# This file will NOT be used for the rest of the problem set
-# This was just an exercise to create the variables.
+```
+This creates the new file of county-year temperature response variables to regress on (degree days, temperature bins, cubic splines, and piecewise linear). I have compared the values of these county-year variables with the CountyAnnualTemperature1950to2012.dta file for Autauga County and they match.
 
 
 
 
 
-#==============================================================================
-1.2 US Climate Impacts
-==============================================================================#
-#=================================================
-1.2.0 Merge Income and Employment onto climate data
-=================================================#
 
-# Extract and read employment file from zip
-df_employ = df_from_zip(root, zip_fn, employment_fn)
-df_employ[!, :fips] = parse.(Int32, df_employ[!, :fips])
+## 1.2 US Climate Impacts
+### 1.2.0 Merge Income and Employment onto climate data
 
-# Download and load example county file to compare variables
-df_temp = df_from_url(example_url, joinpath(root, example_fn))
-
-# drop first row because it's missing
-df_temp = last(df_temp, nrow(df_temp)-1)
-
-# Join onto climate data
-df = innerjoin(df_temp, df_employ, on=[:fips, :year])
-
-# Make year and fips categegorical for regressions
-df[!,:year] = categorical(df[!,:year])
-df[!,:fips] = categorical(df[!,:fips])
-
-# Create log(farm employees in county) and replace log(0) with missing
-df[!, :emp_farm_ln] = replace(log.(df[!, :emp_farm]), -Inf => missing)
-
-# Create log tranformed inc_farm_prop_income/population 
-logfn(x) = x===missing ? missing : (x ≤ 0 ? missing : log(x))
-df[!, :inc_farm_prop_inc_lpc] = logfn.(df[!,:inc_farm_prop_income] ./ df[!,:pop_population])
-# 40,385 missing
-
-# Convert the year into a Date
-df[!, :Date] = Date.(convert(Vector{Int}, df[!,:year]))
-
+First I load and merge the climate and economic data. Then I create several variables needed for parts of the analysis later.
+```julia; results="hidden"
+df = merge_prep_est_data()
+```
 
 #=================================================
 1.2.1 emp_farm vs binned temperature
@@ -626,6 +142,351 @@ p121 = @df df121 plot!(:tAvg, :yhat,
 savefig(p121, "plot121-bins.svg")
 
 #! % change in employees for the average county for each day above 32.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+## TEMPERATURE FUNCTIONS
+
+```julia; results="hidden"; wrap=true; line_width=85
+    """Save single county (01001) to compare to built results fo temperature variables"""
+    function save_autauga_county()
+        f = joinpath(root, "CountyAnnualTemperature1950to2012.csv")
+        if !isfile(f)
+            df_ex = subset(df_ex, :fips => ByRow(==(01001)), skipmissing=true)
+            CSV.write(joinpath(root, "CountyAnnualTemperature1950to2012.csv"), df_ex)
+        end
+    end
+
+
+    """Degree day calculation from Snyder 1985, using integral of sine."""
+    function degree_day_calc(MAX, MIN, THR)
+        M = (MAX + MIN) / 2  # average temp
+        W = (MAX - MIN) / 2  # half temp range
+        θ = asin((THR - M) / W)  # radian between -π/2 and π/2 where sine crosses THR
+        DD = ((M - THR)*(π / 2 - θ) + W * cos(θ)) / π
+        return DD
+    end
+
+
+    """Return degree days above threshold temperature for single day based on max and min temperatures."""
+    function degree_day_single_day(Tmax, Tmin, Threshold)
+        if Threshold ≥ Tmax
+            return 0
+        elseif Threshold ≤ Tmin
+            return (Tmax + Tmin) / 2 - Threshold
+        else
+            return degree_day_calc(Tmax, Tmin, Threshold)
+        end
+
+    end
+
+
+    """Return dataframe with degree day columns, degree days over each threshold in t."""
+    function add_degree_days(df::DataFrame, t::Vector)
+        println("Adding degree days above thresholds in t.")
+        for k ∈ 1:length(t)
+            df[!, "dday$(t[k])C"] = degree_day_single_day.(df[!, :tMax], df[!, :tMin], t[k])
+        end
+        return df
+    end
+
+
+    """Return temperature threshold after converting to -1,1 interval (for sine function)"""
+    function convert_temp_threshold(Tmax, Tmin, Thresh)
+        proportion = (Thresh - Tmin) / (Tmax - Tmin)
+        return (2 * proportion - 1)
+    end
+
+
+    """Return portion (0 to 1) of day's temperature above temperature Threshold,
+        given max and min temperature, 
+        based on sinusoidal curve to model diurnal temperature cycle.
+    """
+    function fraction_above_threshold(Tmax, Tmin, Threshold)
+        α = convert_temp_threshold(Tmax, Tmin, Threshold)
+        if α ≥ 1
+            return 0
+        elseif α ≤ -1
+            return 1
+        else
+            return (π - 2 * asin(α)) / (2π)
+        end
+    end
+
+
+    """Return portion (0 to 1) of day's temperature between temperature Thresholds,
+        given max and min temperature, 
+        based on sinusoidal curve to model diurnal temperature cycle.
+    """
+    function fraction_between_thresholds(Tmax, Tmin, Threshold_lower, Threshold_upper)
+        # Fraction between = (fraction above lower) - (fraction above upper)
+        lower = fraction_above_threshold(Tmax, Tmin, Threshold_lower)
+        upper = fraction_above_threshold(Tmax, Tmin, Threshold_upper)
+        return lower - upper
+    end
+
+
+    """Return dataframe with binned temperature variables columns (indicator for tAvg in bin)."""
+    function add_bin_indicator_days(df::DataFrame, edges::Vector)
+        println("Adding inidicator for average daily temperature in each bin")
+        for k ∈ 1:length(edges)
+            if k == 1
+                # tAvg below lowest threshold
+                df[!, "tempB$(edges[k])"] = (df[!, :tAvg] .< edges[k])
+            else
+                #  tAvg between this threshold and previous threshold
+                df[!, "temp$(edges[k-1])to$(edges[k])"] = (edges[k-1] .≤ df[!, :tAvg] .< edges[k])
+
+                if k == length(edges)
+                    # tAvg above threshold
+                    df[!, "tempA$(edges[k])"] = (df[!, :tAvg] .≥ edges[k])
+                end
+            end
+        end
+        return df
+    end
+
+
+    """Return dataframe with binned temperature variables columns (portion of day in bin)."""
+    function add_bin_portion_days(df::DataFrame, bins::Vector)
+        println("Adding portion of days between bin edges in bins.")
+        for k ∈ 1:length(bins)
+            if k == 1
+                # Portion of day below lowest threshold
+                df[!, "tempPropB$(bins[k])"] = 1 .- fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+            else
+                # Portion of day between this threshold and previous threshold
+                df[!, "tempProp$(bins[k-1])to$(bins[k])"] = fraction_between_thresholds.(df[!, :tMax], df[!, :tMin], bins[k-1], bins[k])
+
+                if k == length(bins)
+                    # Portion of day above threshold
+                    df[!, "tempPropA$(bins[k])"] = fraction_above_threshold.(df[!, :tMax], df[!, :tMin], bins[k])
+                end
+            end
+        end
+        return df
+    end
+
+
+    """(⋅)₊ function from Harrell 2001"""
+    m(a) = maximum([0, a])
+
+
+    """Return jth restricted cubic spline variable using the list of knots t.
+        From Frank Harrell's Stats Textbook: Regression Modeling Strategies, 2001, sect. 2.4.4
+    """
+    function cubic_spline_var_harrell(x, j, t)
+        k = length(t)
+        if (j < 1) | (j > k - 1)
+            println("Out of Bounds (j=$j): j is < 1 or > k-1. Not a valid variable.")
+        elseif j == 1
+            return x
+        else
+            xⱼ = m.(x .- t[j-1]) .^ 3 .-
+                m.(x .- t[k-1]) .^ 3 * (t[k] - t[j-1]) / (t[k] - t[k-1]) +
+                m.(x .- t[k]) .^ 3 * (t[k-1] - t[j-1]) / (t[k] - t[k-1])
+            # Divide by the scale factor from the stata formula (range of the knots)
+            return xⱼ / (t[k] - t[1])^2
+        end
+    end
+
+
+    """Return ith restricted cubic spline variable using the list of knots k.
+        From stata's mkspline documentation
+    """
+    function cubic_spline_var_stata(V, i, k)
+        n = length(k)
+        if (i < 1) | (i > n - 1)
+            println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
+        elseif i == 1
+            return V
+        else
+            Vᵢ = (m.(V .- k[i-1]) .^ 3 .-
+                (k[n]-k[n-1])^(-1) * (m.(V .- k[n-1]) .^ 3 * (k[n]-k[i-1]) .- (V .- k[n]) .^ 3 * (k[n-1]-k[i-1]))) ./
+                (k[n]-k[1])^2
+            return Vᵢ
+        end
+    end
+
+
+    """Add restricted cubic spline basis variables to dataframe df.
+        Using continuous variable varname from dataframe and list of knots.
+
+        After trying both the stata and Harrell formulas, neither matched the example file given. After comparing the formulas, I recognized the only difference was a scaling factor of 
+            `julia 1/(knots[last] - knots[first])^2`
+        so I added that scaling factor to the Harrell formula and it produces results that match the example file. So I probably just messed up the stata formula somehow. I assume the example file was created in stata with mksplines.
+    """
+    function add_cubic_spline_vars(df, varname, knots; newbasename="splineC")
+        for i in 1:(length(knots)-1)
+            newname = "$newbasename$i"
+            println("Making $newname")
+            df[!, newname] = cubic_spline_var_harrell(df[!, varname], i, knots)
+        end
+        return df
+    end
+
+
+    """Return vector of element-wise minimum between a vector and constant."""
+    min_vecs(vec, c) = minimum.(zip(vec, repeat([c], length(vec))))
+    """Return vector of element-wise maximum between a vector and constant."""
+    max_vecs(vec, c) = maximum.(zip(vec, repeat([c], length(vec))))
+
+
+    """Return ith linear piecewise variable using the list of knots k.
+        From stata's mkspline documentation
+    """
+    function piecewise_linear_var_stata(V, i, k)
+        n = length(k) + 1
+        if i == 1
+            return min_vecs(V, k[i])
+        elseif i > 1 && i < n
+            return max_vecs(min_vecs(V, k[i]), k[i-1]) .- k[i-1]
+        elseif i == n
+            return max_vecs(V, k[n-1]) .- k[n-1]
+        else
+            println("Out of Bounds (i=$i, n=$n): i < 1 or i > n-1. Not a valid variable.")
+        end
+    end
+
+
+    """Return dataframe with piecewise linear basis variable columns using given knots."""
+    function add_piecewise_linear_vars(df, varname, knots; newbasename="piece")
+        println("Adding piecewise linear basis variable columns with breakpoints.")
+        n = length(knots)+1
+        for i in 1:n
+            e = i == 1 ? "B$(knots[i])" :
+                i == n ? "A$(knots[n-1])" :
+                #= o.w =# "$(knots[i-1])to$(knots[i])"
+            newname = "$newbasename$e"
+            println("Making $newname")
+            df[!, newname] = piecewise_linear_var_stata(df[!, varname], i, knots)
+        end
+        return df
+    end
+
+
+    """Return grid-day data aggregated to county-year level"""
+    function aggregate_df(df, tags)
+        # List of columns to average over
+        avg_list = [:tMin, :tMax, :tAvg, :prec]
+        # List of columns to sum over the year (all cols with a substring from tags)
+        sum_list = [n for n in names(df) if any(occursin.(tags, n))]
+        # sum_list = [:splineC1, :splineC2, :splineC3, :splineC4]
+
+        # Sum over all days in each year, for each grid point
+        df[!, "date"] = Date(1960, 1, 1) + Day.(df.dateNum)
+        df[!, "year"] = Year.(df.date)
+        gd_gy = groupby(df, [:gridNumber, :year])
+        df_gy = combine(gd_gy,
+                        avg_list .=> mean .=> avg_list,
+                        sum_list .=> sum .=> sum_list)
+        # Take the average over all grid points in the county
+        gd_y = groupby(df_gy, :year)
+        df_y = combine(gd_y, valuecols(gd_y) .=> mean .=> valuecols(gd_y))
+
+        return df_y
+    end
+
+
+    """Save temperature variables
+        
+        1.1.1 Construct 4 temperature response variables
+        1.1.2 Aggregate to year-county
+        - sum each new temperaature variable in each grid point over each year
+        - average tMin, tMax, tAvg, perc in each gridpoint over each year
+        - take a simple average over all grid points in the county to get county-year level
+    """
+    function create_temperature_vars()
+        # Extract county fips file from zip if not present, and read
+        county_fn = "fips1001.dta"
+        extract_file_from_zip(root, zip_fn, county_fn)
+
+        # Load data and create average daily temp
+        df_temp1 = DataFrame(load(joinpath(root, county_fn)))
+        df_temp1[!, :tAvg] = (df_temp1[!, :tMax] .+ df_temp1[!, :tMin]) ./ 2
+
+        # Add degree days for each day-gridpoint
+        thresholds = [30, 32, 34]
+        df_temp1 = add_degree_days(df_temp1, thresholds)
+
+        # Add binned temperature variables
+        bin_edges = [0, 4, 8, 12, 16, 20, 24, 28, 32]
+        df_temp1 = add_bin_indicator_days(df_temp1, bin_edges)
+        df_temp1 = add_bin_portion_days(df_temp1, bin_edges)
+
+        # Add cubic spline basis variables for each day-gridpoint
+        knots = [0 8 16 24 32]
+        df_temp1 = add_cubic_spline_vars(df_temp1, :tAvg, knots)
+
+        # Add piecewise linear basis variables for each day-gridpoint
+        knots = [28, 32]
+        df_temp1 = add_piecewise_linear_vars(df_temp1, :tAvg, knots)
+
+        # sum over year, then average over all grid points in county
+        column_tags = ["dday", "temp", "splineC", "piece"]
+        df_temp = aggregate_df(df_temp1, column_tags)
+
+        # Save the new file
+        CSV.write(joinpath(root, "CountyAnnualTemperature_aaron.csv"), df_temp)
+    end
+```
+
+
+
+
+## ANALYSIS FUNCTIONS
+
+```julia
+
+```
+
+
+
+## ADMIN FUNCTIONS
+
+
+
+```julia; echo=true
+include("ps1-functions-admin.jl")
+```
+
+
+```latex
+\input{scripts/ps1-functions-admin.jl}
+```
+
+```julia 
+```
+
+
+```julia test
+x=2
+```
+
+
+
+
+
+
+
 
 
 
@@ -1245,7 +1106,6 @@ cols223b = [:tsp7576, :ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :
 formula223b = (term(:dgtsp) ~ sum(term.(Symbol.(cols223b))))
 reg223b = @time reg(pollution, formula223b, Vcov.robust(); weights=:pop7080)
 regtable(reg223a, reg223b, renderSettings = latexOutput("reg223-firststage.tex"))
-regtable(reg223a, reg223b, renderSettings = asciiOutput())
 
 # Don't need to include econ shocks because I showed in previous question it was exogenous to the shocks
 
@@ -1375,21 +1235,6 @@ housing price change from 1970 to 1980 being 0.7 percentage points larger (more 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 #=================================================
 2.2.5 Regression Discontinuity, Diff-in-Diffs?
 
@@ -1412,106 +1257,6 @@ them to the results in (4).
 =================================================#
 
 
-#=
-
-I can imagine using either regression discontinuity (RD) or differences-in-differences (DiD) around the 1974 TSP threshold to analyze the capitalization of pollution changes. Because RD takes a relatively small group of observations around the threshold, it depends on having enough data to estimate the effects. Because the regulation is not only dependend on the 1974 threshold for the mean TSPs (it also depends on the 2nd highest daily concentration), this would be a fuzzy RD. DiD on the other hand could use the entire dataset above and below the threshold and would almost surely have more smaller standard errors on the treatment effect estimates of the regulation.
-
-
-
-Assumptions of the RD:
-
-No manipulation: there shouldn't be signs of units manipulating their values very close to the cutoff to avoid being regulated.
-
-Units (counties) just above and just below the threshold should be very similar along other observed and unobserved characteristics that are important in determining the outcomes.
-=#
-
-
-
-function nomissing(df, cols)
-    df2 = dropmissing(df, cols)
-    return (df2[!, c] for c in cols)
-end
-±(x, y) = x+y, x-y
-
-myloess(x::Vector{Float32}, y::Vector{Float32}; bandwidth) = loess(Float64.(x), Float64.(y); span=bandwidth, degree=degrees)
-myloess(x::Vector{Float32}, y::Vector{Float64}; bandwidth) = loess(Float64.(x), y; span=bandwidth, degree=degrees)
-myloess(x::Vector{Float64}, y::Vector{Float32}; bandwidth) = loess(x, Float64.(y); span=bandwidth, degree=degrees)
-myloess(x::Vector{Float64}, y::Vector{Float64}; bandwidth) = loess(x, y; span=bandwidth, degree=degrees)
-
-
-function evenly_spaced(a, b, n)
-    h = (b-a)/(n-1)
-    Float64.(collect(a:h:b))
-end
-
-function get_loess_prediction(df, xcol, ycol; bandwidth, npoints=200)
-    x = df[!, xcol]; y = df[!, ycol];
-    model = myloess(x, y; bandwidth=bandwidth)
-    xs = evenly_spaced(extrema(x)..., npoints)
-    ys = predict(model, xs)
-    return xs, ys
-end
-
-function left_right_plot(df_in, xcol, ycol; bandwidth, plotwidth, threshold=75, npoints=200)
-	# Plot all observations as circles
-	df = dropmissing(df_in, [xcol, ycol])
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df[!, xcol], df[!, ycol], 
-		seriestype=:scatter, 
-		markeralpha=0.3,
-		label="observations",
-		xlabel="1974 TSPs levels",
-		ylabel="$(ylabels[ycol]) changes",
-		title="LOESS regressions: $(ylabels[ycol]) Changes",
-		xlims = (75-plotwidth, 75+plotwidth), #75±width
-		ylims = extrema(df[!, ycol]),
-		legend=:bottomleft
-	)
-	thickness = 3
-	vline!([threshold], label="$xcol threshold", w=thickness)
-	# Plot Loess below threshold
-	df1 = subset(df, xcol => ByRow(<(threshold)))
-	xs1, ys1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
-	plot!(xs1, ys1, label="loess regression (below)", w=thickness)
-	# Plot Loess above threshold
-	df2 = subset(df, xcol => ByRow(≥(threshold)))
-	xs2, ys2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
-	plot!(xs2, ys2, label="loess regression (above)", w=thickness)
-end
-
-bandwidth, plotwidth = 0.055, 1.6
-npoints, degrees = 2000, 3
-
-
-
-left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=0.055, plotwidth=1.6, npoints=npoints)
-
-#=
-But when we zoom out, the nonparametric estimation further away from the threshold is even more noisey. So how do we know the difference in the estimates near the threshold aren't just due to sampling variation? One way to examine the variance due to sampling this is to use permutation inference: hold the bandwidth constant, and resample the data many times, plotting the mean of the LOESS estimate and the 2.5``^{th}`` and 97.5``^{th}`` percentiles of the prediction at each point.
-=#
-
-left_right_plot(pollution, :mtspgm74, :dgtsp; bandwidth=0.055, plotwidth=15, npoints=npoints)
-
-#=
-When we look below at changes in house prices based on the 1974 TSP levels, and using a wider bandwidth, it appears that the house price changes were smaller just below the threshold.
-=#
-
-left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=0.325, plotwidth=3, npoints=npoints)
-
-# Same bandwidth, just zoomed out to see more of the data.
-left_right_plot(pollution, :mtspgm74, :dlhouse; bandwidth=0.325, plotwidth=15, npoints=npoints)
-
-#=
-In part (4), we saw that less improvement in pollution levels, as instrumented by being below this threshold, results in smaller increases in housing prices. If we were to take the plot above at face value, we can see that counties just below the threshold experienced a smaller increase in housing prices compared to counties just above the threshold. From the first two plots above of the pollution changes, we saw that counties just below the threshold (presumably less regulated) saw less of a pollution improvement (the decrease in pollution was smaller in magnitude, on average, just below the threshold).
-
-So, here we see that less improvement in pollution levels (just below the threshold) is correlated with a smaller increase in housing prices (though this result is highly dependent on the choice of bandwidth).
-=#
-
-
-
-
-
-
 
 
 
@@ -1526,7 +1271,7 @@ So, here we see that less improvement in pollution levels (just below the thresh
 
 
 #=================================================
-2.2.6 The Smoothness Criteria of RD
+2.2.6 
 
 Now use linear regression to estimate the
 predicted change in housing prices based on the
@@ -1542,84 +1287,6 @@ smoothness condition required by the regression
 discontinuity design and interpret your findings.
 =================================================#
 
-#=
-The second assumption about RD from part (5) describes covariate balance between observations just above and just below the cutoff.
-This is roughly equivalent to a smoothness condition across the cutoff: the predicted change in housing prices due to all other variables
-should be smooth across the cutoff, so that we can attribute any observed discontinuity in the change in housing prices
-across the cutoff to the treatment (regulation).
-=#
-
-function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, threshold=75, npoints=200)
-	thickness = 3
-    alpha = 0.4
-	c3 = 3
-	# Plot all observations as circles
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df[!, xcol], df[!, ycol1], seriestype=:scatter, markeralpha=alpha, label="observations", c=1)
-	plot!(df[!, xcol], df[!, ycol2], seriestype=:scatter, label="controls' prediction", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
-	# Plot Loess below threshold
-	df1 = subset(df, xcol => ByRow(<(threshold)))
-	x1, y1 = get_loess_prediction(df1, xcol, ycol1; bandwidth=bandwidth,  npoints=npoints)
-	x2, y2 = get_loess_prediction(df1, xcol, ycol2; bandwidth=bandwidth,  npoints=npoints)
-	plot!(x1, y1,
-        label="obseservations conditioned on TSP", 
-        xlabel="1974 TSPs levels",
-		ylabel="$(ylabels[ycol1]) changes",
-		title="LOESS regressions: $(ylabels[ycol1]) Changes",
-		xlims = (75-plotwidth, 75+plotwidth), #75±width
-		ylims = extrema([df[!, ycol1]; df[!, ycol2]]),
-		legend=:topleft,
-        w=thickness, c=1)
-    plot!(x2, y2, label="predictions conditioned on TSP", w=thickness, c=c3)
-	# Plot Loess above threshold
-	df2 = subset(df, xcol => ByRow(≥(threshold)))
-	x3, y3 = get_loess_prediction(df2, xcol, ycol1; bandwidth=bandwidth, npoints=npoints)
-	x4, y4 = get_loess_prediction(df2, xcol, ycol2; bandwidth=bandwidth, npoints=npoints)
-	plot!(x3, y3, label="", w=thickness, c=1)
-	plot!(x4, y4, label="", w=thickness, c=c3)
-    # Vertical line at the threshold
-	vline!([threshold], label="$xcol threshold", w=thickness, c=2)
-end
-
-
-
-#! Predict dlhouse using all controls (and not pollution changes)
-pollution2 = dropmissing(pollution, [cols226; [:dlhouse, :mtspgm74, :dgtsp]])
-cols226 = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop]
-formula226 = (term(:dlhouse) ~ sum(term.(Symbol.(cols226))))
-reg226 = @time reg(pollution2, formula226, Vcov.robust(); weights=:pop7080)
-pollution2[!, :dlhouse_hat] = convert(Vector{Float64}, StatsModels.predict(reg226, pollution2))
-
-
-#! Estimate kernal relationship between dlhouse_hat and 1974 TSPs
-#! Plot it!
-controls_smoothed_plot(pollution2, :mtspgm74, :dlhouse, :dlhouse_hat; bandwidth=0.055, plotwidth=1.6, npoints=npoints)
-
-#! Explain how this provides an indirect test of the smoothness 
-#! condition required by the regression discontinuity design
-#=
-Ideally, to visually test the smoothness condition of the RD design, we would
-want to see a noticable discontinuity at the threshold for the kernel regression
-of observed changes in housing price on TSP levels, while also seeing a smooth
-transition across the threshold for kernel regression of predicted
-changes in housing price on TSP levels. Since the predicted house price changes
-are based on control only (and not pollution changes), if those changes
-show a smooth relationship across the TSP threshold, that is evidence
-of good covariate balance across the threshold (ie, it's less likely that
-there is a large difference in the covariates across the threshold that could
-also create a discontinuity in house price changes). 
-
-In the plots above, we see some evidence of this, but it is not conclusive. With
-this bandwidth, the blue kernel regression (observed data) shows what could be a noticable
-discontinuity across the threshold. Due to the lack of more data very close
-to the threshold, it is hard to tell what could happen in the middle. But
-the green kernel regression (predicted data) looks a little more like it could 
-meet at the threshold. However, even the green lines show some difference on
-either side of the threshold. But this might provide some indirect evidence that
-there is some discontinuity happening at the threshold that is not accounted for
-by the control variables.
-=#
-#! interpret your findings.
 
 
 
@@ -1635,14 +1302,14 @@ by the control variables.
 
 
 #=================================================
-2.2.7 Regulated vs Unregulated
+2.2.7 
 
 A number of counties with annual geometric mean
 TSPs below 75 units in 1974 were regulated due to
 having as few as 2 bad days. This implies that we
 can compare regulated and unregulated counties
 with identical average TSPs levels in the
-regulation selection year (below 75 units). For
+regulation selection year (be- low 75 units). For
 those counties with 1974 mean TSPs between 50 and
 75 units, estimate the bivariate relation between
 TSPs changes and 1974 TSPs levels separately for
@@ -1655,74 +1322,15 @@ bandwidths than those in part (5) (e.g.,
 bandwidths between 6-9).
 =================================================#
 
-function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
-	thickness = 3
-    alpha = 0.2
-    c3=3
-	# Plot all observations as circles
-    df1 = @subset(df, :tsp7576 .== 0)
-	df2 = @subset(df, :tsp7576 .== 1)
-	ylabels = Dict(:dlhouse => "House Price", :dgtsp => "Pollution")
-	plot(df1[!, xcol], df1[!, ycol], 
-        xlabel="1974 TSPs levels",
-        ylabel="$(ylabels[ycol]) changes",
-        title="LOESS regressions: $(ylabels[ycol]) Changes",
-        xlims = (50, 75),
-        ylims = extrema(df[!, ycol]),
-        seriestype=:scatter,
-        markeralpha=alpha, 
-        label="Unregulated observations",
-        c=1)
-	plot!(df2[!, xcol], df2[!, ycol], seriestype=:scatter, 
-        label="Regulated observations", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
-	# Plot unregulated
-	x1, y1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
-	plot!(x1, y1,
-        label="Unregulated Kernel Regression", 
-		legend=:bottomleft,
-        w=thickness, c=1)
-	# Plot regulated
-	x2, y2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
-	plot!(x2, y2, label="Regulated Kernel Regression", w=thickness, c=c3)
-end
 
 
 
 
 
-#! Subset to between 50 and 75 units
-pollution3 = @subset(pollution2, 50 .< :mtspgm74 .< 75)
-
-#! Create kernel plot for regulated and unregulated for pollution changes and TSP level
-bwdgtsp=1.0
-un_regulated_plot(pollution3, :mtspgm74, :dgtsp; bandwidth=bwdgtsp)
 
 
 
 
-#! Create kernel plot for regulated and unregulated for houseprice changes and TSP level
-bwdlhouse2 = 1.0
-un_regulated_plot(pollution3, :mtspgm74, :dlhouse; bandwidth=bwdlhouse2)
-
-
-
-
-#! Interpret your findings.
-#=
-With a fairly large bandwidth (compared to earlier plots):
-For changes in pollution, we can see that as we get closer to the 75-unit
-threshold, the regulated counties show pollution improvements 
-(larger negative pollution changes), while the unregulated counties
-seem to have fairly uniform average pollution improvements.
-
-For changes in house prices, we also see that house prices for 
-regulated counties that are higher in average TSPs in 1974
-(closer to the 75-unit threshold) saw larger house price increases
-than unregulated counties around the same 1974 TSP levels. This provides
-more evidence that regulation, conditional on average TSPs, seems
-to have increased house prices (thus, less pollution is valuable
-to house buyers).
-=#
 
 
 
