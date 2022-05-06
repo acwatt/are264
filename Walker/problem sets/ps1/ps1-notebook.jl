@@ -119,8 +119,18 @@ md"To compare, I again plot the basic temperature bins' effects, but for both Fa
 # ╔═╡ 68e3f5e2-382a-431e-a19e-3547e70c3a94
 
 
-# ╔═╡ b460634b-72c1-4f56-ad00-2a550f1c660f
+# ╔═╡ 1e2c1858-8036-43f5-8f32-19a5c80f97b0
+md"### 1.2.4 Within-bin Treatment heterogeneity"
 
+# ╔═╡ 228dcadd-00dc-4777-92d5-698a95a2136f
+md"
+> In the presence of heterogeneous treatment effects, the OLS coefficient estimate is a weighted average of the heterogeneous treatment effects, where the weights depend on the relative size of the groups and the conditional variance within each group. Derive the OLS regression weights for the 32C+ regressor using methods outlined in Angrist and Krueger (1999), Section 2.3. Replicate figure 3b in Angrist and Krueger, replacing schooling with the support of the 32C+ regressor. Where is most of the weight coming from within the 32C+ regressor? How does this affect our understanding of the the temperature-outcome dose-response relationship?
+"
+
+# ╔═╡ b460634b-72c1-4f56-ad00-2a550f1c660f
+md"
+I haven't produced the weighting function plot yet, but based on the histogram above, we can see that the majority of the county-year observations have 0's in the 32+ bin. (Note that the y-axis is log scaled and the 0-1 bin has nearly 100 times as many observations than even the second most populated bin.) In fact, **the median of the 32+ bin is 0 days**. Angrist and Krueger (1999) discuss that the weighting function will tend to be larest near the median treatment values. This means that the treatment estimate for the 32+ bin will be heavily weighted based on the treatment effect felt by county-years who had zero treatment of 32+ temperatures. I think this means that the the average treatment effect we estimate within the 32+ bin will be underestimating (in magnitude) the true effects of all feasible temperatures above 32°C because we will be mostly estimating the effects with observations that have zero or very few days in the 32+ bin. 
+"
 
 # ╔═╡ 288e1ee5-809f-4108-80d1-15b5c8e67452
 
@@ -262,7 +272,7 @@ md"""
 """
 
 # ╔═╡ 95412c61-3a1b-40bf-9b7c-ddd54ce17ba7
-md"*First-stage* (relevance) relationship between regulation and air pollution changes; and **Reduced form* relationship between regulation and housing price changes. (SE in parentheses)"
+md"*First-stage* (relevance) relationship between regulation (`tsp7576`) and air pollution changes (`dgtsp`); and *Reduced form* relationship between regulation (`tsp7576`) and housing price changes (`dlhouse`). (SE in parentheses)"
 
 # ╔═╡ 0cc1daaa-9358-4074-a576-3f4263c18e95
 md"**How does two-stage least squares use these two equations?**
@@ -301,7 +311,7 @@ $\text{\% increase from 1970 to 1980} = 100\cdot(e^{dlhouse}-1)$
 "
 
 # ╔═╡ 6c00497f-91bf-4122-a366-e2bb119bbcdc
-md"*2SLS Regression using an indicator for regulation as an IV for pollution changes* (SE in parentheses)"
+md"*2SLS Regression of changes in housing prices on changes in pollution, using an indicator for regulation as an IV for pollution changes* (SE in parentheses)"
 
 # ╔═╡ 76650858-6af6-4060-9487-4d6424dc7cb7
 md"*Testing the 2SLS regression coefficients (regressions `223e` and `223f`) for equality with the ratio of coefficients from the reduced-form and first-stage regressions:*"
@@ -331,7 +341,7 @@ md"
 md"*First stage and reduced form regressions* (SE in parentheses)"
 
 # ╔═╡ b989539a-09f4-4ecc-8f24-d3efb5962035
-md"*2SLS Regression using an indicator for above 75 pollution units as an IV for pollution changes* (SE in parentheses)"
+md"*2SLS Regression of changes in housing prices on changes in pollution, using an indicator for above 75 pollution units as an IV for pollution changes* (SE in parentheses)"
 
 # ╔═╡ ae43ae55-ad11-43a9-9f25-9123ee28a885
 
@@ -507,9 +517,18 @@ md"
 "
 
 # ╔═╡ 57754134-0b34-41b5-9366-fe7e469ee1af
-md"
+md"""
+Angrist, Imbens, and Rubin (1996) explain that there are five necessary assumptions to estimate causal treatment effects using 2SLS:
+1. SUTVA: The Stable Unit Treatment Value Assumption implies that potential outcomes for each person `i` are unrelated to the treatment status of other individuals,
+2. Conditionally Random Assignment: Assignment of values of the instrument are as good as random after conditioning on exogenous covariates.
+3. The Exclusion Restriction: any effect of the instrument on the outcome of interest must be via an effect of the instrument on the endogenous variable.
+4. Relevance: the instrument must have a nonzero average causal effect on the endogenous variable.
+5. Monotonicity: there are no defiers (no one does the opposite of their treatment assignment, like pollute more when they are assigned to non-attainment status).
 
-"
+If we add to this the assumption of constant treatment effects (that every county would have the same increase in avereage house price due to being regulated by non-attainment status), then 2SLS would estimate the ATE. Without the constant treatment effects assumption, we would be estimating LATE (the local average treatment effect, or the treatment effect for the compliers). In this case, we would be estimating the effect of regulating pollution on counties who would have reduced their pollution under regulation, but not reduced pollution as much if they were not regulated (the compliers).
+
+Further, if weaken the exclusion restriction assumption, Angrist, Imbens, and Rubin tells us that 2SLS is estimating the LATE plus a bias term equal to "the average direct effect of Z on Y for noncompliers multiplied by the odds of being a noncomplier."
+"""
 
 # ╔═╡ 872ffa35-9f86-461c-bf77-29f4a8ad5e26
 
@@ -527,7 +546,21 @@ md"
 
 # ╔═╡ 5f31d109-b75e-4cc5-9cae-a06493009221
 md"
+**Estimated Impacts of a one-unit increase in pollution changes between 1970 and 1980**
 
+|                      | Without Controls | With Controls   |
+|----------------------|------------------|-----------------|
+| Naive Regression     | 0.003*** (0.001) | 0.001 (0.000)   |
+| Attainment status IV | -0.006 (0.005)   | -0.007* (0.004) |
+| 1974 TSP as IV       | -0.005 (0.005)   | -0.006* (0.003) |
+
+The naive regression estimated that more pollution in 1980 resulted on average in higher house prices (or at least unchanged when adding controls). But after applying the IV's, the estimated effect of higher pollution changes sign so that an increase in pollution would result in lower house prices (or, smaller reductions in pollution result in larger increases in house prices). Both IV's resulted in fairly similar estimates -- that increasing (making more positive) the change in pollution between 1970 and 1980 by one unit resulted in a smaller increase in house prices by about 0.6 percentage points on average.
+
+The IV however is estimating the local average treatment effect for the regulation compliers -- so this is the estimated average effect for counties that would reduce their pollution more when classified as nonattainment (regulated) than if they were classified as attainment (unregulated).
+
+Further, inspecting the visual representation of the regression discontinuity design, we see from part 2.2.6 that the vertical difference near the 75-unit regulation threshold is about 1.7 percentage points after subtracting the difference predicted by the other control covariates. This assumes zero slope however, so is an overestimate. It would be interpreted as: having a mean TSP in 1974 just above the regulatory cutoff (resulting in non-attainment status) resulted in a 1.7-percentage-point higher changes in housing values compared to counties just below the 1974 regulatory cutoff. In a fuzzy regression discontinuity, however, we would account for different slopes on either side of the threshold, likely resulting in a smaller estimate (closer to zero). However, this does seem to corroborate the sign of the IV results above.
+
+Lastly, we can see from section 2.2.7 in our direct comparison of regulated and unregulated counties, that regulated counties with 1974 mean TSPs between 50 and 75 units saw larger house price increases -- on average, 3 percentage points larger house price increases. This is based on the mean across the 50-75 unit domain. However, the difference seems even larger if looking to the upper end of the domain, but the gap shrinks rapidly to 2 percentage points difference. This also seems to corroborate our earlier evidence that regulating pollution in the 70's seems to have increased housing values in counties that were regulated and reduced their pollution.
 "
 
 # ╔═╡ 96ba58aa-8028-4db7-bd76-ef3fc7f24637
@@ -970,6 +1003,24 @@ function plot123b(y, df)
 	temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
     plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
     @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
+	    fillrange=:y_ub, fillalpha=0.35,
+	    label="95% CI")
+    xlabel!("Average Temperature Bins")
+    ylabel!(ylabels[y])
+    title!("Binned Temperature Response: $(labels[y])         ")
+    @df temp plot!(:tAvg, :yhat, 
+        label="Predicted Response", 
+        legend=:bottomright, c=2, shape=:circle, markerstrokewidth=0)
+end
+
+# ╔═╡ 73b91f29-3c4c-4f27-a188-e0da9ff3344c
+"""Plot histogram of >32°C bin."""
+function plot124(y, df)
+	labels = Dict(:emp_farm_ln => "Farm Employment", :inc_farm_prop_inc_lpc => "Farm Income")
+	ylabels = Dict(:emp_farm_ln => "log(Farm Employment)", :inc_farm_prop_inc_lpc => "log(Farm Income per capita)")
+	temp = reg123(df, y; regex=r"^temp(?!20to24)[^P].*[^vg]$")
+    plot(temp[!,:tAvg], repeat([0], nrow(temp)), c="gray", s=:dash, label="")
+    @df temp plot!(:tAvg, :y_lb, w=0, msw = 0, ms = 0, c=1,
     fillrange=:y_ub, fillalpha=0.35,
     label="95% CI")
     xlabel!("Average Temperature Bins")
@@ -1010,6 +1061,14 @@ function left_right_plot(df_in, xcol, ycol; bandwidth, plotwidth, threshold=75, 
 	df2 = subset(df, xcol => ByRow(≥(threshold)))
 	xs2, ys2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
 	plot!(xs2, ys2, label="loess regression (above)", w=thickness)
+	# Plot dashed lines and text of height difference
+	plot!([first(xs1), 75], [last(ys1), last(ys1)], lw=2, lc=:gray, legend=false, style=:dash)
+	p = plot!([75, last(xs2)], [first(ys2), first(ys2)], lw=2, lc=:gray, legend=false, style=:dash)
+	xpos = (xlims(p)[2] - xlims(p)[1])*0.95 + xlims(p)[1]
+	ypos = (ylims(p)[2] - ylims(p)[1])*0.1 + ylims(p)[1]
+	annotate!(xpos, ypos, 
+		("vertical difference = $(round(first(ys2) - last(ys1), digits=4))", 
+		:right, 10))
 end
 
 # ╔═╡ ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
@@ -1027,7 +1086,7 @@ function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, th
 	x1, y1 = get_loess_prediction(df1, xcol, ycol1; bandwidth=bandwidth,  npoints=npoints)
 	x2, y2 = get_loess_prediction(df1, xcol, ycol2; bandwidth=bandwidth,  npoints=npoints)
 	plot!(x1, y1,
-        label="obseservations conditioned on TSP", 
+        label="raw obseservations kernel", 
         xlabel="1974 TSPs levels",
 		ylabel="$(ylabels[ycol1]) changes",
 		title="LOESS regressions: $(ylabels[ycol1]) Changes",
@@ -1035,7 +1094,7 @@ function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, th
 		ylims = extrema([df[!, ycol1]; df[!, ycol2]]),
 		legend=:topleft,
         w=thickness, c=1)
-    plot!(x2, y2, label="predictions conditioned on TSP", w=thickness, c=c3)
+    plot!(x2, y2, label="controls' predictions kernel", w=thickness, c=c3)
 	# Plot Loess above threshold
 	df2 = subset(df, xcol => ByRow(≥(threshold)))
 	x3, y3 = get_loess_prediction(df2, xcol, ycol1; bandwidth=bandwidth, npoints=npoints)
@@ -1043,14 +1102,37 @@ function controls_smoothed_plot(df, xcol, ycol1, ycol2; bandwidth, plotwidth, th
 	plot!(x3, y3, label="", w=thickness, c=1)
 	plot!(x4, y4, label="", w=thickness, c=c3)
     # Vertical line at the threshold
-	vline!([threshold], label="$xcol threshold", w=thickness, c=2)
+	p = vline!([threshold], label="$xcol threshold", w=thickness, c=2)
+	# Plot dashed lines and text of height difference
+	# 1,2 = left raw, predicted    3,4 = right raw, predicted
+	# plot!([first(xs1), 75], [last(ys1), last(ys1)], lw=2, lc=:gray, legend=false, style=:dash)
+	# p = plot!([75, last(xs2)], [first(ys2), first(ys2)], lw=2, lc=:gray, legend=false, style=:dash)
+	xpos = (xlims(p)[2] - xlims(p)[1])*0.95 + xlims(p)[1]
+	ypos1 = (ylims(p)[2] - ylims(p)[1])*0.2 + ylims(p)[1]
+	ypos2 = (ylims(p)[2] - ylims(p)[1])*0.14 + ylims(p)[1]
+	ypos3 = (ylims(p)[2] - ylims(p)[1])*0.08 + ylims(p)[1]
+	annotate!(xpos, ypos1, 
+		("vertical difference of observation kernel = $(round(first(y3) - last(y1), digits=3))", 
+		:right, 10))
+	annotate!(xpos, ypos2, 
+		("vertical difference of control-prediction kernel= $(round(first(y4) - last(y2), digits=3))", 
+		:right, 10))
+	annotate!(xpos, ypos3, 
+		("difference = $(round((first(y3) - last(y1)) - (first(y4) - last(y2)), digits=3))", 
+		:right, 10))
+end
+
+# ╔═╡ 269de191-4075-4bcd-be13-d47b1803c180
+function percentile_range(vec, percentile)
+	min, max = extrema(vec)
+	return min + percentile*(max-min)
 end
 
 # ╔═╡ 3a721fea-a72f-4645-b45a-48f5d03d469f
 """2.2.7: Plot Regulated vs Unregulated kernel regressions for 50-75 1974 TSP."""
 function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
 	thickness = 3
-    alpha = 0.2
+    alpha = 0
     c3=3
 	# Plot all observations as circles
     df1 = @subset(df, :tsp7576 .== 0)
@@ -1064,10 +1146,10 @@ function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
         ylims = extrema(df[!, ycol]),
         seriestype=:scatter,
         markeralpha=alpha, 
-        label="Unregulated observations",
+        label="",
         c=1)
-	plot!(df2[!, xcol], df2[!, ycol], seriestype=:scatter, 
-        label="Regulated observations", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
+	plot!(df2[!, xcol], df2[!, ycol], seriestype=:scatter, alpha=0,
+        label="", c=c3, shape=:+, markerstrokewidth=5, markersize=5)
 	# Plot unregulated
 	x1, y1 = get_loess_prediction(df1, xcol, ycol; bandwidth=bandwidth,  npoints=npoints)
 	plot!(x1, y1,
@@ -1077,7 +1159,27 @@ function un_regulated_plot(df, xcol, ycol; bandwidth, npoints=2000)
 	# Plot regulated
 	x2, y2 = get_loess_prediction(df2, xcol, ycol; bandwidth=bandwidth, npoints=npoints)
 	plot!(x2, y2, label="Regulated Kernel Regression", w=thickness, c=c3)
-end
+	ymax = maximum([y1; y2]) + (maximum([y1; y2]) - minimum([y1; y2]))*0.2
+	ymin = minimum([y1; y2]) - (maximum([y1; y2]) - minimum([y1; y2]))*0.6
+	p = ylims!(ymin, ymax)
+	# Plot averages
+	xpos = (xlims(p)[2] - xlims(p)[1])*0.02 + xlims(p)[1]
+	ypos1 = (ylims(p)[2] - ylims(p)[1])*0.14 + ylims(p)[1]
+	annotate!(xpos, ypos1, 
+		("difference in means = $(round(mean(df2[!, ycol]) - mean(df1[!, ycol]), digits=2))",
+		10, :left))
+	hline!([mean(df1[!, ycol])]; label="Unregulated Mean of observations", c=1, lw=1, style=:dashdot)
+	hline!([mean(df2[!, ycol])]; label="Regulated Mean of observations", c=c3, lw=2, style=:dash)
+	# Plot last values
+	plot!([percentile_range(xlims(p), 0.7), xlims(p)[2]], [last(y1), last(y1)], 
+		c=1, lw=1, style=:solid, label="Unregulated final kernel value")
+	plot!([percentile_range(xlims(p), 0.7), xlims(p)[2]], [last(y2), last(y2)], 
+		c=c3, lw=2, style=:dot, label="Regulated final kernel value")
+	ypos2 = (ylims(p)[2] - ylims(p)[1])*0.08 + ylims(p)[1]
+	annotate!(xpos, ypos2, 
+		("difference in final values = $(round(last(y2) - last(y1), digits=2))",
+		10, :left))
+end;
 
 # ╔═╡ d9fdb9cf-dbb0-4656-8ded-ad7f7c4d3a1f
 md"# Notebook Settings"
@@ -1242,7 +1344,6 @@ begin
 	cols223d = [:ddens, :dwhite, :dfeml, :dage65, :dhs, :dcoll, :durban, :dpoverty, :dvacant, :downer, :dplumb, :dtaxprop, :tsp7576]
 	formula223d = (term(:dlhouse) ~ sum(term.(Symbol.(cols223d))))
 	reg223d = reg(pollution, formula223d, Vcov.robust(); weights=:pop7080)
-	regtable(reg223c, reg223d, renderSettings = latexOutput("reg223-reducedform.tex"))
 	
 	# Make Reg Table
 	mystats223a = NamedTuple{(:means, :controls)}(
@@ -1255,7 +1356,7 @@ begin
 		regressors = ["tsp7576"], print_estimator_section=false,
 		custom_statistics=mystats223a,
 		labels = Dict("__LABEL_CUSTOM_STATISTIC_controls__" => "Controls", "__LABEL_CUSTOM_STATISTIC_shocks__" => "Econ. Shocks",
-		"__LABEL_CUSTOM_STATISTIC_means__" => "dlhouse Mean"),
+		"__LABEL_CUSTOM_STATISTIC_means__" => "Dependent Var Mean"),
 		renderSettings = asciiOutput())
 end
 
@@ -1452,7 +1553,8 @@ begin
 	                  yerror=1.96*se121,
 	                  y_ub=ub121,
 	                  y_lb=lb121)
-	df121 = reduce(vcat, [[df121]; [DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
+	df121 = reduce(vcat, [[df121];
+		[DataFrame(tAvg=22,yhat=0,yerror=0,y_lb=0,y_ub=0)]])
 	df121 = sort!(df121, :tAvg)
 	
 	plot(df121[!,:tAvg], repeat([0], nrow(df121)), c="gray", s=:dash, label="")
@@ -1607,6 +1709,19 @@ plot123b(:emp_farm_ln, df)
 # ╔═╡ c4261949-5b6a-4727-90e0-bde6ca907186
 # ╠═╡ show_logs = false
 plot123b(:inc_farm_prop_inc_lpc, df)
+
+# ╔═╡ f4398ec9-d171-4bc3-a76b-8cd1d44145c4
+begin
+	histogram(df[!,"tempA32"], 
+		bins=Int(ceil(maximum(df[!,"tempA32"]))), 
+		yaxis=(:log10), 
+		label=nothing)
+	# ylims!((0,100))
+	ylabel!("log(counts)")
+	xlabel!("Average days in >32°C bin")
+	title!("Historgram of >32°C temperature bin")
+	yticks!([1e0, 1e1, 1e2, 1e3, 1e4, 1e5])
+end
 
 # ╔═╡ 8879e813-c350-4fe0-8c92-44a80e361588
 """Save temperature variables
@@ -3166,12 +3281,15 @@ version = "0.9.1+5"
 # ╟─aa60b5ef-3aeb-42ff-b679-e00b28205267
 # ╟─6a978c31-51c4-47a8-b626-14ca00de0370
 # ╟─952ba66d-3264-405e-ad52-9f0a951e244c
-# ╠═37882765-26f6-4e68-af76-e64a5a5068fe
-# ╠═e044b2e2-35db-4b3d-9bb0-de63cb791767
+# ╟─37882765-26f6-4e68-af76-e64a5a5068fe
+# ╟─e044b2e2-35db-4b3d-9bb0-de63cb791767
 # ╟─9a4d0f65-7c09-4c92-99fb-ff31b0453054
 # ╠═8f0a8f38-5d62-47e9-a647-e7b607149c35
-# ╠═c4261949-5b6a-4727-90e0-bde6ca907186
+# ╟─c4261949-5b6a-4727-90e0-bde6ca907186
 # ╟─68e3f5e2-382a-431e-a19e-3547e70c3a94
+# ╟─1e2c1858-8036-43f5-8f32-19a5c80f97b0
+# ╟─228dcadd-00dc-4777-92d5-698a95a2136f
+# ╟─f4398ec9-d171-4bc3-a76b-8cd1d44145c4
 # ╟─b460634b-72c1-4f56-ad00-2a550f1c660f
 # ╟─288e1ee5-809f-4108-80d1-15b5c8e67452
 # ╟─4fe46d77-791f-4e80-b715-2ccb12de37f5
@@ -3258,12 +3376,12 @@ version = "0.9.1+5"
 # ╟─9d9db365-0799-4699-8c75-c16b1820d322
 # ╟─40b4be47-8c52-466a-8130-cfc9b256452d
 # ╟─da4a328f-ef3f-44d4-90cb-b22b1519fad0
-# ╠═57754134-0b34-41b5-9366-fe7e469ee1af
+# ╟─57754134-0b34-41b5-9366-fe7e469ee1af
 # ╟─872ffa35-9f86-461c-bf77-29f4a8ad5e26
 # ╟─b5cf0297-5489-488f-a75f-586adca9f222
 # ╟─730c1994-cbee-4ec9-95a8-51e0923ef4ed
 # ╟─26d3b991-cc5c-455e-b38d-5925069cd713
-# ╠═5f31d109-b75e-4cc5-9cae-a06493009221
+# ╟─5f31d109-b75e-4cc5-9cae-a06493009221
 # ╟─96ba58aa-8028-4db7-bd76-ef3fc7f24637
 # ╟─01ce9f00-209a-4f4b-bd63-d7b02767f5a0
 # ╟─8b3041fe-3b6d-4ef2-9223-5f81a6366019
@@ -3306,10 +3424,12 @@ version = "0.9.1+5"
 # ╠═e2702c60-89f5-45fd-8903-4c27ea878e28
 # ╠═4ecef41b-ace5-49fe-9b67-aee256d4884c
 # ╠═02b1800f-6748-49a1-826e-710f4d1f32d6
+# ╠═73b91f29-3c4c-4f27-a188-e0da9ff3344c
 # ╟─05a1bce4-fe91-4e89-82cd-09a7457331ad
 # ╠═36f14f2c-330b-473a-a03b-05289d360983
 # ╠═ecbd00f1-ca73-44d8-96ba-56e01dcae8fc
 # ╠═3a721fea-a72f-4645-b45a-48f5d03d469f
+# ╠═269de191-4075-4bcd-be13-d47b1803c180
 # ╟─d9fdb9cf-dbb0-4656-8ded-ad7f7c4d3a1f
 # ╟─9fae08d1-ad8b-47a6-b284-389d7e56e8be
 # ╟─9bf60494-b58e-495e-adc0-8c9d0585880b
