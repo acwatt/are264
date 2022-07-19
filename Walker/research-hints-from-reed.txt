@@ -151,4 +151,87 @@ Energy Information Administration’s State Energy Data System (SEDS)
 
 
 
+===================================================
+Estimating costs / value using asset market (stock prices)
+===================================================
+- could I use this to value interests in space based on NASA's announcement of SpaceX award for Artemis and how it changes SpaceX's stock price?
+- What about Luxemburg's annoucement of their single-price winner, and compared to the other 4 previous winners?
+
+ATTAINMENT COSTS
+- compare polluting firms in attainment and nonattainment counties that have similar amounts of recorded pollution?
+
+- Walker 2012 ignores what happens to potentially new firms that are prevented from entering the market in the county because of nonattainment status: what is the lost benefit from those firms not entering and the loss of potential jobs
+
+
+
+===================================================
+Admin data
+===================================================
+Federal research data center
+- Expect 1-4 mo proposal writing, 1 year of waiting, 3 mo of special status, ??? mo for analysis
+- need to specify every dataset and variable that you would be using
+-> talk to people who've used the data, read papers that used this data, download the survey forms that are used to create the data
+- proposal: need to include in proposal about how you're going to benefit the census (how are you going to improve their data / analysis?)
+- census wants to have benefits to them and their data, but don't care necessarily about feasibility of an academic paper (though they do have some criteria for producing analysis that provides social welfare / policy analysis estimates)
+- finite timeline (3 years ish)
+
+MISSINGNESS:
+- estimate market power of all firms in counties with AQS monitors
+- does market power of high polluting firms in a county / region lead to more missingness for counties that are at risk of being nonattainment?
+- think of Colorado example of NAAQS  permitting office - were there firms pressuring/nudging/bribing the public officials?
+
+
+
+
+
+===================================================
+Production functions
+===================================================
+Firm level dataset: Compustat (publically traded firms)
+
+ESTIMATING PRODUCTION FUNCTIONS
+- complicated because data comes in expenditures and revenues, but want quantities
+- divide expenditure/revenues by prices
+- industry level price indicies (price deflators), so lots of error in price measurements
+- capital is not directly observed in the dataset
+- capital stocks are imputed (investment amount -> capital stock -> depreciation rates) "perpetual inventory method"
+- OVB is a huge part of the lit
+
+
+
+===================================================
+Modeling regulators
+===================================================
+See Greenstone 2018: The value of regulatory discretion
+
+- See Butaine 2022 WP: Citizen Participation and Government Accountability (notification 
+- is there an EJ version of this in the United States or elsewhere?
+
+
+
+
+
+===================================================
+Funding experiments
+===================================================
+- Xlab (UCB) for students, good for small pilots
+- JPAL-K-CAI (env/climate) funds for larger things
+- All experiments require IRB approval before running
+- Almost all experiments are pre-registered these days via AEA RCT registry
+- Increasingly common to see section on \ethical considerations" in papers
+- Researchers beginning to use \Social Science Prediction Platform" to shape null/priors
+--> if your null is anchored around 0.2, how much power/data do you need to show that?
+
+
+
+
+ 
+
+
+
+
+
+
+
+
 
