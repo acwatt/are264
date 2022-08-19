@@ -1,0 +1,217 @@
+For Thursday, please read the following two papers on measurement if you haven't already: 
+
+Fowlie, M., Rubin, E., & Walker, R. (2019, May). Bringing satellite-based air quality estimates down to earth. In AEA Papers and Proceedings (Vol. 109, pp. 283-88).
+Currie, J., Voorheis, J., & Walker, R. (Forthcoming). What caused racial disparities in particulate exposure to fall? New evidence from the Clean Air Act and satellite-based measures of air quality. American Economic Review.
+We will likely move into Section II of the course on non-market valuation on Thursday. If you want to get ahead, feel free to look at this paper: 
+
+Chay, K. Y., & Greenstone, M. (2003). The Impact of Air Pollution on Infant Mortality: Evidence from Geographic Variation in Pollution Shocks Induced by a Recession. The Quarterly Journal of Economics, 1121-1167.
+
+
+We are going to start covering non-market valuation in the context of air pollution damages on Tuesday. Please take a look at the following papers in advance of class: 
+
+Hsiang, S., Oliva, P., & Walker, R. (2020). The distribution of environmental damages. Review of Environmental Economics and Policy.
+
+Chay, K. Y., & Greenstone, M. (2003). The impact of air pollution on infant mortality: evidence from geographic variation in pollution shocks induced by a recession. The quarterly journal of economics, 118(3), 1121-1167.
+
+Deryugina, T., Heutel, G., Miller, N. H., Molitor, D., & Reif, J. (2019). The mortality and medical costs of air pollution: Evidence from changes in wind direction. American Economic Review, 109(12), 4178-4219.
+
+Chen, Y., Ebenstein, A., Greenstone, M., & Li, H. (2013). Evidence on the impact of sustained exposure to air pollution on life expectancy from China’s Huai River policy. Proceedings of the National Academy of Sciences, 110(32), 12936-12941.
+
+Carleton, T. A., & Hsiang, S. M. (2016). Social and economic impacts of climate. Science, 353(6304).
+
+Burke, M., Hsiang, S. M., & Miguel, E. (2015). Global non-linear effect of temperature on economic production. Nature.
+
+Barreca, A., Clay, K., Deschenes, O., Greenstone, M., & Shapiro, J. S. (2016). Adapting to climate change: The remarkable decline in the US temperature-mortality relationship over the twentieth century. Journal of Political Economy, 124(1), 105-159.
+
+
+
+
+
+
+
+We are going to wrap up our discussion of climate change impacts after the break and begin talking about other methods used in valuation ranging from revealed preference approaches to stated preference approaches. 
+
+I am pasting a list of papers we are going to touch on below - please look at the starred papers in more detail. 
+
+Lastly, I posted Problem Set 1 on bCourses. The first half of the problem set pertains to material we have already covered. The second half of the problem set addresses material we will cover next week. 
+
+Have a great spring break. 
+
+-Reed
+
+**Auffhammer, M. (2018). Quantifying economic damages from climate change. Journal of Economic Perspectives, 32(4), 33-52.
+
+ 
+Auffhammer, M., Hsiang, S. M., Schlenker, W., & Sobel, A. (2020). Using weather data and climate model output in economic analyses of climate change. Review of Environmental Economics and Policy. 
+Pindyck, R. S. (2013). Climate change policy: what do the models tell us?. Journal of Economic Literature, 51(3), 860-72.
+ 
+**Hsiang, S. M., Burke, M., & Miguel, E. (2013). "Quantifying the influence of climate on human conflict." Science, 341(6151), 1235367 (including Supplementary Appendix!)
+ 
+Moore, F. C., Baldos, U., Hertel, T., & Diaz, D. (2017). New science of climate change impacts on agriculture implies higher social cost of carbon. Nature communications, 8(1), 1-9.
+ 
+Costinot, A., Donaldson, D., & Smith, C. (2016). Evolving comparative advantage and the impact of climate change in agricultural markets: Evidence from 1.7 million fields around the world. Journal of Political Economy, 124(1), 205-248.
+ 
+Black, S. E. (1999). Do better schools matter? Parental valuation of elementary education. The quarterly journal of economics, 114(2), 577-599.
+ 
+Rosen, S. (1974). Hedonic prices and implicit markets: product differentiation in pure competition. Journal of political economy, 82(1), 34-55.
+
+**Greenstone, M., & Gallagher, J. (2008). Does hazardous waste matter? Evidence from the housing market and the superfund program. The Quarterly Journal of Economics, 123(3), 951-1003.
+ 
+Banzhaf, H. S. (2021). Difference-in-differences hedonics. Journal of Political Economy, 129(8), 2385-2414.
+ 
+Gamper-Rabindran, S., & Timmins, C. (2013). Does cleanup of hazardous waste sites raise housing values? Evidence of spatially localized benefits. Journal of Environmental Economics and Management, 65(3), 345-360.
+ 
+Mendelsohn, R., Nordhaus, W. D., & Shaw, D. (1994). The impact of global warming on agriculture: a Ricardian analysis. The American economic review, 753-771.
+ 
+**Schlenker, W., Hanemann, W. M., & Fisher, A. C. (2005). Will US agriculture really benefit from global warming? Accounting for irrigation in the hedonic approach. American Economic Review, 95(1), 395-406. 
+ 
+**Deschênes, O., & Greenstone, M. (2007). The economic impacts of climate change: evidence from agricultural output and random fluctuations in weather. American economic review, 97(1), 354-385. 
+ 
+Arrow, K., Solow, R., Portney, P. R., Leamer, E. E., Radner, R., & Schuman, H. (1993). Report of the NOAA panel on contingent valuation. Federal register, 58(10), 4601-4614.
+ 
+Kling, C. L., Phaneuf, D. J., & Zhao, J. (2012). From Exxon to BP: Has some number become better than no number?. Journal of Economic Perspectives, 26(4), 3-26. 
+ 
+Carson, R. T. (2012). Contingent valuation: A practical alternative when prices aren't available. Journal of economic perspectives, 26(4), 27-42.
+ 
+Hausman, J. (2012). Contingent valuation: from dubious to hopeless. Journal of economic perspectives, 26(4), 43-56.
+
+
+
+
+
+
+
+
+
+
+
+Class reading for Thursday piggybacks on the previous announcement, starting with Black (1999) which we have already discussed. 
+
+Here is a link (Links to an external site.) to a helpful discussion on discount rates and the social cost of carbon
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Hi Folks - we are going to wrap up our discussion of non-market valuation on Tuesday of next week. This will include a brief discussion of stated preference methods. We will then start discussing benefit-cost analysis / program evaluation with more of a focus on the regulatory cost side of the equation. Please take a look at the following papers for next week (which we will cover on both Tuesday and Thursday). Starred** being the papers we will spend the most time on... 
+
+Gollop, F. M., & Roberts, M. J. (1983). Environmental regulations and productivity growth: the case of fossil-fueled electric power generation. The Journal of Political Economy, 654-674.
+
+Jaffe, A. B., Peterson, S. R., Portney, P. R., & Stavins, R. N. (1995). Environmental regulation and the competitiveness of US manufacturing: what does the evidence tell us?. Journal of Economic literature, 33(1), 132-163.
+
+Carlson, C., Burtraw, D., Cropper, M., & Palmer, K. L. (2000). Sulfur dioxide control by electric utilities: What are the gains from trade?. Journal of political Economy, 108(6), 1292-1326.
+
+**Joskow, P. L., & Rose, N. L. (1989). The effects of economic regulation. Handbook of industrial organization, 2, 1449-1506.
+
+Fullerton, D. (2011). Six distributional effects of environmental policy. Risk analysis, 31(6), 923-929.
+
+Parry, I. W., Sigman, H., Walls, M., & Williams III, R. C. (2005). The incidence of pollution control policies (No. w11438). National Bureau of Economic Research
+
+Meng, Kyle C. (2017). Using a Free Permit Rule to Forecast the Marginal Abatement Cost of Proposed Climate Policy. Forthcoming, American Economic Review.
+
+Greenstone, M. (2002). The Impacts of Environmental Regulations on Industrial Activity: Evidence from the 1970 and 1977 Clean Air Act Amendments and the Census of Manufactures. Journal of Political Economy, 110(6), 1175-1219.
+
+**Walker, W. R. (2013). The Transitional Costs of Sectoral Reallocation: Evidence From the Clean Air Act and the Workforce. The Quarterly Journal of Economics, 128(4), 1787-1835.
+
+**Shapiro, J. S., & Walker, R. (2021). Is Air Pollution Regulation Too Stringent? (No. w28199). National Bureau of Economic Research.
+
+Greenstone, M., List, J. A., & Syverson, C. (2012). The effects of environmental regulation on the competitiveness of US manufacturing (No. w18392). National Bureau of Economic Research.
+
+**Ryan, S. P. (2012). The costs of environmental regulation in a concentrated industry. Econometrica, 80(3), 1019-1061.
+
+**Cicala, S. (2022). Imperfect markets versus imperfect regulation in US electricity generation. American Economic Review, 112(2), 409-41.
+
+**Cicala, S. (2015). When does regulation distort costs? lessons from fuel procurement in us electricity generation. American Economic Review, 105(1), 411-44.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Next Tuesday we are going to round out our discussion of the benefits/costs of energy/environmental policy by discussing the following set of papers: 
+
+**Walker, W. R. (2013). The Transitional Costs of Sectoral Reallocation: Evidence From the Clean Air Act and the Workforce. The Quarterly Journal of Economics, 128(4), 1787-1835.
+
+**Shapiro, J. S., & Walker, R. (2021). Is Air Pollution Regulation Too Stringent? (No. w28199). National Bureau of Economic Research.
+
+**Cicala, S. (2022). Imperfect markets versus imperfect regulation in US electricity generation. American Economic Review, 112(2), 409-41.
+
+We will then transition a bit to introduce / discuss methods surrounding production function estimation. If you want a head start, then please look at the following set of papers, which we will likely introduce on Tuesday and dive into on Thursday. 
+
+Ackerberg, D. A., Caves, K., & Frazer, G. (2015). Identification properties of recent production function estimators. Econometrica, 83(6), 2411-2451.
+
+De Loecker, J., & Syverson, C. (2021). An industrial organization perspective on productivity. In Handbook of Industrial Organization (Vol. 4, No. 1, pp. 141-223). Elsevier.
+
+
+
+
+
+
+
+
+
+
+
+
+Next week we are going to dive a bit deeper into production functions and some applications. Please take a look at the following papers in advance of class on Tuesday. We will likely not cover all of this on Tuesday and will finish this discussion on Thursday. Have a great weekend (slides posted). 
+
+Ackerberg, D. A., Caves, K., & Frazer, G. (2015). Identification properties of recent production function estimators. Econometrica, 83(6), 2411-2451.
+
+Greenstone, M., List, J. A., & Syverson, C. (2012). The effects of environmental regulation on the competitiveness of US manufacturing (No. w18392). National Bureau of Economic Research.
+
+De Loecker, J., & Syverson, C. (2021). An industrial organization perspective on productivity. In Handbook of Industrial Organization (Vol. 4, No. 1, pp. 141-223). Elsevier.
+
+Collard-Wexler, A., & De Loecker, J. (2015). Reallocation and technology: Evidence from the US steel industry. American Economic Review, 105(1), 131-71.
+
+Ganapati, S., Shapiro, J. S., & Walker, R. (2020). Energy cost pass-through in US manufacturing: Estimates and implications for carbon taxes. American Economic Journal: Applied Economics, 12(2), 303-42.
+
+Muehlegger, E., & Sweeney, R. L. (2019). Pass-through of own and rival cost shocks: Evidence from the US Fracking boom. The Review of Economics and Statistics, 1-32.
+
+
+
+
+
+
+
+
+
+
+
+
+
+Tomorrow, we will be finishing up with production functions, discussing 
+
+Collard-Wexler, A., & De Loecker, J. (2015). Reallocation and technology: Evidence from the US steel industry. American Economic Review, 105(1), 131-71.
+Ganapati, S., Shapiro, J. S., & Walker, R. (2020). Energy cost pass-through in US manufacturing: Estimates and implications for carbon taxes. American Economic Journal: Applied Economics, 12(2), 303-42.
+Muehlegger, E., & Sweeney, R. L. (2019). Pass-through of own and rival cost shocks: Evidence from the US Fracking boom. The Review of Economics and Statistics, 1-32.
+
+On Thursday, we will switch gears to discuss some Principal-Agent problems that show up in Energy/Environmental Economics. Readings for Thursday below: 
+
+*Duflo, E., Greenstone, M., Pande, R., & Ryan, N. (2018). The value of regulatory discretion: Estimates from environmental inspections in India. Econometrica, 86(6), 2123-2160.
+Duflo, E., Greenstone, M., Pande, R., & Ryan, N. (2013). Truth-telling by third-party auditors and the response of polluting firms: Experimental evidence from India. The Quarterly Journal of Economics, 128(4), 1499-1545.
+*Greenstone, M., He, G., Jia, R., & Liu, T. (2022). Can Technology Solve the Principal-Agent Problem? Evidence from China's War on Air Pollution. American Economic Review: Insights, 4(1), 54-70.
+*Buntaine, M., Greenstone, M., He, G., Liu, M., Wang, S., & Zhang, B. (2021). Citizen Participation and Government Accountability: National-Scale Experimental Evidence from Pollution Appeals in China.
+*Cicala, S., Hémous, D., & Olsen, M. (2020). Adverse selection as a policy instrument: unraveling climate change. Universities of Chicago, Zurich, and Copenhagen.
+Wagner, K. (2019). Adaptation and adverse selection in markets for natural disaster insurance. Available at SSRN 3467329.
+Gillingham, K., Harding, M., & Rapson, D. (2012). Split incentives in residential energy consumption. The Energy Journal, 33(2).
+Davis, L. (2021). Evidence of a Homeowner-Renter Gap for Electric Appliances. Energy Institute at Haas Working Paper, 316.
+
+
+
+
